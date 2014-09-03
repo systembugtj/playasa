@@ -1,0 +1,6 @@
+lib
+out
+Debug Unicode
+binaries
+Release
+*.suo
