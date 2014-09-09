@@ -7,3 +7,5 @@ Release
 *.dll
 *.rsc
 lang
+/src/ipch
+/src/UpgradeLog.htm
