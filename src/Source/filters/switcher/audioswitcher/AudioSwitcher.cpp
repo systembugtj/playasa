@@ -34,6 +34,7 @@
 #include <initguid.h>
 #include "..\..\..\..\include\moreuuids.h"
 #include "..\..\..\svplib\svplib.h"
+#include "..\apps\shared\sharedlib\utility.h"
 #include <afxtempl.h>
 //#define TRACE SVP_LogMsg5
 #undef  SVP_LogMsg5
@@ -1257,10 +1258,10 @@ STDMETHODIMP CAudioSwitcherFilter::SetEQControl ( int lEQBandControlPreset, floa
 		BOOL bNoPerset = true;
 		if(lEQBandControlPreset > 0){
 
-			AppSettings& s = AfxGetAppSettings();
+			GlobalSettings & s = SysUtil.CurrentSettings;
 			eq_perset_setting t;
 
-			if( s.eqPerset.Lookup(lEQBandControlPreset , t) ){
+			if( s.EqPerset.Lookup(lEQBandControlPreset , t) ){
 				memcpy(m_pEQBandControlCurrent, t.f_amp, sizeof(m_pEQBandControlCurrent));
 				bNoPerset = false;
 			}

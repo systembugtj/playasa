@@ -21,20 +21,6 @@
 
 #pragma once
 
-#ifdef UNICODE
-#ifdef DEBUG
-#pragma comment(lib, "dsutil")
-#else
-#pragma comment(lib, "dsutil")
-#endif
-#else
-#ifdef DEBUG
-#pragma comment(lib, "dsuti")
-#else
-#pragma comment(lib, "dsutil")
-#endif
-#endif
-
 //#define DNew new
 #include "SharedInclude.h"
 

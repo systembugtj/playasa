@@ -96,8 +96,9 @@
     <OutDir>$(SolutionDir)\out\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
-    <IntDir>$(SolutionDir)\out\obj\$(ProjectName)\</IntDir>
-    <OutDir>$(SolutionDir)lib\$(Platform)\</OutDir>
+    <IntDir>$(SolutionDir)out\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)out\lib\$(Platform)\</OutDir>
+    <TargetName>$(ProjectName)DU</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug lib|Win32'">
     <ClCompile>
@@ -141,7 +142,7 @@
     </ClCompile>
     <Lib />
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)out\bin;$(SolutionDir)lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)out\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>

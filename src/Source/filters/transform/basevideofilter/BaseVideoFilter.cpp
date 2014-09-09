@@ -27,6 +27,7 @@
 
 #include <initguid.h>
 #include "..\..\..\..\include\moreuuids.h"
+#include "..\apps\shared\sharedlib\Utility.h"
 #include <afxtempl.h>
 
 #undef   SVP_LogMsg5
@@ -695,8 +696,8 @@ VIDEO_OUTPUT_FORMATS DefaultFormatsRGB[] =
 
 void CBaseVideoFilter::GetOutputFormats (int& nNumber, VIDEO_OUTPUT_FORMATS** ppFormats)
 {
-	AppSettings& s = AfxGetAppSettings();
-	if(s.bRGBOnly){
+	GlobalSettings & s = SysUtil.CurrentSettings;
+	if(s.RGBOnly){
 		nNumber		= countof(DefaultFormatsRGB);
 		*ppFormats	= DefaultFormatsRGB;
 	}else{

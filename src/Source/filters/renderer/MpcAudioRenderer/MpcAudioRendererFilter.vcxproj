@@ -156,7 +156,7 @@
     <IntDir>$(SolutionDir)\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
-    <LibraryPath>$(SolutionDir)lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <LibraryPath>$(SolutionDir)out\lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
     <TargetExt>.ax</TargetExt>
     <OutDir>$(SolutionDir)out\bin\</OutDir>
     <IntDir>$(SolutionDir)out\obj\$(ProjectName)\</IntDir>

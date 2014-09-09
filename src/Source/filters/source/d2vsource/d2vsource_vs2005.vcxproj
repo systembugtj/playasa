@@ -150,7 +150,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <IncludePath>$(SolutionDir)Source\filters\BaseClasses;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
+    <LibraryPath>$(SolutionDir)out\lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
     <TargetExt>.ax</TargetExt>
     <OutDir>$(SolutionDir)out\bin\</OutDir>
     <IntDir>$(SolutionDir)out\obj\$(ProjectName)\</IntDir>
@@ -197,7 +197,7 @@
       <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>strmbaseDU.lib;basesourceDU.lib;foundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).ax</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)out\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>D2VSource.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>

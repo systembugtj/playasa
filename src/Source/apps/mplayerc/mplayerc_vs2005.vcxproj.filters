@@ -619,9 +619,6 @@
     <ClInclude Include="KeyProvider.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="MainFrm.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="MakeMultiplyBmp.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -629,9 +626,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="MediaTypesDlg.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mplayerc.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="NEWOSDWnd.h">
@@ -1118,6 +1112,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mplayerc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

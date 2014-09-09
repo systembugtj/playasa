@@ -8,6 +8,7 @@
 
 #include <streams.h>
 #include <afxtempl.h>
+#include "..\apps\mplayerc\mplayerc.h"
 
 #pragma pack(push, 1)
 typedef struct

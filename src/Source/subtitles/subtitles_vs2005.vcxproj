@@ -84,7 +84,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <IncludePath>$(SolutionDir)Source\filters\BaseClasses;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <TargetName>$(ProjectName)DU</TargetName>
-    <OutDir>$(SolutionDir)lib\$(Platform)\</OutDir>
+    <OutDir>$(SolutionDir)out\lib\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

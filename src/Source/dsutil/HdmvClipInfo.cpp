@@ -368,7 +368,6 @@ HRESULT CHdmvClipInfo::ReadChapters(CString strPlaylistFile, CAtlList<CHdmvClipI
 		}
 
 		DWORD				dwPos;
-		DWORD				dwTemp;
 		SHORT				nMarkCount;
 
 		ReadDword();			// PlayList_start_address

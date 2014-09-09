@@ -26,6 +26,7 @@
 #include <afxtempl.h>
 
 #include "..\svplib\svplib.h"
+#include "..\apps\shared\sharedlib\Utility.h"
 //#define  LOGSUBRECT
 
 #undef  SVP_LogMsg5
@@ -1034,7 +1035,7 @@ STDMETHODIMP ISubPicAllocatorPresenterImpl::NonDelegatingQueryInterface(REFIID r
 void ISubPicAllocatorPresenterImpl::AlphaBltSubPic(CSize size, SubPicDesc* pTarget)
 {
 	// TODO: Figure out how to get the ButtomSubOffset;
-	size.cy -= AfxGetMyApp()->GetBottomSubOffset();
+	size.cy -= SysUtil.CurrentSettings.GetBottomSubOffset();
 
 	CComPtr<ISubPic> pSubPic;
 	CComPtr<ISubPic> pSubPic2;

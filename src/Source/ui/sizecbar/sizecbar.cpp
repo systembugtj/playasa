@@ -60,7 +60,7 @@
 
 #include <streams.h>
 #include <afxtempl.h>
-#include "..\..\apps\mplayerc\mplayerc.h"
+#include "..\..\apps\shared\sharedlib\utility.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -536,7 +536,7 @@ void CSizingControlBar::OnNcPaint()
     // get window DC that is clipped to the non-client area
     CWindowDC dc(this); // the HDC will be released by the destructor
 
-	AppSettings& s = AfxGetAppSettings();
+	GlobalSettings & s = SysUtil.CurrentSettings;
 
     CRect rcClient, rcBar;
     GetClientRect(rcClient);
@@ -1156,26 +1156,25 @@ void CSizingControlBar::LoadState(LPCTSTR lpszProfileName)
             }
     }
 #endif //_SCB_REPLACE_MINIFRAME && !_SCB_MINIFRAME_CAPTION
-
-    CMPlayerCApp* pApp = AfxGetMyApp();
+	GlobalSettings & s = SysUtil.CurrentSettings;
 
     TCHAR szSection[256];
     wsprintf(szSection, _T("%s-SCBar-%d"), lpszProfileName,
         GetDlgCtrlID());
 
-    m_szHorz.cx = max(m_szMinHorz.cx, (int) pApp->GetProfileInt(
+    m_szHorz.cx = max(m_szMinHorz.cx, (int) s.GetProfileInt(
         szSection, _T("sizeHorzCX"), m_szHorz.cx));
-    m_szHorz.cy = max(m_szMinHorz.cy, (int) pApp->GetProfileInt(
+    m_szHorz.cy = max(m_szMinHorz.cy, (int) s.GetProfileInt(
         szSection, _T("sizeHorzCY"), m_szHorz.cy));
 
-    m_szVert.cx = max(m_szMinVert.cx, (int) pApp->GetProfileInt(
+	m_szVert.cx = max(m_szMinVert.cx, (int)s.GetProfileInt(
         szSection, _T("sizeVertCX"), m_szVert.cx));
-    m_szVert.cy = max(m_szMinVert.cy, (int) pApp->GetProfileInt(
+    m_szVert.cy = max(m_szMinVert.cy, (int) s.GetProfileInt(
         szSection, _T("sizeVertCY"), m_szVert.cy));
 
-    m_szFloat.cx = max(m_szMinFloat.cx, (int) pApp->GetProfileInt(
+    m_szFloat.cx = max(m_szMinFloat.cx, (int) s.GetProfileInt(
         szSection, _T("sizeFloatCX"), m_szFloat.cx));
-    m_szFloat.cy = max(m_szMinFloat.cy, (int) pApp->GetProfileInt(
+    m_szFloat.cy = max(m_szMinFloat.cy, (int) s.GetProfileInt(
         szSection, _T("sizeFloatCY"), m_szFloat.cy));
 }
 
@@ -1186,20 +1185,20 @@ void CSizingControlBar::SaveState(LPCTSTR lpszProfileName)
     ASSERT_VALID(this);
     ASSERT(GetSafeHwnd());
 
-    CMPlayerCApp* pApp = AfxGetMyApp();
+	GlobalSettings & s = SysUtil.CurrentSettings;
 
     TCHAR szSection[256];
     wsprintf(szSection, _T("%s-SCBar-%d"), lpszProfileName,
         GetDlgCtrlID());
 
-    pApp->WriteProfileInt(szSection, _T("sizeHorzCX"), m_szHorz.cx);
-    pApp->WriteProfileInt(szSection, _T("sizeHorzCY"), m_szHorz.cy);
+    s.WriteProfileInt(szSection, _T("sizeHorzCX"), m_szHorz.cx);
+	s.WriteProfileInt(szSection, _T("sizeHorzCY"), m_szHorz.cy);
 
-    pApp->WriteProfileInt(szSection, _T("sizeVertCX"), m_szVert.cx);
-    pApp->WriteProfileInt(szSection, _T("sizeVertCY"), m_szVert.cy);
+	s.WriteProfileInt(szSection, _T("sizeVertCX"), m_szVert.cx);
+	s.WriteProfileInt(szSection, _T("sizeVertCY"), m_szVert.cy);
 
-    pApp->WriteProfileInt(szSection, _T("sizeFloatCX"), m_szFloat.cx);
-    pApp->WriteProfileInt(szSection, _T("sizeFloatCY"), m_szFloat.cy);
+	s.WriteProfileInt(szSection, _T("sizeFloatCX"), m_szFloat.cx);
+	s.WriteProfileInt(szSection, _T("sizeFloatCY"), m_szFloat.cy);
 }
 
 void CSizingControlBar::GlobalLoadState(CFrameWnd* pFrame,

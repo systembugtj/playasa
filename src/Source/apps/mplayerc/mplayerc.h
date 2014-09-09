@@ -36,7 +36,7 @@
 #include "Model\appSQLlite.h"
 //#include "..\..\..\Updater\cupdatenetlib.h"
 #include "..\..\filters\switcher\AudioSwitcher\AudioSwitcher.h"
-#include "..\shared\sharedlib\Utility.h";
+#include "..\shared\sharedlib\Utility.h"
 
 class cupdatenetlib;
 
@@ -64,14 +64,6 @@ extern bool LoadResource(UINT resid, CStringA& str, LPCTSTR restype);
 extern void GetSystemFontWithScale(CFont* pFont, double dDefaultSize = 14.0, int iWeight = FW_NORMAL, CString szTryFontName = _T(""));
 extern HACCEL GetAcceleratorTable();
 
-struct eq_perset_setting
-{
-	/* Filter static config */
-	CString szPersetName;
-	int  i_band;
-	float f_preamp;
-	float f_amp[MAX_EQ_BAND];   /* Per band amp */
-};
 
 /////////////////////////////////////////////////////////////////////////////
 // CMPlayerCApp:
@@ -373,7 +365,7 @@ public:
 		CAtlList<CString> slFiles, slDubs, slSubs, slFilters;
 		__int64 rtStart;
 		CSize fixedWindowSize;
-		bool HasFixedWindowSize() {return fixedWindowSize.cx > 0 || fixedWindowSize.cy > 0;}
+		bool HasFixedWindowSize() { return fixedWindowSize.cx > 0 || fixedWindowSize.cy > 0; }
 		// int iFixedWidth, iFixedHeight;
 		int iMonitor;
 
@@ -389,7 +381,7 @@ public:
 		UINT tCheckUpdaterInterleave;
 
 		CString szSVPSubPerf;
-		int fVMDetected ;
+		int fVMDetected;
 		CString szStartUPCheckExts;
 		bool fPopupStartUpExtCheck;
 		bool fHideCaptionMenu;
@@ -426,7 +418,7 @@ public:
 		int iSVPRenderType;
 		int skinid;
 		std::wstring skinname;
-		
+
 		bool bExternalSubtitleTime;
 		bool bDisableSoftCAVC;
 		bool bDisableSoftCAVCForce;
@@ -443,13 +435,13 @@ public:
 		int nUseGPUCUDA;
 		int useFFMPEGWMV;
 		int autoDownloadSVPSub;
-        int autoIconvSubBig2GB;
-        int autoIconvSubGB2BIG;
+		int autoIconvSubBig2GB;
+		int iAutoIconvSubGB2BIG;
 		int iDX9Resizer;
 		bool fVMR9MixerMode;
 		bool fVMR9MixerYUV;
 		bool fFasterSeeking;
-		int				iLanguage;
+		int	 iLanguage;
 		int  i3DStereo;
 		int  i3DStereoKeepAspectRatio;
 
@@ -510,7 +502,7 @@ public:
 				iEVRHighColorResolution = 0;
 				iEVROutputRange = 0;
 			}
-			
+
 		};
 
 		CRendererSettingsEVR m_RenderSettings;
@@ -536,10 +528,10 @@ public:
 		CSize AspectRatio;
 		bool fKeepHistory;
 
-        bool bDontDeleteOldSubFileAutomaticly;
+		bool bDontDeleteOldSubFileAutomaticly;
 
 		CString szUELastPanel;
-		
+
 		bool bHasCUDAforCoreAVC;
 		bool bSupportFFGPU;
 		bool bDisableEVR;
@@ -597,12 +589,12 @@ public:
 		int tAudioTimeShift;
 		bool fCustomChannelMapping;
 		bool fCustomSpeakers;
-		
+
 		float pSpeakerToChannelMap2[MAX_INPUT_CHANNELS][MAX_OUTPUT_CHANNELS][MAX_OUTPUT_CHANNELS][MAX_NORMALIZE_CHANNELS]; //Meaning [Total Channel Number] [Speaker] = 1 << Channel
 		float pSpeakerToChannelMap2Custom[MAX_INPUT_CHANNELS][MAX_OUTPUT_CHANNELS][MAX_OUTPUT_CHANNELS][MAX_NORMALIZE_CHANNELS];
 		float pSpeakerToChannelMapOffset[MAX_INPUT_CHANNELS][MAX_NORMALIZE_CHANNELS];
-		float pEQBandControlCustom[MAX_EQ_BAND+1];
-		
+		float pEQBandControlCustom[MAX_EQ_BAND + 1];
+
 		int pEQBandControlPerset;
 
 		CAtlMap<DWORD, eq_perset_setting > eqPerset;
@@ -627,19 +619,19 @@ public:
 
 		bool fWinLirc;
 		CString WinLircAddr;
-// 		CWinLircClient WinLircClient;
+		// 		CWinLircClient WinLircClient;
 		bool fUIce;
 		CString UIceAddr;
-// 		CUIceClient UIceClient;
+		// 		CUIceClient UIceClient;
 
 		CMediaFormats Formats;
-		
+
 		UINT SrcFilters, TraFilters, DXVAFilters, FFmpegFilters;
 		BOOL bDVXACompat;
 
 		CString logofn;
 
-//		UINT logostretch;
+		//		UINT logostretch;
 		bool logoext;
 
 		BOOL fBUltraFastMode;
@@ -648,7 +640,7 @@ public:
 		DWORD priority;
 		bool launchfullscreen;
 		bool htpcmode;
-        bool startAsFullscreen;
+		bool startAsFullscreen;
 
 		int nWebServerPort;
 		bool fWebServerPrintDebugInfo;
@@ -663,26 +655,26 @@ public:
 
 		CString ISDb;
 
-		struct Shader {CString label, target, srcdata;};
+		struct Shader { CString label, target, srcdata; };
 		CAtlList<Shader> m_shaders;
 		CString m_shadercombine;
 		int m_lTransparentToolbarPosOffset;
 		int m_lTransparentToolbarPosSavedOffset;
-		
+
 		CString	strShaderList;
 		CString szFGMLog;
-		CAtlMap<CString, COLORREF , CStringElementTraits<CString>> colorsTheme;
+		CAtlMap<CString, COLORREF, CStringElementTraits<CString>> colorsTheme;
 	private:
 		CString SVPSubStoreDir; //must not use this directly
 
 	public:
-		Settings();virtual ~Settings();
+		Settings(); virtual ~Settings();
 		void ThreadedLoading();
 		void SetNumberOfSpeakers(int iSS, int iNumberOfSpeakers);
 		void RegGlobalAccelKey(HWND hWnd = NULL);
 		void UpdateData(bool fSave);
 		BOOL bUserAeroUI();
-        BOOL bIsChineseUIUser();
+		BOOL bIsChineseUIUser();
 		BOOL bShouldUseGPUAcel();
 		CString GetSVPSubStorePath(BOOL spdefault = false);
 		void InitChannelMap();
@@ -695,7 +687,7 @@ public:
 		void SetFav(favtype ft, CAtlList<CString>& sl, BOOL bRecent = FALSE);
 		void DelFavByFn(favtype ft, BOOL bRecent, CString szMatch);
 		void AddFav(favtype ft, CString s, BOOL bRecent = FALSE, CString szMatch = _T(""));
-		COLORREF GetColorFromTheme(CString clrName, COLORREF clrDefault);
+		virtual COLORREF GetColorFromTheme(CString clrName, COLORREF clrDefault);
 
 		virtual void putHardwareDecoderFailCount(int value)
 		{
@@ -705,7 +697,7 @@ public:
 		{
 			return this->lHardwareDecoderFailCount;
 		}
-		
+
 		virtual void putbUserGPUCUDA(int value)
 		{
 			this->nUseGPUCUDA = value;
@@ -732,6 +724,107 @@ public:
 		{
 			return this->bNoMoreDXVA;
 		}
+
+		virtual CAtlMap<DWORD, eq_perset_setting >& getEqPerset()
+		{
+			return this->eqPerset;
+		}
+
+		virtual void putGSubFontRatio(double value)
+		{
+			this->dGSubFontRatio = value;
+		}
+		virtual double getGSubFontRatio()
+		{
+			return this->dGSubFontRatio;
+		}
+
+		virtual void putAeroGlassAvalibility(BOOL value)
+		{
+			this->bAeroGlassAvalibility = value;
+		}
+		virtual BOOL getAeroGlassAvalibility()
+		{
+			return this->bAeroGlassAvalibility;
+		}
+
+		virtual void putRGBOnly(bool value)
+		{
+			this->bRGBOnly = value;
+		}
+		virtual bool getRGBOnly()
+		{
+			return this->bRGBOnly;
+		}
+
+		virtual void putExternalSubtitleTime(bool value)
+		{
+			this->bExternalSubtitleTime = value;
+		}
+		virtual bool getExternalSubtitleTime()
+		{
+			return this->bExternalSubtitleTime;
+		}
+
+		virtual void putLanguage(int value)
+		{
+			this->iLanguage = value;
+		}
+		virtual int getLanguage()
+		{
+			return this->iLanguage;
+		}
+
+		virtual void putWriteProfileIntAutoIconvSubGB2BIG(int value)
+		{
+			this->iAutoIconvSubGB2BIG = value;
+		}
+		virtual int getAutoIconvSubGB2BIG()
+		{
+			return this->iAutoIconvSubGB2BIG;
+		}
+
+		virtual void putAutoIconvSubBig2GB(int value)
+		{
+			this->autoIconvSubBig2GB = value;
+		}
+		virtual int getAutoIconvSubBig2GB()
+		{
+			return this->autoIconvSubBig2GB;
+		}
+		// Function
+		virtual bool CanUseCUDA()
+		{
+			return CMPlayerCApp::CanUseCUDA();
+		}
+		
+		virtual void Direct3DCreate9Ex(UINT SDKVersion, LPVOID**pD3DEx)
+		{
+			CMPlayerCApp* pApp = (CMPlayerCApp*)AfxGetApp();
+			if (pApp->m_pDirect3DCreate9Ex)
+			{
+				pApp->m_pDirect3DCreate9Ex(SDKVersion, (LPVOID**)&pD3DEx);
+				if (!pD3DEx)
+				{
+					pApp->m_pDirect3DCreate9Ex(SDKVersion, (LPVOID**)&pD3DEx);
+				}
+			}
+		}
+		virtual UINT GetBottomSubOffset()
+		{
+			CMPlayerCApp* pApp = (CMPlayerCApp*)AfxGetApp();
+			pApp->GetBottomSubOffset();
+		}
+		virtual UINT GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault)
+		{
+			CMPlayerCApp* pApp = (CMPlayerCApp*)AfxGetApp();
+			return pApp->GetProfileInt(lpszSection, lpszEntry, nDefault);
+		}
+		virtual BOOL WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue)
+		{
+			CMPlayerCApp* pApp = (CMPlayerCApp*)AfxGetApp();
+			return pApp->WriteProfileInt(lpszSection, lpszEntry, nValue);
+		}
 	} m_s;
 
 public:
@@ -743,7 +836,7 @@ public:
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnAppAbout();
 	afx_msg void OnFileExit();
-  afx_msg void OnFileRestart();
+	afx_msg void OnFileRestart();
 	afx_msg void OnHelpShowcommandlineswitches();
 	bool m_bMouseIn;
 	bool m_bMouseInOutUnknown;
@@ -779,9 +872,5 @@ extern const UINT WM_MOUSEMOVEOUT;
 
 
 #define AfxGetMyApp() ((CMPlayerCApp*)AfxGetApp())
-
-
 #define AppSettings CMPlayerCApp::Settings
-
-
 #define AfxGetCurrentSettings() ((CMPlayerCApp*)AfxGetApp())->m_s

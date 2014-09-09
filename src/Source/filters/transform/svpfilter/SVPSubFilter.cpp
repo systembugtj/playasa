@@ -11,7 +11,7 @@
 
 #include <initguid.h>
 #include "..\..\..\..\include\moreuuids.h"
-
+#include "..\apps\shared\sharedlib\Utility.h"
 #include "..\..\..\svplib\svplib.h"
 
 #include "..\..\..\apps\mplayerc\DX7AllocatorPresenter.h"
@@ -309,7 +309,8 @@ HRESULT CSVPSubFilter::Transform(IMediaSample* pIn)
 			m_pSubPicQueue2->SetFPS(fps_that_we_using);
 
 		SVP_LogMsg5(L" SetFPS fps %f ", m_fps);
-		if (!AfxGetAppSettings().bExternalSubtitleTime){
+		GlobalSettings & s = SysUtil.CurrentSettings;
+		if (!s.ExternalSubtitleTime){
 
 
 			if (m_pSubPicQueue)

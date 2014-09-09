@@ -150,7 +150,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <IncludePath>$(SolutionDir)Source\filters\BaseClasses;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SolutionDir)lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)Thirdparty\pkg\trunk\unrar;</LibraryPath>
+    <LibraryPath>$(SolutionDir)out\lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)Thirdparty\pkg\trunk\unrar;</LibraryPath>
     <OutDir>$(SolutionDir)out\bin\</OutDir>
     <IntDir>$(SolutionDir)out\obj\$(ProjectName)\</IntDir>
     <TargetExt>.ax</TargetExt>

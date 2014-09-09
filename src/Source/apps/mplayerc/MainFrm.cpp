@@ -9010,7 +9010,7 @@ void CMainFrame::OnRenderModeChange(UINT nID)
 		s.iQTVideoRendererType = 1;
 		break;
 	case 	ID_VIEW_MODE_DXVA_MODE:
-		s.useGPUAcel = !s.useGPUAcel;
+		s.nUseGPUAcel = !s.nUseGPUAcel;
 		break;
 	case 	ID_VIEW_MODE_SOFT_COREAVC_MODE:
 		s.bDisableSoftCAVC = !s.bDisableSoftCAVC;
@@ -9046,11 +9046,11 @@ void CMainFrame::OnUpdateRenderModeChange(CCmdUI* pCmdUI)
 		break;
 	case 	ID_VIEW_MODE_DXVA_MODE:
 		pCmdUI->Enable(s.iSVPRenderType);
-		pCmdUI->SetCheck(s.useGPUAcel);
+		pCmdUI->SetCheck(s.nUseGPUAcel);
 
 		break;
 	case 	ID_VIEW_MODE_SOFT_COREAVC_MODE:
-		if (s.useGPUAcel &&  s.bHasCUDAforCoreAVC){
+		if (s.nUseGPUAcel &&  s.bHasCUDAforCoreAVC){
 			pCmdUI->Enable(false);
 		}
 		pCmdUI->SetCheck(s.bDisableSoftCAVC);

@@ -67,7 +67,7 @@
     <IntDir>$(SolutionDir)\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
-    <OutDir>$(SolutionDir)\out\bin\</OutDir>
+    <OutDir>$(SolutionDir)out\lib\$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

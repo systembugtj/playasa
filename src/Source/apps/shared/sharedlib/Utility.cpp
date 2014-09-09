@@ -4,9 +4,9 @@
 Utility SysUtil;
 
 Utility::Utility()
-{
+{ 
+	m_pCurrrentSettings = NULL;
 }
-
 
 Utility::~Utility()
 {

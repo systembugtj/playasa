@@ -11,6 +11,7 @@
 #include <Shlobj.h>
 #include "SVPRarLib.h"
 #include "..\..\Thirdparty\pkg\unrar.hpp"
+#include "..\apps\shared\sharedlib\utility.h"
 
 #include <d3d9.h>
 //#include <d3dx9.h>
@@ -1728,11 +1729,10 @@ UINT CSVPToolBox::GetAdapter(LPVOID lpD3D)
 	return D3DADAPTER_DEFAULT;
 }
 bool CSVPToolBox::TestD3DCreationAbility(HWND hWnd)
-{
-	//SVP_LogMsg5(L"TestD3DCreationAbility start");
+{	//SVP_LogMsg5(L"TestD3DCreationAbility start");
 
 	m_hWnd = hWnd;
-	AppSettings& s = AfxGetAppSettings();
+	GlobalSettings & s = SysUtil.CurrentSettings;
 	bool ret = true;
 	do{
 		CComPtr<IDirect3D9Ex> m_pD3DEx;
@@ -1740,16 +1740,8 @@ bool CSVPToolBox::TestD3DCreationAbility(HWND hWnd)
 		CComPtr<IDirect3DDevice9Ex> m_pD3DDevEx;
 		CComPtr<IDirect3DDevice9> m_pD3DDev;
 
-		if (AfxGetMyApp()->m_pDirect3DCreate9Ex)
-		{
-			AfxGetMyApp()->m_pDirect3DCreate9Ex(D3D_SDK_VERSION, (LPVOID**)&m_pD3DEx);
-			if(!m_pD3DEx) 
-			{
-				AfxGetMyApp()->m_pDirect3DCreate9Ex(D3D9b_SDK_VERSION, (LPVOID**)&m_pD3DEx);
-				
+		s.Direct3DCreate9Ex(D3D_SDK_VERSION, (LPVOID**)&m_pD3DEx);
 
-			}
-		}
 		if(!m_pD3DEx) 
 		{
 			m_pD3D.Attach(Direct3DCreate9(D3D_SDK_VERSION));
@@ -1788,7 +1780,7 @@ bool CSVPToolBox::TestD3DCreationAbility(HWND hWnd)
 		D3DPRESENT_PARAMETERS pp;
 		ZeroMemory(&pp, sizeof(pp));
 
-		BOOL bCompositionEnabled = s.bAeroGlassAvalibility;
+		BOOL bCompositionEnabled = s.AeroGlassAvalibility;
 
 
 		{

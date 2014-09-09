@@ -34,7 +34,7 @@ BOOL OptionAdvancedPage::OnInitDialog(HWND hwnd, LPARAM lParam)
   m_videoqualitymode = s.iSVPRenderType?0:1;
   // TODO: 检测系统是否支持硬件加速
   m_gpuaccelcheckbox.EnableWindow(s.iSVPRenderType);
-  m_enablegpuaccel = s.useGPUAcel;
+  m_enablegpuaccel = s.nUseGPUAcel;
 
   m_usecustomspeakersetting = s.fCustomSpeakers;
   m_speakers_combo.EnableWindow(m_usecustomspeakersetting);
@@ -100,7 +100,7 @@ int OptionAdvancedPage::OnApply()
     s.iRMVideoRendererType = 1;
     s.iQTVideoRendererType = 1;
   }
-  s.useGPUAcel = m_enablegpuaccel;
+  s.nUseGPUAcel = m_enablegpuaccel;
 
   s.fbUseSPDIF = m_usespdifprority?true:false;
   s.fAudioNormalize = m_usenormalize?true:false;
