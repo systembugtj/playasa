@@ -4,3 +4,6 @@ Debug Unicode
 binaries
 Release
 *.suo
+*.dll
+*.rsc
+lang
