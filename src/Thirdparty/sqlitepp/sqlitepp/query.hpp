@@ -25,7 +25,7 @@ namespace sqlitepp {
 class session;
 class statement;
 
-// SQL query base class. Noncopyable.
+// SQL query base class. Non-copyable.
 class query
 {
 public:

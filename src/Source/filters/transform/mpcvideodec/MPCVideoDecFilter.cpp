@@ -35,7 +35,7 @@
 
 #include "../../../apps/mplayerc/Resource.h"
 #include "../../../svplib/svplib.h"
-#include "..\..\..\app\shared\sharedlib\utility.h"
+#include "..\..\..\apps\shared\sharedlib\utility.h"
 
 extern "C"
 {
