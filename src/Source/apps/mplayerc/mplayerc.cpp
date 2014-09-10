@@ -1376,7 +1376,7 @@ DWORD WINAPI Mine_GetPrivateProfileStringA(
 		char defaultsettings[] = "use_cuda=1 use_tray=0";
 		char defaultsettings_nocuda[] = "use_cuda=0 use_tray=0";
 		AppSettings& s = AfxGetCurrentSettings();
-		if (s.useGPUCUDA)
+		if (s.nUseGPUCUDA)
 			strcpy_s(lpReturnedString, nSize, defaultsettings);
 		else
 			strcpy_s(lpReturnedString, nSize, defaultsettings_nocuda);
@@ -3363,7 +3363,7 @@ CString CMPlayerCApp::Settings::GetSVPSubStorePath(BOOL spdefault){
 	return StoreDir;
 }
 BOOL CMPlayerCApp::Settings::bShouldUseGPUAcel(){
-	return  useGPUAcel && !bNoMoreDXVAForThisFile;
+	return  this->nUseGPUAcel  && !bNoMoreDXVAForThisFile;
 }
 BOOL CMPlayerCApp::Settings::bIsChineseUIUser()
 {
@@ -3488,13 +3488,13 @@ void CMPlayerCApp::Settings::UpdateData(bool fSave)
 		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_ASPECTRATIO_X), AspectRatio.cx);
 		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_ASPECTRATIO_Y), AspectRatio.cy);
 		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_KEEPHISTORY), fKeepHistory);
-		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_USEGPUACEL), useGPUAcel);
+		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_USEGPUACEL), this->nUseGPUAcel);
 		pApp->WriteProfileString(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_OPTIONDECODER), optionDecoder);
-		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_USEGPUCUDA), useGPUCUDA);
+		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_USEGPUCUDA), this->nUseGPUCUDA);
 
 
 		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_AUTOCONVSUB) + L"BIG2GB", autoIconvSubBig2GB);
-		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_AUTOCONVSUB) + L"GB2BIG", autoIconvSubGB2BIG);
+		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_AUTOCONVSUB) + L"GB2BIG", this->iAutoIconvSubGB2BIG);
 
 		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_AUTODOWNLAODSVPSUB), autoDownloadSVPSub);
 		pApp->WriteProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_NOTAUTOCHECKSPEAKER), bNotAutoCheckSpeaker);
@@ -3885,13 +3885,13 @@ void CMPlayerCApp::Settings::UpdateData(bool fSave)
 
 		CSVPToolBox svptoolbox;
 		fForceRGBrender = 0;
-		useGPUAcel = pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_USEGPUACEL), -1);
-		if (useGPUAcel < 0){
+		this->nUseGPUAcel = pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_USEGPUACEL), -1);
+		if (this->nUseGPUAcel  < 0){
 			try{
-				useGPUAcel = !!svptoolbox.GetGPUString(&szaGPUStrings);
+				this->nUseGPUAcel = !!svptoolbox.GetGPUString(&szaGPUStrings);
 			}
 			catch (...){
-				useGPUAcel = 0;
+				this->nUseGPUAcel = 0;
 			}
 		}
 
@@ -3921,7 +3921,7 @@ void CMPlayerCApp::Settings::UpdateData(bool fSave)
 
 		optionDecoder = pApp->GetProfileString(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_OPTIONDECODER), _T("CoreAVCdec"));
 		//iDXVer = 7;
-		if (useGPUAcel){
+		if (nUseGPUAcel){
 			//	iDXVer = 9;
 		}
 		bRGBOnly = 0;//!!pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_USERGBONLY), 0);
@@ -3948,7 +3948,7 @@ void CMPlayerCApp::Settings::UpdateData(bool fSave)
 			}
 			if (noDX93D){
 				iDefaultSVPRenderType = 0;
-				useGPUAcel = 0;
+				this->nUseGPUAcel = 0;
 			}
 		}
 		iSVPRenderType = pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_DSSVPRENDERTYE), iDefaultSVPRenderType);
@@ -3977,8 +3977,8 @@ void CMPlayerCApp::Settings::UpdateData(bool fSave)
 
 		iAPSurfaceUsage = pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_APSURACEFUSAGE), VIDRNDT_AP_TEXTURE3D);
 		iAPSurfaceUsage = VIDRNDT_AP_TEXTURE3D;
-		useGPUCUDA = !!pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_USEGPUCUDA), 0);
-		useGPUCUDA = SVP_CanUseCoreAvcCUDA(useGPUCUDA);
+		this->nUseGPUCUDA = !!pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_USEGPUCUDA), 0);
+		this->nUseGPUCUDA = SVP_CanUseCoreAvcCUDA(this->nUseGPUCUDA);
 
 		bNotAutoCheckSpeaker = pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_NOTAUTOCHECKSPEAKER), 0);
 		fCustomSpeakers = pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_FCUSTOMSPEAKERS), 0) > 0;
@@ -3994,7 +3994,7 @@ void CMPlayerCApp::Settings::UpdateData(bool fSave)
 		autoDownloadSVPSub = !!pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_AUTODOWNLAODSVPSUB), 1);
 
 		autoIconvSubBig2GB = !!pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_AUTOCONVSUB) + L"BIG2GB", 1);
-		autoIconvSubGB2BIG = !!pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_AUTOCONVSUB) + L"GB2BIG", 1);
+		iAutoIconvSubGB2BIG = !!pApp->GetProfileInt(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_AUTOCONVSUB) + L"GB2BIG", 1);
 
 
 		//fVMRSyncFix = 0;
@@ -4528,7 +4528,7 @@ void CMPlayerCApp::Settings::UpdateData(bool fSave)
 
 				*/
 		CString szDefaultShaders = _T("");
-		if (useGPUAcel){
+		if (this->nUseGPUAcel){
 			//szDefaultShaders = ResStr(IDF_SHADER_LEVELS);
 		}
 		strShaderList = pApp->GetProfileString(ResStr(IDS_R_SETTINGS), ResStr(IDS_RS_SHADERLIST), szDefaultShaders);

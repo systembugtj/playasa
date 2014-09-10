@@ -24,8 +24,6 @@
 #ifndef __AFXWIN_H__
 	#error include 'stdafx.h' before including this file for PCH
 #endif
- 
-#define ResStr(id) CString(MAKEINTRESOURCE(id))
 
 #include "resource.h"       // main symbols
 #include <afxadv.h>
@@ -676,7 +674,7 @@ public:
 		BOOL bUserAeroUI();
 		BOOL bIsChineseUIUser();
 		BOOL bShouldUseGPUAcel();
-		CString GetSVPSubStorePath(BOOL spdefault = false);
+		virtual CString GetSVPSubStorePath(BOOL spdefault = false);
 		void InitChannelMap();
 		void InitEQPerset();
 		void ChangeChannelMapByCustomSetting();
@@ -698,11 +696,12 @@ public:
 			return this->lHardwareDecoderFailCount;
 		}
 
-		virtual void putbUserGPUCUDA(int value)
+		virtual void putbUseGPUCUDA(int value)
 		{
 			this->nUseGPUCUDA = value;
 		}
-		virtual int getUserGPUCUDA()
+
+		virtual int getUseGPUCUDA()
 		{
 			return this->nUseGPUCUDA;
 		}
@@ -813,7 +812,7 @@ public:
 		virtual UINT GetBottomSubOffset()
 		{
 			CMPlayerCApp* pApp = (CMPlayerCApp*)AfxGetApp();
-			pApp->GetBottomSubOffset();
+			return pApp->GetBottomSubOffset();
 		}
 		virtual UINT GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault)
 		{

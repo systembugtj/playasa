@@ -132,11 +132,11 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <AdditionalDependencies>Kernel32.lib;D3D9.lib;ole32.lib;wbemuuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Kernel32.lib;D3D9.lib;ole32.lib;wbemuuid.lib;sharedlibDU.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)out\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

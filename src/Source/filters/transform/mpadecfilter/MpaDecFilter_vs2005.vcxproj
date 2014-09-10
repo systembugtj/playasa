@@ -151,7 +151,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <TargetExt>.ax</TargetExt>
     <IncludePath>$(SolutionDir)Source\filters\BaseClasses;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
-    <LibraryPath>$(SolutionDir)out\lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
+    <LibraryPath>$(SolutionDir)out\lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)lib;</LibraryPath>
+    <OutDir>$(SolutionDir)out\bin\</OutDir>
+    <IntDir>$(SolutionDir)out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -191,14 +193,15 @@
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>libfaad2D.lib;libmadD.lib;liba52D.lib;libdtsD.lib;decssDU.lib;dsutilDU.lib;strmbaseDU.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libavcodec_gcc.lib;libgcc.a;libmingwex.a;libflacD.lib;libfaad2D.lib;libmadD.lib;liba52D.lib;libdtsD.lib;decssDU.lib;dsutilDU.lib;foundation.lib;strmbaseDU.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>../../../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MpaDecFilter.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">

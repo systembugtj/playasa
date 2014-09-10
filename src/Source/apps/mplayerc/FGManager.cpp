@@ -2152,7 +2152,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, UINT src, UINT
 	if ( s.bShouldUseGPUAcel() && !s.bIsIVM)
 	{
 		UINT64 gMerit =  MERIT64_ABOVE_DSHOW+100;
-		if(s.useGPUCUDA){gMerit =  MERIT64_ABOVE_DSHOW+5;}
+		if(s.nUseGPUCUDA){gMerit =  MERIT64_ABOVE_DSHOW+5;}
 		pFGF = new CFGFilterInternal<CMPCVideoDecFilter>(_T("MPC Video Decoder DXVA"), gMerit);
 		if(dxva_filters & MPCDXVA_H264){
 			pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_H264);

@@ -10,9 +10,9 @@ public:
 	virtual int  getHardwareDecoderFailCount();
 	__declspec(property(get = getHardwareDecoderFailCount, put = putHardwareDecoderFailCount)) int HardwareDecoderFailCount;
 
-	virtual void putUserGPUCUDA(int value);
-	virtual int getUserGPUCUDA();
-	__declspec(property(get = getUserGPUCUDA, put = putUserGPUCUDA)) int UserGPUCUDA;
+	virtual void putUseGPUCUDA(int value);
+	virtual int getUseGPUCUDA();
+	__declspec(property(get = getUseGPUCUDA, put = putUseGPUCUDA)) int UseGPUCUDA;
 
 	virtual void putUseGPUAcel(int value);
 	virtual int  getUseGPUAcel();
@@ -61,6 +61,7 @@ public:
 	virtual COLORREF GetColorFromTheme(CString clrName, COLORREF clrDefault);
 	virtual UINT GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault);
 	virtual BOOL WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue);	
+	virtual CString GetSVPSubStorePath(BOOL spdefault = false);
 };
 
 class Utility

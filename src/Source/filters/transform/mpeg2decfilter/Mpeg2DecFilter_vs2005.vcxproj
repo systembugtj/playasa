@@ -145,6 +145,8 @@
     <TargetExt>.ax</TargetExt>
     <IncludePath>$(SolutionDir)Source\filters\BaseClasses;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)out\lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)lib\detours\;$(SolutionDir)Source\filters\transform\mpeg2decfilter\libmpeg2\vc++</LibraryPath>
+    <OutDir>$(SolutionDir)out\bin\</OutDir>
+    <IntDir>$(SolutionDir)out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">
     <GenerateManifest>false</GenerateManifest>
@@ -192,9 +194,10 @@
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>idct_mmx.obj;motion_comp_mmx.obj;decssDU.lib;dsutilDU.lib;foundation.lib;strmbaseDU.lib;basevideofilterDU.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>idct_mmx.obj;motion_comp_mmx.obj;decssDU.lib;sharedlibDU.lib;dsutilDU.lib;foundation.lib;strmbaseDU.lib;basevideofilterDU.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>../../../../lib;../../../../lib/detours;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
       <ModuleDefinitionFile>Mpeg2DecFilter.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>

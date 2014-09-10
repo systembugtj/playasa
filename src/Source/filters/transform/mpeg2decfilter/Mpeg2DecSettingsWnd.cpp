@@ -1,4 +1,4 @@
-﻿/* 
+﻿/*
  *	Copyright (C) 2003-2006 Gabest
  *	http://www.gabest.org
  *
@@ -6,15 +6,15 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2, or (at your option)
  *  any later version.
- *   
+ *
  *  This Program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  *  GNU General Public License for more details.
- *   
+ *
  *  You should have received a copy of the GNU General Public License
  *  along with GNU Make; see the file COPYING.  If not, write to
- *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA. 
+ *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  *  http://www.gnu.org/copyleft/gpl.html
  *
  */
@@ -23,7 +23,7 @@
 #include "resource.h"
 #include "Mpeg2DecSettingsWnd.h"
 #include "..\..\..\dsutil\dsutil.h"
-
+#include "..\apps\mplayerc\resource.h"
 
 #include <streams.h>
 #include <afxtempl.h>
@@ -42,10 +42,10 @@ static TCHAR m_strSaturation[100];
 
 CMpeg2DecSettingsWnd::CMpeg2DecSettingsWnd()
 {
-	wcscpy (m_strBrightness, ResStr(IDS_MPEG2_BRIGHTNESS));
-	wcscpy (m_strContrast,	 ResStr(IDS_MPEG2_CONTRAST));
-	wcscpy (m_strHue,		 ResStr(IDS_MPEG2_HUE));
-	wcscpy (m_strSaturation, ResStr(IDS_MPEG2_SATURATION));
+	wcscpy(m_strBrightness, ResStr(IDS_MPEG2_BRIGHTNESS));
+	wcscpy(m_strContrast, ResStr(IDS_MPEG2_CONTRAST));
+	wcscpy(m_strHue, ResStr(IDS_MPEG2_HUE));
+	wcscpy(m_strSaturation, ResStr(IDS_MPEG2_SATURATION));
 }
 
 bool CMpeg2DecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknown>& pUnks)
@@ -55,9 +55,9 @@ bool CMpeg2DecSettingsWnd::OnConnect(const CInterfaceList<IUnknown, &IID_IUnknow
 	m_pM2DF.Release();
 
 	POSITION pos = pUnks.GetHeadPosition();
-	while(pos && !(m_pM2DF = pUnks.GetNext(pos)));
-	
-	if(!m_pM2DF) return false;
+	while (pos && !(m_pM2DF = pUnks.GetNext(pos)));
+
+	if (!m_pM2DF) return false;
 
 	m_ditype = m_pM2DF->GetDeinterlaceMethod();
 	m_procamp[0] = m_pM2DF->GetBrightness();
@@ -78,63 +78,63 @@ void CMpeg2DecSettingsWnd::OnDisconnect()
 
 bool CMpeg2DecSettingsWnd::OnActivate()
 {
-	DWORD dwStyle = WS_VISIBLE|WS_CHILD|WS_TABSTOP;
+	DWORD dwStyle = WS_VISIBLE | WS_CHILD | WS_TABSTOP;
 
 	CPoint p(10, 10);
 
-	m_planaryuv_check.Create(ResStr(IDS_MPEG2DECSETTINGSWND_0), dwStyle|BS_AUTOCHECKBOX, CRect(p, CSize(300, m_fontheight)), this, IDC_PP_CHECK1);
+	m_planaryuv_check.Create(ResStr(IDS_MPEG2DECSETTINGSWND_0), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(300, m_fontheight)), this, IDC_PP_CHECK1);
 	m_planaryuv_check.SetCheck(m_planaryuv ? BST_CHECKED : BST_UNCHECKED);
 	p.y += m_fontheight + 5;
 
-	m_interlaced_check.Create(ResStr(IDS_MPEG2DECSETTINGSWND_1), dwStyle|BS_AUTOCHECKBOX, CRect(p, CSize(300, m_fontheight)), this, IDC_PP_CHECK2);
+	m_interlaced_check.Create(ResStr(IDS_MPEG2DECSETTINGSWND_1), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(300, m_fontheight)), this, IDC_PP_CHECK2);
 	m_interlaced_check.SetCheck(m_interlaced ? BST_CHECKED : BST_UNCHECKED);
 	p.y += m_fontheight + 5;
 
-	m_forcedsubs_check.Create(ResStr(IDS_MPEG2DECSETTINGSWND_2), dwStyle|BS_AUTOCHECKBOX, CRect(p, CSize(300, m_fontheight)), this, IDC_PP_CHECK3);
+	m_forcedsubs_check.Create(ResStr(IDS_MPEG2DECSETTINGSWND_2), dwStyle | BS_AUTOCHECKBOX, CRect(p, CSize(300, m_fontheight)), this, IDC_PP_CHECK3);
 	m_forcedsubs_check.SetCheck(m_forcedsubs ? BST_CHECKED : BST_UNCHECKED);
 	p.y += m_fontheight + 5;
 
 	p.y += 10;
 
 	m_ditype_static.Create(ResStr(IDS_MPEG2_DEINTERLACING), dwStyle, CRect(p, CSize(70, m_fontheight)), this);
-	m_ditype_combo.Create(dwStyle|CBS_DROPDOWNLIST, CRect(p + CSize(85, -3), CSize(100, 200)), this, IDC_PP_COMBO1);
+	m_ditype_combo.Create(dwStyle | CBS_DROPDOWNLIST, CRect(p + CSize(85, -3), CSize(100, 200)), this, IDC_PP_COMBO1);
 	m_ditype_combo.SetItemData(m_ditype_combo.AddString(ResStr(IDS_PANEL_MPEG_DECODER_DEINTERLACE_DEFAULT)), (DWORD)DIAuto);
 	m_ditype_combo.SetItemData(m_ditype_combo.AddString(_T("Weave")), (DWORD)DIWeave);
 	m_ditype_combo.SetItemData(m_ditype_combo.AddString(_T("Blend")), (DWORD)DIBlend);
 	m_ditype_combo.SetItemData(m_ditype_combo.AddString(_T("Bob")), (DWORD)DIBob);
 	m_ditype_combo.SetItemData(m_ditype_combo.AddString(_T("Field Shift")), (DWORD)DIFieldShift);
 	m_ditype_combo.SetCurSel(0);
-	for(int i = 0; i < m_ditype_combo.GetCount(); i++)
-		if((int)m_ditype_combo.GetItemData(i) == m_ditype)
+	for (int i = 0; i < m_ditype_combo.GetCount(); i++)
+		if ((int)m_ditype_combo.GetItemData(i) == m_ditype)
 			m_ditype_combo.SetCurSel(i);
 
 	p.y += m_fontheight + 20;
 
-	for(int i = 0, h = max(20, m_fontheight)+1; i < countof(m_procamp_slider); i++, p.y += h)
+	for (int i = 0, h = max(20, m_fontheight) + 1; i < countof(m_procamp_slider); i++, p.y += h)
 	{
-		static const TCHAR* labels[] = {m_strBrightness, m_strContrast,	m_strHue, m_strSaturation};
+		static const TCHAR* labels[] = { m_strBrightness, m_strContrast, m_strHue, m_strSaturation };
 		m_procamp_static[i].Create(labels[i], dwStyle, CRect(p, CSize(70, h)), this);
-		m_procamp_slider[i].Create(dwStyle, CRect(p + CPoint(80, 0), CSize(200, h)), this, IDC_PP_SLIDER1+i);
+		m_procamp_slider[i].Create(dwStyle, CRect(p + CPoint(80, 0), CSize(200, h)), this, IDC_PP_SLIDER1 + i);
 		m_procamp_value[i].Create(_T(""), dwStyle, CRect(p + CPoint(280, 0), CSize(40, h)), this);
 	}
 
-	m_procamp_slider[0].SetRange(0, 2*128);
+	m_procamp_slider[0].SetRange(0, 2 * 128);
 	m_procamp_slider[0].SetTic(128);
 	m_procamp_slider[0].SetPos((int)(m_procamp[0] + (m_procamp[0] >= 0 ? 0.5f : -0.5f)) + 128);
 	m_procamp_slider[1].SetRange(0, 200);
 	m_procamp_slider[1].SetTic(100);
-	m_procamp_slider[1].SetPos((int)(100*m_procamp[1] + 0.5f));
-	m_procamp_slider[2].SetRange(0, 2*180);
+	m_procamp_slider[1].SetPos((int)(100 * m_procamp[1] + 0.5f));
+	m_procamp_slider[2].SetRange(0, 2 * 180);
 	m_procamp_slider[2].SetTic(180);
 	m_procamp_slider[2].SetPos((int)(m_procamp[2] + (m_procamp[2] >= 0 ? 0.5f : -0.5f)) + 180);
 	m_procamp_slider[3].SetRange(0, 200);
 	m_procamp_slider[3].SetTic(100);
-	m_procamp_slider[3].SetPos((int)(100*m_procamp[3] + 0.5f));
+	m_procamp_slider[3].SetPos((int)(100 * m_procamp[3] + 0.5f));
 
 	p.y += 5;
 
-	m_procamp_tv2pc.Create(_T("TV->PC"), dwStyle, CRect(p + CPoint(80 + 200/2 - 55, 0), CSize(50, 20)), this, IDC_PP_BUTTON1);
-	m_procamp_reset.Create(ResStr(IDS_MPEG2_RESET), dwStyle, CRect(p + CPoint(80 + 200/2 + 5, 0), CSize(50, 20)), this, IDC_PP_BUTTON2);
+	m_procamp_tv2pc.Create(_T("TV->PC"), dwStyle, CRect(p + CPoint(80 + 200 / 2 - 55, 0), CSize(50, 20)), this, IDC_PP_BUTTON1);
+	m_procamp_reset.Create(ResStr(IDS_MPEG2_RESET), dwStyle, CRect(p + CPoint(80 + 200 / 2 + 5, 0), CSize(50, 20)), this, IDC_PP_BUTTON2);
 
 	p.y += 30;
 
@@ -145,7 +145,7 @@ bool CMpeg2DecSettingsWnd::OnActivate()
 		ResStr(IDS_MPEG2DECSETTINGSWND_8),
 		dwStyle, CRect(p, CSize(320, m_fontheight * 3)), this);
 
-	for(CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow())
+	for (CWnd* pWnd = GetWindow(GW_CHILD); pWnd; pWnd = pWnd->GetNextWindow())
 		pWnd->SetFont(&m_font, FALSE);
 
 	return true;
@@ -167,7 +167,7 @@ bool CMpeg2DecSettingsWnd::OnApply()
 {
 	OnDeactivate();
 
-	if(m_pM2DF)
+	if (m_pM2DF)
 	{
 		m_pM2DF->SetDeinterlaceMethod(m_ditype);
 		m_pM2DF->SetBrightness(m_procamp[0]);
@@ -199,14 +199,14 @@ void CMpeg2DecSettingsWnd::UpdateProcampValues()
 BEGIN_MESSAGE_MAP(CMpeg2DecSettingsWnd, CInternalPropertyPageWnd)
 	ON_BN_CLICKED(IDC_PP_BUTTON1, OnButtonProcampPc2Tv)
 	ON_BN_CLICKED(IDC_PP_BUTTON2, OnButtonProcampReset)
-	ON_BN_CLICKED(IDC_PP_CHECK2, OnButtonInterlaced)	
+	ON_BN_CLICKED(IDC_PP_CHECK2, OnButtonInterlaced)
 	ON_WM_HSCROLL()
 END_MESSAGE_MAP()
 
 void CMpeg2DecSettingsWnd::OnButtonProcampPc2Tv()
 {
 	m_procamp_slider[0].SetPos(128 - 16);
-	m_procamp_slider[1].SetPos(100 * 255/(235-16));
+	m_procamp_slider[1].SetPos(100 * 255 / (235 - 16));
 
 	UpdateProcampValues();
 }

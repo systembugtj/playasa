@@ -210,7 +210,7 @@
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>dsutilD.lib;strmbaseDU.lib;basesourceDU.lib;foundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>dsutilDU.lib;strmbaseDU.lib;basesourceDU.lib;foundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>$(ProjectName).def</ModuleDefinitionFile>

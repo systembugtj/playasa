@@ -195,7 +195,7 @@
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>strmbaseDU.lib;basesourceDU.lib;foundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>strmbaseDU.lib;basesourceDU.lib;dsutilDU.lib;foundation.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).ax</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)out\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>D2VSource.def</ModuleDefinitionFile>
@@ -206,8 +206,12 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
-      <IgnoreSpecificDefaultLibraries>uafxcw.lib;libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">
     <ClCompile>
