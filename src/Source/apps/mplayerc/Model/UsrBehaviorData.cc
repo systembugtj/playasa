@@ -10,6 +10,7 @@
 #include "../Controller/UsrBehaviorController.h"
 #include <comdef.h>
 #include <Wbemidl.h>
+#include <Strings.h>
 
 #define GET_EVNDATABYWMI(sql, f, var) \
 { \
@@ -65,7 +66,7 @@ UsrBehaviorData::~UsrBehaviorData()
 	{
 		setenv = true;
 
-		db.open(path.c_str());
+		db.open(Strings::WStringToString(path));
 		// create a new db file
 		db << "create table usrbhv ("
 			<< "id integer, data text, time real)";
@@ -74,7 +75,7 @@ UsrBehaviorData::~UsrBehaviorData()
 			<< "name text, data text)";
 	}
 	else
-		db.open(path.c_str());
+		db.open(Strings::WStringToString(path));
 
 	db << "PRAGMA synchronous=0";
 	sqlitepp::transaction ts(db);

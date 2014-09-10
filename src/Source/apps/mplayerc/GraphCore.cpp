@@ -674,7 +674,7 @@ bool CGraphCore::OpenMediaPrivate(CAutoPtr<OpenMediaData> pOMD)
 					s.bIsIVM = true;
 
 				s.bDisableSoftCAVCForce = false;
-				if (!(s.useGPUAcel && s.bHasCUDAforCoreAVC) && !s.bDisableSoftCAVC
+				if (!(s.nUseGPUAcel && s.bHasCUDAforCoreAVC) && !s.bDisableSoftCAVC
 					&& s.szCurrentExtension == _T(".mkv"))
 				{
 					FILE* fp;
@@ -1047,7 +1047,7 @@ void CGraphCore::GetSnapShotSliently(const std::vector<std::wstring> &args)
 	AppSettings& s = AfxGetCurrentSettings();
 	s.fEnableWorkerThreadForOpening = 0;
 	s.fMute = true;
-	s.useGPUAcel = false;
+	s.nUseGPUAcel = false;
 	// skip read/write setting/playlist/download sub
 	CAutoPtr<OpenMediaData> pOMD((OpenMediaData*)p);
 	OpenMedia(pOMD);
