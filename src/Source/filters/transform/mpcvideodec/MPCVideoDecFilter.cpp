@@ -64,7 +64,6 @@ extern "C"
 #undef  SVP_LogMsg6
 #define SVP_LogMsg5 __noop
 #define SVP_LogMsg6 __noop
-#define TRACE SVP_LogMsg6
 #define TRACE5  SVP_LogMsg5
 
 
