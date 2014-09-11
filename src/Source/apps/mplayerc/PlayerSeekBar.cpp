@@ -420,9 +420,9 @@ void CPlayerSeekBar::OnPaint()
 		if( pFrame->m_aRefTime > 0){
 			CRect rFilled(r);
 			
-			rFilled.left += (__int64)r.Width() * (pFrame->m_aRefTime - m_start) / (m_stop - m_start) ;
+			rFilled.left += (LONG)((__int64)r.Width() * (pFrame->m_aRefTime - m_start) / (m_stop - m_start));
 			if( pFrame->m_aRefTime < pFrame->m_bRefTime )
-				rFilled.right = r.left + (__int64)r.Width() * (pFrame->m_bRefTime - m_start) / (m_stop - m_start) ;
+				rFilled.right = r.left + (LONG) ((__int64)r.Width() * (pFrame->m_bRefTime - m_start) / (m_stop - m_start));
 			else
 				rFilled.right = rFilled.left + 1;
 

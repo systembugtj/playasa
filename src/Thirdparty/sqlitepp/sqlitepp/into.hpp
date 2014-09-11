@@ -40,7 +40,7 @@ private:
 
 	void do_update(statement& st)
 	{
-		typename converter<T>::base_type t;
+		typename converter<T, void>::base_type t;
 		st.column_value(this->pos_, t);
 		this->value_ = converter<T>::to(t);
 	}
