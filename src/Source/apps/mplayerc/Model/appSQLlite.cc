@@ -38,8 +38,9 @@ void SQLliteapp::begin_transaction()
 }
 
 
-int SQLliteapp::exec_sql(std::wstring s_exe)
+int SQLliteapp::exec_sql(std::wstring ws_exe)
 {
+	sqlitepp::string_t s_exe = Strings::WStringToUtf8String(ws_exe);
 	vdata.clear();
 	nrow = 0;
 
@@ -51,7 +52,7 @@ int SQLliteapp::exec_sql(std::wstring s_exe)
 
 		while (st.exec())
 		{
-			vdata.push_back(Strings::Utf8StringToWString(str));
+			vdata.push_back(str);
 			str.clear();
 		}
 		nrow = vdata.size();
@@ -70,7 +71,7 @@ int SQLliteapp::get_single_int_from_sql(std::wstring szSQL, int nDefault)
 {
 	exec_sql(szSQL);
 	if (nrow == 1)
-		return  atoi(Strings::WStringToString(vdata.at(0)).c_str());
+		return  atoi(vdata.at(0).c_str());
 	else
 		return nDefault;
 }
@@ -165,7 +166,7 @@ CString SQLliteapp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPC
 		st.exec();
 
 		if (!str.empty())
-			return CString(str.c_str());
+			return CString(Strings::Utf8StringToWString(str).c_str());
 	}
 	catch (...)
 	{

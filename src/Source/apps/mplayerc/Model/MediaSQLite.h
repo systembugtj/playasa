@@ -13,7 +13,7 @@ template<typename T1 = int, typename T2 = int, typename T3 = int, typename T4 = 
 class MediaSQLite
 {
 public:
-	static void exec(const std::wstring &sql
+	static void exec(const std::wstring & wsql
 		, T1 *pRet1 = 0
 		, T2 *pRet2 = 0
 		, T3 *pRet3 = 0
@@ -21,7 +21,7 @@ public:
 		, T5 *pRet5 = 0)
 	{
 		g_csMediaSQLite.lock();
-
+		sqlitepp::string_t sql = Strings::WStringToUtf8String(wsql);
 		try
 		{
 			init();
@@ -85,7 +85,7 @@ public:
 		g_csMediaSQLite.unlock();
 	}
 
-	static void exec(const std::wstring &sql
+	static void exec(const std::wstring & wsql
 		, std::vector<T1 > *pRet1
 		, std::vector<T2 > *pRet2 = 0
 		, std::vector<T3 > *pRet3 = 0
@@ -93,7 +93,7 @@ public:
 		, std::vector<T5 > *pRet5 = 0)
 	{
 		g_csMediaSQLite.lock();
-
+		sqlitepp::string_t sql = Strings::WStringToUtf8String(wsql);
 		try
 		{
 			init();

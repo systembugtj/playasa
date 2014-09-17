@@ -1,8 +1,5 @@
 #include "..\stdafx.h"
 #include "UsrBehaviorData.h"
-#include "..\..\..\..\Thirdparty\sqlitepp\sqlitepp\session.hpp"
-#include "..\..\..\..\Thirdparty\sqlitepp\sqlitepp\sqlitepp.hpp"
-#include "..\..\..\..\Thirdparty\sqlitepp\sqlitepp\transaction.hpp"
 #include "../revision.h"
 #include "../Utils/SPlayerGUID.h"
 #include "../Controller/PlayerPreference.h"
@@ -17,15 +14,15 @@
   hr = ser->ExecQuery(bstr_t("WQL"), bstr_t(sql), \
   WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &enumerator);  \
   if (FAILED(hr)) \
-    { \
+	  { \
   loc->Release(); \
   ser->Release(); \
   CoUninitialize(); \
   return; \
-    } \
+	  } \
 ##var = L""; \
-	  while (enumerator) \
-	    { \
+		  while (enumerator) \
+				{ \
   enumerator->Next(WBEM_INFINITE, 1, &obj, &result);  \
   if (0 == result) \
   break; \
@@ -33,7 +30,7 @@
   std::wstring tmp(vr.bstrVal); \
 ##var += tmp; \
   VariantClear(&vr); \
-	    } \
+				} \
   obj->Release(); \
   enumerator->Release(); \
 }
@@ -64,18 +61,19 @@ UsrBehaviorData::~UsrBehaviorData()
 	sqlitepp::session db;
 	if (_wstat(path.c_str(), &buf) != 0)
 	{
+
 		setenv = true;
 
-		db.open(Strings::WStringToString(path));
+		db.open(Strings::WStringToUtf8String(path));
 		// create a new db file
-		db << "create table usrbhv ("
+		db << L"create table usrbhv ("
 			<< "id integer, data text, time real)";
 		// create new environment table
 		db << "create table usrenv ("
 			<< "name text, data text)";
 	}
 	else
-		db.open(Strings::WStringToString(path));
+		db.open(Strings::WStringToUtf8String(path));
 
 	db << "PRAGMA synchronous=0";
 	sqlitepp::transaction ts(db);
@@ -112,13 +110,13 @@ void UsrBehaviorData::AppendBhvEntry(int id, std::wstring data)
 	::GetSystemTime(&st);
 	::SystemTimeToVariantTime(&st, &vt);
 
-	UsrBehaviorEntry ube = { id, data, vt };
+	UsrBehaviorEntry ube = { id, Strings::WStringToUtf8String(data), vt };
 	ubhv_entries.push_back(ube);
 }
 
 void UsrBehaviorData::AppendEnvEntry(std::wstring name, std::wstring data)
 {
-	UsrEnvEntry env = { name, data };
+	UsrEnvEntry env = { Strings::WStringToUtf8String(name), Strings::WStringToUtf8String(data) };
 	env_entries.push_back(env);
 }
 

@@ -4,6 +4,7 @@
 
 #include "MainFrm.h"
 
+#include <psapi.h>
 #include <math.h>
 
 #include <afxpriv.h>
@@ -1206,8 +1207,8 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 		}
 	}
 
-	int iDistance = sqrt(pow((double)abs(point.x - m_pLastClickPoint.x), 2) + pow((double)abs(point.y - m_pLastClickPoint.y), 2));
-	int idisplacement = sqrt(pow((double)abs(point.x - m_pDragFuncStartPoint.x), 2) + pow((double)abs(point.y - m_pDragFuncStartPoint.y), 2));
+	int iDistance = (int)sqrt(pow((double)abs(point.x - m_pLastClickPoint.x), 2) + pow((double)abs(point.y - m_pLastClickPoint.y), 2));
+	int idisplacement = (int)sqrt(pow((double)abs(point.x - m_pDragFuncStartPoint.x), 2) + pow((double)abs(point.y - m_pDragFuncStartPoint.y), 2));
 	if ((iDistance > 30 || s_mDragFucOn) && bMouseMoved && s_mDragFuc){
 		if (!s_mDragFucOn){
 			m_pDragFuncStartPoint = point;
@@ -2387,7 +2388,6 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 	GetDesktopWindow()->GetWindowRect(&m_rcDesktop);
 }
 
-#include <psapi.h>
 
 void CMainFrame::OnSysCommand(UINT nID, LPARAM lParam)
 {

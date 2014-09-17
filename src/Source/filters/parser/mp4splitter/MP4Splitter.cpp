@@ -499,7 +499,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						vih->bmiHeader.biWidth = (LONG)vse->GetWidth();
 						vih->bmiHeader.biHeight = (LONG)vse->GetHeight();
 						vih->bmiHeader.biCompression = type;
-                        vih->bmiHeader.biBitCount = (LONG)vse->GetDepth();
+						vih->bmiHeader.biBitCount = (LONG)vse->GetDepth();
 						memcpy(vih+1, db.GetData(), db.GetDataSize());
 						mts.Add(mt);
 
@@ -556,14 +556,14 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if(mts.IsEmpty()) continue;
 
 			REFERENCE_TIME rtDuration = 10000i64 * track->GetDurationMs();
-      SVP_LogMsg5(L"Dur %d %f %f %f %f", track->GetType(), (double)track->GetDurationMs()/1000/60,
-                  (double)track->GetDuration(), (double)track->GetMediaTimeScale(),
-                  (double)track->GetMovieTimeScale());
+	  SVP_LogMsg5(L"Dur %d %f %f %f %f", track->GetType(), (double)track->GetDurationMs()/1000/60,
+				  (double)track->GetDuration(), (double)track->GetMediaTimeScale(),
+				  (double)track->GetMovieTimeScale());
 			if (m_rtDuration < rtDuration)
-        m_rtDuration = rtDuration;
+		m_rtDuration = rtDuration;
 
-      if (rtVideoDuration < rtDuration && AP4_Track::TYPE_VIDEO == track->GetType())
-        rtVideoDuration = rtDuration;
+	  if (rtVideoDuration < rtDuration && AP4_Track::TYPE_VIDEO == track->GetType())
+		rtVideoDuration = rtDuration;
 
 			DWORD id = track->GetId();
 
@@ -693,7 +693,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 	}
   if (rtVideoDuration > 0 && rtVideoDuration < m_rtDuration/2 )
-    m_rtDuration = rtVideoDuration;
+	m_rtDuration = rtVideoDuration;
 
 	m_rtNewStop = m_rtStop = m_rtDuration;
 
@@ -1097,32 +1097,32 @@ bool CMP4SplitterFilter::DemuxLoop()
 
 				p->rtStop = p->rtStart;
 				int fFirst = true;
-        int if_readsample_isnt_working = true;
-        //
+		int if_readsample_isnt_working = true;
+		//
 
 				while(AP4_SUCCEEDED(track->ReadSample(pPairNext->m_value.index, sample, data)))
 				{
-         
+		 
 					AP4_Size size = data.GetDataSize();
 					const AP4_Byte* ptr = data.GetData();
-          
-          if (fFirst) 
-          {
-            p->SetData(ptr, size);
-            p->rtStart = p->rtStop = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts()); fFirst = false;
-          }
-          else
-            for(int i = 0; i < size; i++) p->Add(ptr[i]);
-          
+		  
+		  if (fFirst) 
+		  {
+			p->SetData(ptr, size);
+			p->rtStart = p->rtStop = (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetCts()); fFirst = false;
+		  }
+		  else
+			for(int i = 0; i < size; i++) p->Add(ptr[i]);
+		  
 
 					p->rtStop += (REFERENCE_TIME)(10000000.0 / track->GetMediaTimeScale() * sample.GetDuration());
 
-          //SVP_LogMsg5(L"track->GetSampleCount() %d %d | %d %d ", track->GetSampleCount(),pPairNext->m_value.index, p->GetCount() , nBlockAlign);
-          if((pPairNext->m_value.index+1) >= track->GetSampleCount() || p->GetCount() >= nBlockAlign)
+		  //SVP_LogMsg5(L"track->GetSampleCount() %d %d | %d %d ", track->GetSampleCount(),pPairNext->m_value.index, p->GetCount() , nBlockAlign);
+		  if((pPairNext->m_value.index+1) >= track->GetSampleCount() || p->GetCount() >= nBlockAlign)
 						break;
-          pPairNext->m_value.index++;
+		  pPairNext->m_value.index++;
 				}
-        //SVP_LogMsg5(L"p3");
+		//SVP_LogMsg5(L"p3");
 			}
 			else if(track->GetType() == AP4_Track::TYPE_TEXT)
 			{

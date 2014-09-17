@@ -20,11 +20,11 @@ MediaCheckDB::~MediaCheckDB()
 
 bool MediaCheckDB::ShouldExit()
 {
-  // see if need to be stop
-  if (_Exit_state(0))
-    return true;
-  else
-    return false;
+	// see if need to be stop
+	if (_Exit_state(0))
+		return true;
+	else
+		return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -33,115 +33,115 @@ bool MediaCheckDB::ShouldExit()
 // analysis the media files' path and add some to the detect_path
 void MediaCheckDB::_Thread()
 {
-  while (true)
-  {
-    // need stop?
-    if (ShouldExit())
-      return;
+	while (true)
+	{
+		// need stop?
+		if (ShouldExit())
+			return;
 
-    //// analysis the media files' path and add some to the detect_path
-    //AddInfoToDetectPath();
+		//// analysis the media files' path and add some to the detect_path
+		//AddInfoToDetectPath();
 
-    // make sure the detect_path is exist, otherwise delete it
-    CheckDetectPath();
+		// make sure the detect_path is exist, otherwise delete it
+		CheckDetectPath();
 
-    // make sure the media_data's file is exist, otherwise delete it
-    CheckMediaData();
+		// make sure the media_data's file is exist, otherwise delete it
+		CheckMediaData();
 
-    // sleep for a moment
-    ::Sleep(3000);
-  }
+		// sleep for a moment
+		::Sleep(3000);
+	}
 }
 
 void MediaCheckDB::CheckDetectPath()
 {
-  // -------------------------------------------------------------------------
-  // make sure the detect_path is exist, otherwise delete it
-  try
-  {
-    std::vector<std::wstring> vtPath;
+	// -------------------------------------------------------------------------
+	// make sure the detect_path is exist, otherwise delete it
+	try
+	{
+		std::vector<sqlitepp::string_t> vtPath;
 
-    // get the path
-    MediaDB<std::wstring>::exec(L"SELECT path FROM detect_path", &vtPath);
+		// get the path
+		MediaDB<sqlitepp::string_t>::exec(L"SELECT path FROM detect_path", &vtPath);
 
-    // delete those records which path is null
-    MediaDB<>::exec(L"DELETE FROM detect_path WHERE path is null");
+		// delete those records which path is null
+		MediaDB<>::exec(L"DELETE FROM detect_path WHERE path is null");
 
-    // delete the records which path is not exist in file system
-    std::vector<std::wstring>::iterator it = vtPath.begin();
-    while (it != vtPath.end())
-    {
-      // need stop?
-      if (ShouldExit())
-        return;
+		// delete the records which path is not exist in file system
+		std::vector<sqlitepp::string_t>::iterator it = vtPath.begin();
+		while (it != vtPath.end())
+		{
+			// need stop?
+			if (ShouldExit())
+				return;
 
-      if (!it->empty() && !::PathFileExists(it->c_str()))
-      {
-        std::wstringstream ss;
-        ss << L"DELETE FROM detect_path WHERE path='" << it->c_str() << L"'";
-        MediaDB<>::exec(ss.str());
-      }
+			if (!it->empty() && !::PathFileExists(Strings::Utf8StringToWString(*it).c_str()))
+			{
+				std::wstringstream ss;
+				ss << L"DELETE FROM detect_path WHERE path='" << it->c_str() << L"'";
+				MediaDB<>::exec(ss.str());
+			}
 
-      ++it;
+			++it;
 
-      // sleep for a moment
-      ::Sleep(100);
-    }
-  }
-  catch (std::runtime_error const& err)
-  {
-    Logging(err.what());
-  }
+			// sleep for a moment
+			::Sleep(100);
+		}
+	}
+	catch (std::runtime_error const& err)
+	{
+		Logging(err.what());
+	}
 }
 
 void MediaCheckDB::CheckMediaData()
 {
-  // -------------------------------------------------------------------------
-  // make sure the media_data's file is exist, otherwise delete it
-  try
-  {
-    std::vector<std::wstring> vtPath;
-    std::vector<std::wstring> vtFilename;
+	// -------------------------------------------------------------------------
+	// make sure the media_data's file is exist, otherwise delete it
+	try
+	{
+		std::vector<sqlitepp::string_t> vtPath;
+		std::vector<sqlitepp::string_t> vtFilename;
 
-    // get the path and filename
-    MediaDB<std::wstring, std::wstring>::exec(L"SELECT path, filename FROM media_data", &vtPath, &vtFilename);
+		// get the path and filename
+		MediaDB<sqlitepp::string_t, sqlitepp::string_t>::exec(L"SELECT path, filename FROM media_data", &vtPath, &vtFilename);
 
-    // delete those records which path or filename is null
-    MediaDB<>::exec(L"DELETE FROM media_data WHERE path is null or filename is null");
+		// delete those records which path or filename is null
+		MediaDB<>::exec(L"DELETE FROM media_data WHERE path is null or filename is null");
 
-    // delete the records which path and filename is not exist in file system
-    std::vector<std::wstring>::iterator itPath = vtPath.begin();
-    std::vector<std::wstring>::iterator itFilename = vtFilename.begin();
-    while (itPath != vtPath.end())
-    {
-      // need stop?
-      if (ShouldExit())
-        return;
+		// delete the records which path and filename is not exist in file system
+		std::vector<sqlitepp::string_t>::iterator itPath = vtPath.begin();
+		std::vector<sqlitepp::string_t>::iterator itFilename = vtFilename.begin();
+		while (itPath != vtPath.end())
+		{
+			// need stop?
+			if (ShouldExit())
+				return;
 
-      std::wstring sFullPath = *itPath;
-      if (sFullPath[sFullPath.size() - 1] != L'\\')
-        sFullPath += L"\\";
-      sFullPath += *itFilename;
+			std::wstring sFullPath = Strings::Utf8StringToWString(*itPath);
+			if (sFullPath[sFullPath.size() - 1] != L'\\')
+				sFullPath += L"\\";
+			sFullPath += Strings::Utf8StringToWString(*itFilename);
 
-      if (!sFullPath.empty() && !::PathFileExists(sFullPath.c_str()))
-      {
-        std::wstringstream ss;
-        ss << L"DELETE FROM media_data WHERE path='"
-          << *itPath << L"' and filename='" << *itFilename << L"'";
-        MediaDB<>::exec(ss.str());
-      }
+			if (!sFullPath.empty() && !::PathFileExists(sFullPath.c_str()))
+			{
+				std::wstringstream ss;
+				ss << L"DELETE FROM media_data WHERE path='"
+					<< *itPath << L"' and filename='" << *itFilename << L"'";
+				MediaDB<>::exec(ss.str());
+			}
 
-      ++itPath;
-      ++itFilename;
+			++itPath;
+			++itFilename;
 
-      // sleep for a moment
-      ::Sleep(100);
-    }
-  }
-  catch (std::runtime_error const& err)
-  {
-    Logging(err.what());
-  }
+			// sleep for a moment
+			::Sleep(100);
+		}
+	}
+	catch (std::runtime_error const& err)
+	{
+		Logging(err.what());
+	}
 }
 
 //void MediaCheckDB::AddInfoToDetectPath()
