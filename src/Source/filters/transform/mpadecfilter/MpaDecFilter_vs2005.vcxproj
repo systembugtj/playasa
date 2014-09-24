@@ -157,7 +157,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>REGISTER_FILTER;WIN32;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REGISTER_FILTER;WIN32;_DEBUG;_USRDLL;FLAC__NO_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
@@ -189,11 +189,11 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>REGISTER_FILTER;WIN32;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>REGISTER_FILTER;WIN32;FLAC__NO_DLL;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>libavcodec_gcc.lib;libgcc.a;libmingwex.a;libflacD.lib;libfaad2D.lib;libmadD.lib;liba52D.lib;libdtsD.lib;decssDU.lib;dsutilDU.lib;foundation.lib;strmbaseDU.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>zlibD.lib;libavcodec_gcc.lib;libgcc.a;libmingwex.a;libflacD.lib;libfaad2D.lib;libmadD.lib;liba52D.lib;libdtsD.lib;decssDU.lib;dsutilDU.lib;foundation.lib;strmbaseDU.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MpaDecFilter.def</ModuleDefinitionFile>

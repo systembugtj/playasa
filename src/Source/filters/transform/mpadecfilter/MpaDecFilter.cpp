@@ -35,6 +35,7 @@
 #include "..\mpcvideodec\ffmpeg\libavcodec\avcodec.h"
 
 #include "faad2\include\neaacdec.h"
+
 #include "..\mpadecfilter\libflac\include\FLAC\stream_decoder.h"
 
 #include "..\..\..\svplib\svplib.h"
