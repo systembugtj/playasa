@@ -5,8 +5,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

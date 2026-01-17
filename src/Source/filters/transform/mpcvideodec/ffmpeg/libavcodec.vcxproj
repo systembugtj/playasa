@@ -107,8 +107,8 @@
     <IntDir>$(Configuration)$(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(Configuration)$(Platform)\</OutDir>

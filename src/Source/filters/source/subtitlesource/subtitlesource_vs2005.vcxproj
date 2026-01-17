@@ -137,14 +137,14 @@
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode lib|Win32'">
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <IncludePath>$(SolutionDir)src\Source\filters\BaseClasses;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <LibraryPath>$(SolutionDir)out\lib\$(Platform);$(SolutionDir)Thirdparty\pkg\trunk\unrar;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
     <TargetExt>.ax</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

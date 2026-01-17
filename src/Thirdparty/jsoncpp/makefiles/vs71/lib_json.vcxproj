@@ -75,18 +75,19 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>../../build/vs71/debug/lib_json\</OutDir>
     <IntDir>../../build/vs71/debug/lib_json\</IntDir>
+    <TargetName>json_vc71_libmtd</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='dummy|Win32'">
     <OutDir>$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

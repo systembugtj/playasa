@@ -127,7 +127,7 @@
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
     <IntDir>$(SolutionDir)out\obj\$(Platform)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <TargetExt>.ax</TargetExt>
@@ -150,8 +150,8 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode lib|Win32'">
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode lib|x64'">
     <OutDir>$(Platform)\$(Configuration)\</OutDir>

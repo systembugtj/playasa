@@ -106,21 +106,21 @@
     <GenerateManifest>true</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
     <IncludePath>$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
     <IncludePath>$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(SolutionDir)src\Source\filters\BaseClasses;$(SolutionDir)src\Thirdparty\wtl\include;$(SolutionDir)src\Thirdparty\boost\;</IncludePath>
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(DXSDK_DIR)include;$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
     <LibraryWPath>$(WindowsSDK_MetadataPath);$(SolutionDir)out\lib\$(Platform)\;$(SolutionDir)lib\;$(SolutionDir)out\bin\;</LibraryWPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>

@@ -21,6 +21,7 @@ RFC (Request for Comments) 是一种用于记录技术提案、设计决策和�
 - [RFC-0004: 构建错误修复 - BaseClasses 路径问题](./rfc-0004-build-errors-fix.md) - 修复 BaseClasses 头文件路径问题
 - [RFC-0005: mplayerc 项目路径修复](./rfc-0005-mplayerc-project-fix.md) - 修复 mplayerc 主项目路径问题
 - [RFC-0006: 输出目录统一化](./rfc-0006-output-directory-consolidation.md) - 统一所有项目的输出目录路径
+- [RFC-0007: 构建警告和错误修复](./rfc-0007-build-warnings-fix.md) - 修复构建警告和错误
 
 ### 草案中
 

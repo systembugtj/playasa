@@ -92,12 +92,12 @@
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode lib|Win32'">
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
-    <OutDir>$(SolutionDir)src\out\bin</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
     <TargetName>$(ProjectName)DU</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug lib|Win32'">
