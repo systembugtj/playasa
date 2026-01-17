@@ -8,6 +8,8 @@
 
 #include "../sqlite/sqlite3.h"
 
+#include <cstddef>
+#include <stdint.h>
 #include "exception.hpp"
 #include "session.hpp"
 

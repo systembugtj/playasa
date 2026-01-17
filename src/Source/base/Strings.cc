@@ -8,8 +8,8 @@ int Strings::Split(const wchar_t* input, const wchar_t* delimiter,
 {
 	int pos = 0;
 	int newpos = -1;
-	int sizes2 = lstrlen(delimiter);
-	int isize = lstrlen(input);
+	int sizes2 = lstrlenW(delimiter);
+	int isize = lstrlenW(input);
 
 	std::vector<int> positions;
 
@@ -131,7 +131,7 @@ std::wstring Strings::ResourceString(int id)
 	{
 		try
 		{
-			lpstrText = new TCHAR[nLen];
+			lpstrText = new wchar_t[nLen];
 		}
 		catch (...) {}
 
@@ -140,7 +140,7 @@ std::wstring Strings::ResourceString(int id)
 		if (Strings::m_hInstance == NULL)
 			Strings::m_hInstance = GetModuleHandle(NULL);
 
-		nRes = ::LoadString(NULL, id, lpstrText, nLen);
+		nRes = ::LoadStringW(Strings::m_hInstance, id, lpstrText, nLen);
 		if (nRes < nLen - 1)
 			break;
 		delete[] lpstrText;

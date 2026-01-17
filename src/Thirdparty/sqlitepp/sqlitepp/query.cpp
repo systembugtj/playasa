@@ -8,9 +8,12 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <cstddef>
+#include <stdint.h>
 
 #include "../sqlite/sqlite3.h"
 
+#include <cstddef>
 #include "query.hpp"
 #include "binders.hpp"
 #include "exception.hpp"

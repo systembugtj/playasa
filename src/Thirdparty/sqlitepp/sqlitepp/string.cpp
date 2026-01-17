@@ -7,6 +7,8 @@
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <iterator>
+#include <cstddef>
+#include <stdint.h>
 
 #include "string.hpp"
 #include "unicode.hpp"

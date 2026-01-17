@@ -121,7 +121,9 @@
     <ClCompile Include="md5.c" />
     <ClCompile Include="plug_openssl.c" />
     <ClCompile Include="rhash.c" />
-    <ClCompile Include="rhash_ex.cpp" />
+    <ClCompile Include="rhash_ex.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ripemd-160.c" />
     <ClCompile Include="sha1.c" />
     <ClCompile Include="sha256.c" />

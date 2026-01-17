@@ -1,1 +1,0 @@
-C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\vc++\Debug\libmpeg2.lib

@@ -8,6 +8,8 @@
 
 #include <algorithm>
 #include <numeric>
+#include <cstddef>
+#include <stdint.h>
 
 #include "../sqlite/sqlite3.h"
 

@@ -64,6 +64,11 @@
     <IntDir>.\Debug\</IntDir>
     <TargetName>id3libD</TargetName>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)src\out\bin\</OutDir>
     <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>

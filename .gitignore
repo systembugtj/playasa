@@ -1,12 +1,127 @@
-out
-Debug Unicode
-binaries
-Release
+# ============================================================================
+# Visual Studio / MSBuild Build Outputs
+# ============================================================================
+
+# Build configuration directories (all variants)
+[Dd]ebug/
+[Dd]ebug [Uu]nicode/
+[Dd]ebug [Ll]ib/
+[Dd]ebug [Uu]nicode [Ll]ib/
+[Dd]ebug[Ww]in32/
+[Dd]ebug_[Ss]tatic/
+[Rr]elease/
+[Rr]elease [Uu]nicode/
+[Rr]elease [Ll]ib/
+[Rr]elease [Uu]nicode [Ll]ib/
+[Rr]elease[Ww]in32/
+[Rr]elease_[Ss]tatic/
+debug-utf8/
+debug-utf16/
+release-utf8/
+release-utf16/
+
+# Standard output directories
+[Bb]in/
+[Ll]ib/
+[Oo]ut/
+[Oo]bj/
+[Bb]inaries/
+
+# ============================================================================
+# Visual Studio / MSBuild Intermediate Files
+# ============================================================================
+
+# Object files
+*.obj
+*.o
+
+# Precompiled headers
+*.pch
+*.gch
+
+# Database files
+*.idb
+*.ipdb
+*.pdb
+*.ilk
+
+# Build logs and tracking
+*.log
+*.tlog/
+*.lastbuildstate
+*.unsuccessfulbuild
+*.recipe
+*.vcxproj.FileListAbsolute.txt
+
+# IntelliSense database
+*.sdf
+*.opensdf
 *.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio cache/options
+.vs/
+.vscode/
+*.VC.db
+*.VC.VC.opendb
+
+# ============================================================================
+# Executables and Libraries
+# ============================================================================
+
+*.exe
 *.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.exp
+
+# ============================================================================
+# Resource Files (compiled)
+# ============================================================================
+
+*.res
 *.rsc
-lang
+*.resources
+
+# ============================================================================
+# Project Specific
+# ============================================================================
+
+# Language resources
+lang/
 /src/ipch
 /src/UpgradeLog.htm
-.vs/
-lib/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# ============================================================================
+# Platform Specific
+# ============================================================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+
+# Windows reserved names
+nul
+nul.txt
+nul.*

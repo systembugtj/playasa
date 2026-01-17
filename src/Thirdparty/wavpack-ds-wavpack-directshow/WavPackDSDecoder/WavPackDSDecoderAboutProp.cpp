@@ -74,7 +74,7 @@ HRESULT CWavPackDSDecoderAboutProp::OnActivate()
 
     GetModuleFileName(g_hInst, szExeName, sizeof (szExeName)); 
 
-    wsprintf(version, "Version %s - ("__DATE__", "__TIME__")",
+    wsprintf(version, "Version %s - (" __DATE__ ", " __TIME__ ")",
         GetDllVersion(szExeName));
 
 	SetDlgItemText(m_hwnd, IDC_LABEL_VERSION, version);

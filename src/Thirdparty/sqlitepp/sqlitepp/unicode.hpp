@@ -35,6 +35,8 @@
 
 #include <cassert>
 #include <stdexcept>
+#include <cstddef>
+#include <stdint.h>
 
 #include "string.hpp"
 

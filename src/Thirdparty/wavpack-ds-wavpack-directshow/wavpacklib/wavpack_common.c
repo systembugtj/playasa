@@ -16,7 +16,8 @@
 #ifdef _DEBUG
 
 #include <stdio.h>
-#include <tchar.h>
+#include <stdarg.h>
+#include <string.h>
 
 void DebugLog(const char *pFormat,...) {
     char szInfo[2000];
@@ -25,9 +26,9 @@ void DebugLog(const char *pFormat,...) {
     va_list va;
     va_start(va, pFormat);
     
-    _vstprintf(szInfo, 2000, pFormat, va);
-    lstrcat(szInfo, TEXT("\r\n"));
-    OutputDebugString(szInfo);
+    vsprintf_s(szInfo, sizeof(szInfo), pFormat, va);
+    strcat_s(szInfo, sizeof(szInfo), "\r\n");
+    OutputDebugStringA(szInfo);
     
     va_end(va);
 }

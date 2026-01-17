@@ -17,7 +17,7 @@
 #define SVP_MIN(a, b)  (((a) < (b)) ? (a) : (b)) 
 #define SVP_MAX(a, b)  (((a) > (b)) ? (a) : (b)) 
 
-#include <logging.h>
+#include "../base/logging.h"
 
 #ifndef SVP_LogMsg
 #define SVP_LogMsg(x, ...)  Logging(x)

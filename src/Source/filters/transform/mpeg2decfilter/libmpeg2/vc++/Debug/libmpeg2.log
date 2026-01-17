@@ -1,4 +1,0 @@
-﻿cpu_state.obj : warning LNK4006: _mpeg2_cpu_state_init already defined in cpu_state.obj; second definition ignored
-cpu_state.obj : warning LNK4006: _mpeg2_cpu_state_save already defined in cpu_state.obj; second definition ignored
-cpu_state.obj : warning LNK4006: _mpeg2_cpu_state_restore already defined in cpu_state.obj; second definition ignored
-  libmpeg2.vcxproj -> C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\vc++\Debug\libmpeg2.lib
