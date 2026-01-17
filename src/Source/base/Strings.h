@@ -2,6 +2,7 @@
 #define STRINGS_H
 
 #include <vector>
+#include <string>
 
 #define ResStr_STL(id) Strings::ResourceString(id)
 #include <wtypes.h>

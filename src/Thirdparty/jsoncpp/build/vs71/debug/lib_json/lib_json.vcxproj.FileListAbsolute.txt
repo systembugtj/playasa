@@ -1,0 +1,1 @@
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\jsoncpp\build\vs71\debug\lib_json\json_vc71_libmtd.lib

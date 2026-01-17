@@ -11,7 +11,7 @@ m_PerfFrequency(0)
 {
 	QueryPerformanceFrequency((LARGE_INTEGER*)&m_PerfFrequency);
 	wchar_t buff[MAX_PATH];
-	GetModuleFileName(NULL, buff, MAX_PATH);
+	GetModuleFileNameW(NULL, buff, MAX_PATH);
 	log_path = FilePath::GetInstance()->DirName(buff) + L"SVPDebug.log";
 	_wremove(log_path.c_str());
 }

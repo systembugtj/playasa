@@ -149,7 +149,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='WithOpenPGM|Win32'">
     <PreBuildEvent>
-      <Command>copy ..\platform.hpp ..\..\..\src</Command>
+      <Command>if exist "..\platform.hpp" copy "..\platform.hpp" "$(SolutionDir)src\"</Command>
     </PreBuildEvent>
     <ClCompile>
       <AdditionalOptions>-DDLL_EXPORT -DFD_SETSIZE=1024 %(AdditionalOptions)</AdditionalOptions>
