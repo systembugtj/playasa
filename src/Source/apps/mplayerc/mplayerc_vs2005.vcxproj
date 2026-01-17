@@ -27,25 +27,25 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <UseOfMfc>Static</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <UseOfMfc>Static</UseOfMfc>
     <UseOfAtl>false</UseOfAtl>
     <CharacterSet>Unicode</CharacterSet>
@@ -55,44 +55,44 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\common.props" />
-    <Import Project="..\..\debug.props" />
+    <Import Project="$(SolutionDir)src\Source\common.props" />
+    <Import Project="$(SolutionDir)src\Source\debug.props" />
     <Import Project="wtl_integration.props" />
-    <Import Project="$(SolutionDir)Source\apps\mplayerc\atlserver_integration.props" />
-    <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
-    <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
-    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)src\Source\apps\mplayerc\atlserver_integration.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\sinet.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\unrar_dll.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\sphash.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\common.props" />
-    <Import Project="$(SolutionDir)Source\release.props" />
+    <Import Project="$(SolutionDir)src\Source\common.props" />
+    <Import Project="$(SolutionDir)src\Source\release.props" />
     <Import Project="wtl_integration.props" />
-    <Import Project="$(SolutionDir)Source\apps\mplayerc\atlserver_integration.props" />
-    <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
-    <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
-    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)src\Source\apps\mplayerc\atlserver_integration.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\sinet.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\unrar_dll.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\sphash.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\common.props" />
-    <Import Project="..\..\debug.props" />
+    <Import Project="$(SolutionDir)src\Source\common.props" />
+    <Import Project="$(SolutionDir)src\Source\debug.props" />
     <Import Project="wtl_integration.props" />
-    <Import Project="$(SolutionDir)Source\apps\mplayerc\atlserver_integration.props" />
-    <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
-    <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
-    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)src\Source\apps\mplayerc\atlserver_integration.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\sinet.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\unrar_dll.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\sphash.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="wtl_integration.props" />
-    <Import Project="$(SolutionDir)Source\apps\mplayerc\atlserver_integration.props" />
-    <Import Project="$(SolutionDir)Source\common.props" />
-    <Import Project="$(SolutionDir)Source\release.props" />
-    <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
+    <Import Project="$(SolutionDir)src\Source\apps\mplayerc\atlserver_integration.props" />
+    <Import Project="$(SolutionDir)src\Source\common.props" />
+    <Import Project="$(SolutionDir)src\Source\release.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\sinet.props" />
     <Import Project="..\..\..\Thirdparty\sqlitepp.props" />
-    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
-    <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)src\Thirdparty\unrar_dll.props" />
     <Import Project="..\..\..\Thirdparty\boost.props" />
     <Import Project="..\..\..\Thirdparty\tcl.props" />
     <Import Project="..\..\..\Thirdparty\jsoncpp.props" />
@@ -106,21 +106,21 @@
     <GenerateManifest>true</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
     <IncludePath>$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)\out\bin\</OutDir>
-    <IntDir>$(SolutionDir)\out\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
-    <IncludePath>$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(SolutionDir)Source\filters\BaseClasses;$(SolutionDir)Thirdparty\wtl\include;$(SolutionDir)Thirdparty\boost\;</IncludePath>
-    <OutDir>$(SolutionDir)out\bin\</OutDir>
-    <IntDir>$(SolutionDir)out\obj\$(ProjectName)\</IntDir>
+    <IncludePath>$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(SolutionDir)src\Source\filters\BaseClasses;$(SolutionDir)src\Thirdparty\wtl\include;$(SolutionDir)src\Thirdparty\boost\;</IncludePath>
+    <OutDir>$(SolutionDir)src\out\bin</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(DXSDK_DIR)include;$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
     <LibraryWPath>$(WindowsSDK_MetadataPath);$(SolutionDir)out\lib\$(Platform)\;$(SolutionDir)lib\;$(SolutionDir)out\bin\;</LibraryWPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)src\out\bin</OutDir>
+    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>

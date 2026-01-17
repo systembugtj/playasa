@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+# Visual Studio 2025
+VisualStudioVersion = 18.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Filters", "Filters", "{F127F305-5EF5-4B69-B35F-8B30021B175D}"
 EndProject
@@ -213,9 +213,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqliteppTest", "Test\sqlite
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "res_french", "Source\apps\lang\res_french\res_french.vcxproj", "{BD6502B7-5734-4415-8F87-9F8FEAA79157}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "splayer_prototype", "Prototype\SPlayerNewGui\splayer\splayer.vcxproj", "{BD0569B4-084B-40D2-B968-F28904716FCF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "splayer_prototype", "src\src\Prototype\SPlayerNewGui\splayer\splayer.vcxproj", "{BD0569B4-084B-40D2-B968-F28904716FCF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "splayer_rsc", "Prototype\SPlayerNewGui\splayer_rsc\splayer_rsc.vcxproj", "{B29116D8-3B09-42A7-8F73-F306D0D7E4D1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "splayer_rsc", "src\src\Prototype\SPlayerNewGui\splayer_rsc\splayer_rsc.vcxproj", "{B29116D8-3B09-42A7-8F73-F306D0D7E4D1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yamlcpp", "Thirdparty\yaml-cpp\yamlcpp.vcxproj", "{3104AB4E-CD31-4F47-95E9-0E8D9374E15D}"
 EndProject
