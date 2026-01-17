@@ -1,0 +1,6 @@
+﻿cl : command line  warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  WavPackDSSplitter.cpp
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\wavpack-ds-wavpack-directshow\WavPackDSSplitter\WavPackDSSplitter.cpp(25,10): error C1083: Cannot open include file: 'streams.h': No such file or directory
+  RegistryUtils.cpp
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\wavpack-ds-wavpack-directshow\WavPackDSSplitter\RegistryUtils.cpp(3,10): error C1083: Cannot open include file: 'streams.h': No such file or directory
+  Generating Code...

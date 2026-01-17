@@ -1,0 +1,809 @@
+﻿
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\librhash\librhash\rhash_ex.cpp(3,10): error C1083: Cannot open 
+include file: 'boost/filesystem.hpp': No such file or directory 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\librhash\librhash\librhash.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(156,5): 
+error MSB3073: The command "C:\Users\alber\ws\prj\playasa\playasa\BuildScript\pre-build.cmd 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\svplib\svplib.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppCommon.targets(156,5): 
+error MSB3073: :VCEnd" exited with code 3. [C:\Users\alber\ws\prj\playasa\playasa\src\Source\svplib\svplib.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subtitles\libssf\Subtitle.cpp(306,9): error C2664: 'double 
+modf(double,double *)': cannot convert argument 2 from 'float *' to 'double *' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subtitles\libssf\libssf_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.h(30,10): error C2065: 'IDirect3DDevice7': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.h(30,2): error C2923: 'ATL::CComPtr': 
+'IDirect3DDevice7' is not a valid template type argument for parameter 'T' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.h(37,13): error C2061: syntax error: identifier 
+'IDirect3DDevice7' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.h(52,13): error C2065: 'IDirect3DDevice7': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.h(52,5): error C2923: 'ATL::CComPtr': 
+'IDirect3DDevice7' is not a valid template type argument for parameter 'T' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.h(58,22): error C2061: syntax error: identifier 
+'IDirect3DDevice7' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(31,24): error C2065: 'IDirect3DDevice7': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(31,42): error C2065: 'pD3DDev': undeclared 
+identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(31,72): error C2065: 'pSurface': undeclared 
+identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(31,51): error C2275: 'IDirectDrawSurface7': 
+expected an expression instead of a type 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(31,13): error C7550: 'CDX7SubPic::{ctor}': the 
+qualified name in this context names a constructor, not a type 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(32,2): error C2059: syntax error: ':' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(32,15): error C2065: 'pSurface': undeclared 
+identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(32,4): error C4430: missing type specifier - int 
+assumed. Note: C++ does not support default-int 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(33,14): error C2065: 'pD3DDev': undeclared 
+identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(33,4): error C4430: missing type specifier - int 
+assumed. Note: C++ does not support default-int 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(34,1): error C2059: syntax error: '{' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(34,1): error C2143: syntax error: missing ';' 
+before '{' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(34,1): error C2447: '{': missing function header 
+(old-style formal list?) [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(175,35): error C2065: 'D3DRENDERSTATE_CULLMODE': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(176,35): error C2065: 'D3DRENDERSTATE_LIGHTING': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(177,35): error C2065: 
+'D3DRENDERSTATE_BLENDENABLE': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(178,35): error C2065: 'D3DRENDERSTATE_SRCBLEND': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(179,35): error C2065: 
+'D3DRENDERSTATE_DESTBLEND': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(185,44): error C2065: 'D3DTSS_MAGFILTER': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(185,62): error C2065: 'D3DTFG_LINEAR': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(186,44): error C2065: 'D3DTSS_MINFILTER': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(186,62): error C2065: 'D3DTFN_LINEAR': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(187,44): error C2065: 'D3DTSS_MIPFILTER': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(187,62): error C2065: 'D3DTFP_LINEAR': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(189,44): error C2065: 'D3DTSS_ADDRESS': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(209,25): error C2065: 'D3DDP_WAIT': undeclared 
+identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(227,42): error C2065: 'IDirect3DDevice7': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(227,60): error C2065: 'pD3DDev': undeclared 
+identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(227,69): error C2275: 'SIZE': expected an 
+expression instead of a type [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(227,74): error C2146: syntax error: missing ')' 
+before identifier 'maxsize' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(228,32): error C2143: syntax error: missing ')' 
+before ',' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(228,25): error C2259: 'ISubPicAllocatorImpl': 
+cannot instantiate abstract class [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(228,25): error C2512: 'ISubPicAllocatorImpl': no 
+appropriate default constructor available 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(228,34): error C2059: syntax error: 'constant' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(228,53): error C2059: syntax error: ')' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(231,1): error C2143: syntax error: missing ';' 
+before '{' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(231,1): error C2447: '{': missing function 
+header (old-style formal list?) [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(238,12): error C2065: 'IDirect3DDevice7': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(238,31): error C2065: 'IID_IDirect3DDevice7': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(238,2): error C2923: 'ATL::CComQIPtr': 
+'IDirect3DDevice7' is not a valid template type argument for parameter 'T' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(238,31): error C2975: 'piid': invalid template 
+argument for 'ATL::CComQIPtr', expected compile-time constant expression 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(238,61): error C2514: 'ATL::CComQIPtr': class 
+template cannot be constructed [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(242,2): error C2678: binary '=': no operator 
+found which takes a left-hand operand of type 'ATL::CComPtr' (or there is no acceptable conversion) 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(242,12): error C2582: 'operator =' function is 
+unavailable in 'ATL::CComPtr' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(279,10): error C2065: 'IDirect3D7': undeclared 
+identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(279,2): error C2923: 'ATL::CComPtr': 
+'IDirect3D7' is not a valid template type argument for parameter 'T' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(279,22): error C2133: 'pD3D': unknown size 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(279,22): error C2512: 'ATL::CComPtr': no 
+appropriate default constructor available 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(281,57): error C2679: binary '=': no operator 
+found which takes a right-hand operand of type 'ATL::CComPtr' (or there is no acceptable conversion) 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\DX7SubPic.cpp(288,33): error C2661: 'CDX7SubPic::CDX7SubPic': 
+no overloaded function takes 2 arguments 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\subpic\subpic_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+LINK : fatal error LNK1181: cannot open input file 'basevideofilter.lib' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\svpfilter\svpfilter.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\common.h(318,23): error 
+C2169: 'lrintf': intrinsic function, cannot be defined 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpadecfilter\faad2\libfaad\libfaad_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\source\d2vsource\idctref.cpp(354,3): error C2420: '__floor': 
+illegal symbol in first operand 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\source\d2vsource\d2vsource_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\source\d2vsource\idctref.cpp(354,3): error C2415: improper 
+operand type [C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\source\d2vsource\d2vsource_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\source\d2vsource\idctref.cpp(357,3): error C2420: '__floor': 
+illegal symbol in first operand 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\source\d2vsource\d2vsource_vs2005.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\source\d2vsource\idctref.cpp(357,3): error C2415: improper 
+operand type [C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\source\d2vsource\d2vsource_vs2005.vcxproj]
+LINK : fatal error LNK1181: cannot open input file 'libflac.lib' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\source\flacsource\Flacsource.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2117,17): 
+error C3646: 'm_pConfigs': unknown override specifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2117,2): error 
+C4430: missing type specifier - int assumed. Note: C++ does not support default-int 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2038,44): 
+error C2065: 'GC_PAN_WITH_GUTTER': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2038,44): 
+error C2065: 'GC_PAN_WITH_INERTIA': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2102,32): 
+error C2065: 'GC_ALLGESTURES': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2044,43): 
+error C2065: 'GID_ZOOM': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2044,55): 
+error C2065: 'GC_ZOOM': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2044,67): 
+error C2065: 'GC_ZOOM': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2050,45): 
+error C2065: 'GID_ROTATE': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2050,59): 
+error C2065: 'GC_ROTATE': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2050,73): 
+error C2065: 'GC_ROTATE': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2056,51): 
+error C2065: 'GID_TWOFINGERTAP': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2056,71): 
+error C2065: 'GC_TWOFINGERTAP': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2056,91): 
+error C2065: 'GC_TWOFINGERTAP': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2070,45): 
+error C2065: 'GID_PAN': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2070,56): 
+error C2065: 'GC_PAN': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2070,67): 
+error C2065: 'GC_PAN': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2076,50): 
+error C2065: 'GID_PAN': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2076,61): 
+error C2065: 'GC_PAN_WITH_SINGLE_FINGER_VERTICALLY': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2076,102): 
+error C2065: 'GC_PAN_WITH_SINGLE_FINGER_VERTICALLY': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2082,52): 
+error C2065: 'GID_PAN': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2082,63): 
+error C2065: 'GC_PAN_WITH_SINGLE_FINGER_HORIZONTALLY': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2082,106): 
+error C2065: 'GC_PAN_WITH_SINGLE_FINGER_HORIZONTALLY': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2088,52): 
+error C2065: 'GID_PAN': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2088,63): 
+error C2065: 'GC_PAN_WITH_GUTTER': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2088,86): 
+error C2065: 'GC_PAN_WITH_GUTTER': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2094,53): 
+error C2065: 'GID_PAN': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2094,64): 
+error C2065: 'GC_PAN_WITH_INERTIA': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2094,88): 
+error C2065: 'GC_PAN_WITH_INERTIA': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2978,15): 
+error C3646: 'GetCurrentGestureInfo': unknown override specifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2978,36): 
+error C2059: syntax error: '(' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(2979,2): error 
+C2334: unexpected token(s) preceding '{'; skipping apparent function body 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(3034,48): 
+error C2061: syntax error: identifier 'PTOUCHINPUT' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(3044,75): 
+error C2061: syntax error: identifier 'PTOUCHINPUT' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(3057,15): 
+error C3646: 'm_pCurrentGestureInfo': unknown override specifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\atlmfc\include\afxwin.h(3057,2): error 
+C4430: missing type specifier - int assumed. Note: C++ does not support default-int 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj]
+LINK : fatal error LNK1181: cannot open input file 'libmpeg2.lib' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\Mpeg2DecFilter_vs2005.vcxproj]
+LINK : fatal error LNK1181: cannot open input file 'basesplitter.lib' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\realmediasplitter\RealMediaSplitter_vs2005.vcxproj]
+LINK : fatal error LNK1181: cannot open input file 'C:\Users\alber\ws\prj\playasa\playasa\Thirdparty\pkg\unrar.lib' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Test\RARChunk_unitest\ChuckTest.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Test\sqliteppTest\sqliteppTest.vcxproj(52,5): error MSB4019: The imported 
+project "C:\Users\alber\ws\prj\playasa\playasa\Source\apps\mplayerc\wtl_integration.props" was not found. Confirm that 
+the expression in the Import declaration "$(SolutionDir)Source\apps\mplayerc\wtl_integration.props", which evaluated 
+to "C:\Users\alber\ws\prj\playasa\playasa\Source\apps\mplayerc\wtl_integration.props", is correct, and that the file 
+exists on disk.
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(13,37): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(13,37): error C2065: 'wstring': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(13,25): error C2923: 'std::vector': 'wstring' is not a 
+valid template type argument for parameter '_Ty' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(13,25): error C2976: 'std::vector': too few template 
+arguments [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(14,15): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(14,23): error C3646: 'StringToWString': unknown 
+override specifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(14,39): error C2059: syntax error: 'const' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(14,50): error C2039: 'string': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(14,60): error C2238: unexpected token(s) preceding ';' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(15,15): error C2039: 'string': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(15,22): error C3646: 'WStringToString': unknown 
+override specifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(15,38): error C2059: syntax error: 'const' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(15,49): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(15,60): error C2238: unexpected token(s) preceding ';' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(16,15): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(16,23): error C3646: 'Utf8StringToWString': unknown 
+override specifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(16,43): error C2059: syntax error: 'const' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(16,54): error C2039: 'string': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(16,64): error C2238: unexpected token(s) preceding ';' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(17,15): error C2039: 'string': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(17,22): error C3646: 'WStringToUtf8String': unknown 
+override specifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(17,42): error C2059: syntax error: 'const' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(17,53): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(17,64): error C2238: unexpected token(s) preceding ';' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(18,25): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(18,25): error C2061: syntax error: identifier 
+'wstring' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(19,15): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(19,23): error C3646: 'ResourceString': unknown 
+override specifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(19,38): error C2062: type 'int' unexpected 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(19,45): error C2238: unexpected token(s) preceding ';' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(20,15): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(20,23): error C3646: 'Format': unknown override 
+specifier [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(20,30): error C2059: syntax error: 'const' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.h(20,57): error C2238: unexpected token(s) preceding ';' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(7,19): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(7,19): error C2065: 'wstring': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(7,7): error C2923: 'std::vector': 'wstring' is not a 
+valid template type argument for parameter '_Ty' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(7,7): error C2976: 'std::vector': too few template 
+arguments [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(35,8): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(35,8): error C2065: 'wstring': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(35,16): error C2146: syntax error: missing ';' before 
+identifier 's' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(35,16): error C2065: 's': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(37,4): error C2065: 's': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(44,6): error C2065: 's': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(46,6): error C2065: 's': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(49,23): error C2065: 's': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(55,6): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(55,23): error C2039: 'StringToWString': is not a 
+member of 'Strings' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(55,6): error C4430: missing type specifier - int 
+assumed. Note: C++ does not support default-int [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(55,23): error C2146: syntax error: missing ';' before 
+identifier 'StringToWString' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(55,50): error C2039: 'string': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(56,1): error C2143: syntax error: missing ';' before 
+'{' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(56,1): error C2447: '{': missing function header 
+(old-style formal list?) [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(68,6): error C2039: 'string': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(68,22): error C2039: 'WStringToString': is not a 
+member of 'Strings' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(68,6): error C4430: missing type specifier - int 
+assumed. Note: C++ does not support default-int [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(68,22): error C2146: syntax error: missing ';' before 
+identifier 'WStringToString' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(68,49): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(69,1): error C2143: syntax error: missing ';' before 
+'{' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(69,1): error C2447: '{': missing function header 
+(old-style formal list?) [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(83,6): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(83,23): error C2039: 'Utf8StringToWString': is not a 
+member of 'Strings' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(83,6): error C4430: missing type specifier - int 
+assumed. Note: C++ does not support default-int [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(83,6): error C2086: 'int wstring': redefinition 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(83,23): error C2146: syntax error: missing ';' before 
+identifier 'Utf8StringToWString' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(83,54): error C2039: 'string': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(84,1): error C2143: syntax error: missing ';' before 
+'{' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(84,1): error C2447: '{': missing function header 
+(old-style formal list?) [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(96,6): error C2039: 'string': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(96,22): error C2039: 'WStringToUtf8String': is not a 
+member of 'Strings' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(96,6): error C4430: missing type specifier - int 
+assumed. Note: C++ does not support default-int [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(96,6): error C2086: 'int string': redefinition 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(96,22): error C2146: syntax error: missing ';' before 
+identifier 'WStringToUtf8String' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(96,53): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(97,1): error C2143: syntax error: missing ';' before 
+'{' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(97,1): error C2447: '{': missing function header 
+(old-style formal list?) [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(110,25): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(110,34): error C2065: 's': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(110,15): error C2761: 'void Strings::Trim(void)': 
+redeclaration of member is not allowed [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(111,1): error C2143: syntax error: missing ';' before 
+'{' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(112,7): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(112,7): error C3083: 'wstring': the symbol to the 
+left of a '::' must be a type [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(112,16): error C2039: 'size_type': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(112,16): error C4430: missing type specifier - int 
+assumed. Note: C++ does not support default-int [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(112,26): error C2146: syntax error: missing ';' 
+before identifier 'first' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(113,2): error C2059: syntax error: 'if' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(113,20): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(113,20): error C3083: 'wstring': the symbol to the 
+left of a '::' must be a type [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(113,29): error C2039: 'npos': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(115,2): error C2059: syntax error: 'else' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(116,2): error C2143: syntax error: missing ';' before 
+'{' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(116,2): error C2447: '{': missing function header 
+(old-style formal list?) [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(120,1): error C2059: syntax error: '}' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(120,1): error C2143: syntax error: missing ';' before 
+'}' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(122,1): error C2143: syntax error: missing ';' before 
+'{' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(122,1): error C2447: '{': missing function header 
+(old-style formal list?) [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(125,6): error C2039: 'wstring': is not a member of 
+'std' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(125,23): error C2039: 'ResourceString': is not a 
+member of 'Strings' [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(125,6): error C4430: missing type specifier - int 
+assumed. Note: C++ does not support default-int [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(125,6): error C2086: 'int wstring': redefinition 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\Strings.cc(125,6): error C1003: error count exceeds 100; 
+stopping compilation [C:\Users\alber\ws\prj\playasa\playasa\src\Source\base\base.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Test\MediaTree_Test\main.cpp(4,10): error C1083: Cannot open include file: 
+'boost/thread.hpp': No such file or directory 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Test\MediaTree_Test\MediaTree_Test.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\apps\mplayerc\Model\MediaDB.cc(5,1): error C1010: unexpected end of 
+file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source? 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Test\MediaTree_Test\MediaTree_Test.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\apps\mplayerc\Model\MediaModel.cc(307,1): error C1010: unexpected end 
+of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source? 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Test\MediaTree_Test\MediaTree_Test.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\apps\mplayerc\Model\MediaSQLite.cc(6,1): error C1010: unexpected end 
+of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source? 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Test\MediaTree_Test\MediaTree_Test.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\apps\mplayerc\Model\MediaTreeModel.cc(243,1): error C1010: unexpected 
+end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source? 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Test\MediaTree_Test\MediaTree_Test.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(619,23): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(619,23): error C2065: 'iostate': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(619,31): error C2146: syntax error: 
+missing ';' before identifier '_State' [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(619,31): error C2065: '_State': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(619,49): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(619,49): error C2065: 'goodbit': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(622,9): 
+error C2027: use of undefined type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(622,51): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(625,36): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(628,29): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(628,5): 
+error C4430: missing type specifier - int assumed. Note: C++ does not support default-int 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(628,36): error C2146: syntax error: 
+missing ';' before identifier '_Ok' [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(628,36): error C3861: '_Ok': identifier 
+not found [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(630,10): error C2065: '_Ok': undeclared 
+identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(631,9): 
+error C2065: '_State': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(631,28): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(631,28): error C2065: 'badbit': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(634,14): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(634,39): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(634,39): error C2065: 'adjustfield': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(634,64): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(636,58): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(636,79): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(636,30): error C2660: 
+'std::_Narrow_char_traits<char,int>::eq_int_type': function does not take 1 arguments 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(637,21): error C2065: '_State': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(637,40): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(637,40): error C2065: 'badbit': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(643,13): error C2065: '_State': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(643,32): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(643,32): error C2065: 'goodbit': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(644,16): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(645,13): error C2065: '_State': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(645,32): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(645,32): error C2065: 'badbit': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(648,58): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(648,79): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(648,30): error C2660: 
+'std::_Narrow_char_traits<char,int>::eq_int_type': function does not take 1 arguments 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(649,21): error C2065: '_State': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(649,40): error C2027: use of undefined 
+type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(649,40): error C2065: 'badbit': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(655,9): 
+error C2027: use of undefined type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(656,9): 
+error C2027: use of undefined type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(656,9): 
+error C2065: 'badbit': undeclared identifier 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(659,5): 
+error C2027: use of undefined type 'std::basic_ostream<char,std::char_traits<char>>' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Program Files\Microsoft Visual 
+Studio\18\Community\VC\Tools\MSVC\14.50.35717\include\__msvc_string_view.hpp(659,20): error C2065: '_State': 
+undeclared identifier [C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\yaml-cpp\yamlcpp.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\WavPackSplitter\WavPackSplitter.vcxproj(45,5): error 
+MSB4019: The imported project "C:\Users\alber\ws\prj\playasa\playasa\src\release.props" was not found. Confirm that 
+the expression in the Import declaration "$(SolutionDir)src\release.props", which evaluated to 
+"C:\Users\alber\ws\prj\playasa\playasa\src\release.props", is correct, and that the file exists on disk.
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\wavpack-ds-wavpack-directshow\WavPackDSDecoder\WavPackDSDecoderAbo
+utProp.cpp(77,47): error C3680: cannot concatenate user-defined string literals with mismatched literal suffix 
+identifiers [C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\WavPackDecoder\WavPackDecoder.vcxproj]
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\wavpack-ds-wavpack-directshow\WavPackDSDecoder\WavPackDSDecoderAbo
+utProp.cpp(77,23): error C3688: invalid literal suffix '__DATE__'; literal operator or literal operator template 
+'operator ""__DATE__' not found 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\WavPackDecoder\WavPackDecoder.vcxproj]
+LINK : fatal error LNK1181: cannot open input file 'libdirac.lib' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\diracsplitter\DiracSplitter_vs2005.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+LINK : fatal error LNK1181: cannot open input file 'id3lib.lib' 
+[C:\Users\alber\ws\prj\playasa\playasa\src\lib\lyriclib\lyriclib.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.26100.0\ucrt\stdio.h(1914,1): error C1189: #error:  Macro 
+definition of snprintf conflicts with Standard Library function declaration 
+[C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\parser\mp4splitter\MP4Splitter_vs2005.vcxproj]
+
+

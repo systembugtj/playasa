@@ -1,0 +1,217 @@
+﻿cl : command line  warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  motion_comp_mmx.c
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(69,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(69,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(69,5): warning C4013: '__volatile__' undefined; assuming extern returning int
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(77,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(77,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(77,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(78,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(78,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(80,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(80,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(80,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(81,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(81,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(83,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(83,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(84,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(84,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(84,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(85,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(85,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(85,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(86,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(86,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(87,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(87,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(88,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(88,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(88,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(97,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(97,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(97,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(98,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(98,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(100,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(100,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(100,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(101,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(101,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(103,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(103,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(103,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(104,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(104,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(106,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(106,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(107,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(107,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(107,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(108,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(108,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(108,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(109,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(109,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(110,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(110,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(111,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(111,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(113,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(113,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(114,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(114,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(114,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(115,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(115,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(115,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(116,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(116,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(117,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(117,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(118,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(118,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(118,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(128,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(128,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(128,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(129,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(129,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(131,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(131,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(132,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(132,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(134,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(134,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(134,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(135,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(135,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(137,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(137,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(138,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(138,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(140,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(140,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(141,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(141,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(145,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(145,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(145,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(146,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(146,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(148,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(148,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(149,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\motion_comp_mmx.c(149,5): error C1003: error count exceeds 100; stopping compilation
+  idct_mmx.c
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(152,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(152,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(152,5): warning C4013: '__volatile__' undefined; assuming extern returning int
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(152,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(154,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(154,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(154,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(155,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(155,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(157,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(157,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(157,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(158,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(158,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(160,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(160,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(160,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(161,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(161,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(163,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(163,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(163,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(169,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(169,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(169,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(170,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(170,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(172,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(172,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(172,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(173,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(173,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(173,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(175,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(175,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(175,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(176,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(176,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(178,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(178,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(178,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(179,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(179,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(181,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(181,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(181,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(182,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(182,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(184,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(184,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(184,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(185,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(185,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(187,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(187,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(187,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(188,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(188,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(190,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(190,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(190,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(191,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(191,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(193,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(193,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(193,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(194,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(194,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(196,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(196,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(197,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(197,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(197,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(199,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(199,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(200,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(200,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(202,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(202,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(203,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(203,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(208,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(208,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(208,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(210,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(210,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(210,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(212,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(212,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(214,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(214,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(216,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(216,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(216,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(217,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(217,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(217,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(221,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(221,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(221,5): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(228,5): error C2065: '__asm__': undeclared identifier
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(228,5): error C2146: syntax error: missing ';' before identifier '__volatile__'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\idct_mmx.c(228,5): error C1003: error count exceeds 100; stopping compilation
+  cpu_accel.c
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\cpu_accel.c(73,2): warning C4013: '__asm__' undefined; assuming extern returning int
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\cpu_accel.c(83,4): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\cpu_accel.c(92,2): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\cpu_accel.c(98,2): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\cpu_accel.c(112,2): error C2143: syntax error: missing ')' before ':'
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpeg2decfilter\libmpeg2\libmpeg2\cpu_accel.c(116,2): error C2143: syntax error: missing ')' before ':'
+  Generating Code...

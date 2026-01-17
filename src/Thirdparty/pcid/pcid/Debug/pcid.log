@@ -1,0 +1,87 @@
+﻿cl : command line  warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  stdafx.cpp
+cl : command line  warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  SMBiosTable.cpp
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(40,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/SMBiosTable.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(124,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/SMBiosTable.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(199,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/SMBiosTable.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(276,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/SMBiosTable.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(364,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/SMBiosTable.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.cpp(261,19): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/SMBiosTable.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.cpp(382,54): warning C4244: '=': conversion from 'SHORT' to 'unsigned char', possible loss of data
+  (compiling source file '/SMBiosTable.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.cpp(391,55): warning C4244: '=': conversion from 'SHORT' to 'unsigned char', possible loss of data
+  (compiling source file '/SMBiosTable.cpp')
+  
+  PCIdentificationCode.cpp
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\PCIdentificationCode.cpp(99,21): warning C4244: '=': conversion from 'DWORD' to 'BYTE', possible loss of data
+  (compiling source file '/PCIdentificationCode.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\PCIdentificationCode.cpp(176,21): warning C4244: '=': conversion from 'DWORD' to 'BYTE', possible loss of data
+  (compiling source file '/PCIdentificationCode.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\PCIdentificationCode.cpp(238,71): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/PCIdentificationCode.cpp')
+  
+  PCIDCalculator.cpp
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(40,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/PCIDCalculator.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(124,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/PCIDCalculator.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(199,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/PCIDCalculator.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(276,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/PCIDCalculator.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(364,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/PCIDCalculator.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\PCIDCalculator.cpp(252,14): warning C4018: '>': signed/unsigned mismatch
+  (compiling source file '/PCIDCalculator.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\PCIDCalculator.cpp(270,14): warning C4018: '>': signed/unsigned mismatch
+  (compiling source file '/PCIDCalculator.cpp')
+  
+  MyMacAddress.cpp
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\MyMacAddress.cpp(2,9): warning C4603: '_WIN32_DCOM': macro is not defined or definition is different after precompiled header use
+  (compiling source file '/MyMacAddress.cpp')
+      C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\MyMacAddress.cpp(2,9):
+      Add macro to precompiled header instead of defining here
+      C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\MyMacAddress.cpp(3,1):
+      use of precompiled header
+  
+  md5.cpp
+  BiosInfo.cpp
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(40,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/BiosInfo.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(124,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/BiosInfo.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(199,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/BiosInfo.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(276,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/BiosInfo.cpp')
+  
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\pcid\pcid\SMBiosTable.h(364,18): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file '/BiosInfo.cpp')
+  
+  Generating Code...
+  pcid.vcxproj -> C:\Users\alber\ws\prj\playasa\playasa\Debug\pcid.dll

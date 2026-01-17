@@ -1,0 +1,7 @@
+﻿cl : command line  warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  wavpack_common.c
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\wavpack-ds-wavpack-directshow\wavpacklib\wavpack_common.c(28,24): warning C4047: 'function': 'const char *const ' differs in levels of indirection from 'int'
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\wavpack-ds-wavpack-directshow\wavpacklib\wavpack_common.c(28,24): warning C4024: 'vsprintf': different types for formal and actual parameter 2
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\wavpack-ds-wavpack-directshow\wavpacklib\wavpack_common.c(28,30): warning C4090: 'function': different 'const' qualifiers
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\wavpack-ds-wavpack-directshow\wavpacklib\wavpack_common.c(28,39): error C2197: 'int vsprintf(char *const ,const char *const ,va_list)': too many arguments for call
+C:\Users\alber\ws\prj\playasa\playasa\src\Thirdparty\wavpack-ds-wavpack-directshow\wavpacklib\wavpack_common.c(28,5): warning C4996: 'vsprintf': This function or variable may be unsafe. Consider using vsprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.

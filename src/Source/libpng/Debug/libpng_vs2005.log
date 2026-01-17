@@ -1,0 +1,22 @@
+﻿  png.c
+  pngerror.c
+  pnggccrd.c
+  pngget.c
+  pngmem.c
+  pngpread.c
+  pngread.c
+  pngrio.c
+  pngrtran.c
+  pngrutil.c
+  pngset.c
+  pngtest.c
+  pngtrans.c
+  pngvcrd.c
+  pngwio.c
+  pngwrite.c
+  pngwtran.c
+  pngwutil.c
+  Generating Code...
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(1574,5): warning MSB8012: TargetPath(C:\Users\alber\ws\prj\playasa\playasa\Debug\libpng.lib) does not match the Library's OutputFile property value (C:\Users\alber\ws\prj\playasa\playasa\src\lib\libpngD.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(1576,5): warning MSB8012: TargetName(libpng) does not match the Library's OutputFile property value (libpngD). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+  libpng_vs2005.vcxproj -> C:\Users\alber\ws\prj\playasa\playasa\Debug\libpng.lib

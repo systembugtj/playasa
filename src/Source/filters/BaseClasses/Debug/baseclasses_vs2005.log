@@ -1,0 +1,38 @@
+﻿cl : command line  warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  wxutil.cpp
+  wxlist.cpp
+  wxdebug.cpp
+  winutil.cpp
+  winctrl.cpp
+  vtrans.cpp
+  videoctl.cpp
+  transip.cpp
+  transfrm.cpp
+  sysclock.cpp
+  strmctl.cpp
+  source.cpp
+  seekpt.cpp
+  schedule.cpp
+  renbase.cpp
+  refclock.cpp
+  pullpin.cpp
+  pstream.cpp
+  perflog.cpp
+  outputq.cpp
+  Generating Code...
+  Compiling...
+  mtype.cpp
+  dllsetup.cpp
+  dllentry.cpp
+  ddmm.cpp
+  ctlutil.cpp
+  cprop.cpp
+  combase.cpp
+  arithutil.cpp
+  amvideo.cpp
+  amfilter.cpp
+  amextra.cpp
+  Generating Code...
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(1574,5): warning MSB8012: TargetPath(C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\BaseClasses\Debug\BaseClasses.lib) does not match the Library's OutputFile property value (C:\Users\alber\ws\prj\playasa\playasa\src\lib\strmbaseD.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(1576,5): warning MSB8012: TargetName(BaseClasses) does not match the Library's OutputFile property value (strmbaseD). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+  baseclasses_vs2005.vcxproj -> C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\BaseClasses\Debug\BaseClasses.lib

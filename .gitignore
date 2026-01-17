@@ -8,3 +8,5 @@ Release
 lang
 /src/ipch
 /src/UpgradeLog.htm
+.vs/
+lib/
