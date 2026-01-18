@@ -10,8 +10,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\include\;$(SolutionDir)src\include\dx;$(SolutionDir)src\Source\base;$(SolutionDir)src\Source\filters\BaseClasses;$(SolutionDir)src\Thirdparty\sqlitepp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WINVER=0x0A00;_WIN32_WINNT=0x0A00;NTDDI_VERSION=NTDDI_WIN10_RS1;PSAPI_VERSION=1;_CRT_STDINT_H;DIRECT3D_VERSION=0x0700;PTRDIFF_MAX=0x7fffffff;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\include\;$(SolutionDir)src\include\dx;$(SolutionDir)src\Source\base;$(SolutionDir)src\Source\filters\BaseClasses;$(SolutionDir)src\Thirdparty\sqlitepp;$(SolutionDir)src\Thirdparty\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WINVER=0x0A00;_WIN32_WINNT=0x0A00;NTDDI_VERSION=NTDDI_WIN10_RS1;PSAPI_VERSION=1;_CRT_STDINT_H;DIRECT3D_VERSION=0x0700;PTRDIFF_MAX=0x7fffffff;_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4995;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
