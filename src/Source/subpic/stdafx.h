@@ -44,3 +44,10 @@
 #include <streams.h>
 #include <dvdmedia.h>
 #include "..\DSUtil\DSUtil.h"
+
+// DirectX 7 headers
+#ifndef DIRECT3D_VERSION
+#define DIRECT3D_VERSION 0x0700
+#endif
+#include <ddraw.h>
+#include <d3d.h>

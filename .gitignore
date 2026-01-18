@@ -22,10 +22,13 @@ release-utf16/
 
 # Standard output directories
 [Bb]in/
-[Ll]ib/
+/[Ll]ib/
 [Oo]ut/
 [Oo]bj/
 [Bb]inaries/
+
+# Third-party and library source code (should be managed separately or as submodules)
+src/lib/
 
 # ============================================================================
 # Visual Studio / MSBuild Intermediate Files

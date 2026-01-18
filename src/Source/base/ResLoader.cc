@@ -3,6 +3,7 @@
 
 #include <Shlwapi.h>
 #include <atlimage.h>
+#include <string>
 #pragma comment(lib, "shlwapi.lib")
 
 HINSTANCE ResLoader::hResourceHandle = NULL;
@@ -63,7 +64,15 @@ HBITMAP ResLoader::LoadBitmapFromDisk(const std::wstring& sBitmapPath)
   std::wstring sFullPath = GetModuleFolder() + sBitmapPath;
 
   CImage igImage;
-  igImage.Load(sFullPath.c_str()); // CImage::Load accepts LPCTSTR which is wchar_t* in Unicode builds
+  // CImage::Load accepts LPCTSTR, which is wchar_t* in Unicode builds and char* in MultiByte builds
+  // Since we're using std::wstring, we need to convert for MultiByte builds
+#ifdef _UNICODE
+  igImage.Load(sFullPath.c_str());
+#else
+  // Convert wstring to string for MultiByte builds
+  std::string sFullPathA(sFullPath.begin(), sFullPath.end());
+  igImage.Load(sFullPathA.c_str());
+#endif
 
   HBITMAP hBitmap = (HBITMAP)igImage;
 

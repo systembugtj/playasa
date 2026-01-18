@@ -22,7 +22,9 @@ RFC (Request for Comments) 是一种用于记录技术提案、设计决策和�
 - [RFC-0005: mplayerc 项目路径修复](./rfc-0005-mplayerc-project-fix.md) - 修复 mplayerc 主项目路径问题
 - [RFC-0006: 输出目录统一化](./rfc-0006-output-directory-consolidation.md) - 统一所有项目的输出目录路径
 - [RFC-0007: 构建警告和错误修复](./rfc-0007-build-warnings-fix.md) - 修复构建警告和错误
-- [RFC-0008: 编译错误修复](./rfc-0008-compilation-errors-fix.md) - 修复编译错误
+- [RFC-0008: 编译错误修复](./rfc-0008-compilation-errors-fix.md) - 修复编译错误（第一阶段）
+- [RFC-0009: 编译错误修复 - 第二阶段](./rfc-0009-compilation-errors-fix-phase2.md) - 修复 DirectX 7、入口点、PTRDIFF_MAX 等错误
+- [RFC-0010: 全面修复所有编译问题](./rfc-0010-all-issues-fix.md) - 全面修复库依赖、字符类型、未解析符号等问题
 
 ### 草案中
 

@@ -6,9 +6,9 @@
 // Boost Software License, Version 1.0. (See accompanying file 
 // LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <iterator>
-#include <cstddef>
 #include <stdint.h>
+#include <cstddef>
+#include <iterator>
 
 #include "string.hpp"
 #include "unicode.hpp"

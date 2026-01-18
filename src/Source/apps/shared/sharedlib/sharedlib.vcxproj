@@ -44,7 +44,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)src\out\bin\</OutDir>
     <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
-    <TargetName>$(ProjectName)DU</TargetName>
+    <TargetName>$(ProjectName)D</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

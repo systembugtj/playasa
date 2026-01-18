@@ -33,10 +33,10 @@
 //#include <boost/cstdint.hpp>
 //#include <boost/utility/enable_if.hpp>
 
+#include <stdint.h>
+#include <cstddef>
 #include <cassert>
 #include <stdexcept>
-#include <cstddef>
-#include <stdint.h>
 
 #include "string.hpp"
 

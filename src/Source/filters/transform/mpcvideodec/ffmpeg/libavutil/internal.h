@@ -102,8 +102,11 @@
 #endif
 
 #ifdef _MSC_VER
+	// MSVC 2015+ (VS2015+) has snprintf/vsnprintf in stdio.h, don't redefine them
+	#if _MSC_VER < 1900
 	#define snprintf _snprintf
 	#define vsnprintf _vsnprintf
+	#endif
 #endif
 
 #if defined(__MINGW32__) || defined(__CYGWIN__)

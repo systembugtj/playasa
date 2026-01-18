@@ -141,7 +141,7 @@
       <AdditionalOptions>/D "CURL_STATICLIB"  /MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>..\..\ZenLib\Source;..\..\..\include;..\..\mediainfo\Source\;..\..\mediainfo\Source\MediaInfo\;..\..\filters\BaseClasses;..\..\filters\transform\webm\vp8_sdk\include;..\..\filters\transform\webm\IDL;..\..\filters\transform\webm\common;..\..\filters\transform\mpcvideodec;..\..\svplib;..\..\..\thirdparty;..\..\..\include\dx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;DIRECT3D_VERSION=0x0700;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>false</OpenMPSupport>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -215,9 +215,11 @@
 "%25programfiles%25\TortoiseSVN\bin\SubWCRev.exe" ..\..\..\ .\SubWCRev.conf .\revision.h
 goto End
 
-:SubWCRev
+:NoSubWCRev
+if not exist ".\revision.h" (
 echo #pragma once &gt; .\revision.h
 echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
+)
 
 :End
 </Command>
@@ -264,9 +266,11 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
 "%25programfiles%25\TortoiseSVN\bin\SubWCRev.exe" ..\..\..\ .\SubWCRev.conf .\revision.h
 goto End
 
-:SubWCRev
+:NoSubWCRev
+if not exist ".\revision.h" (
 echo #pragma once &gt; .\revision.h
 echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
+)
 
 :End
 </Command>
@@ -280,7 +284,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile>
       <AdditionalOptions> /MP %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>..\..\..\include;..\..\filters\BaseClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;DIRECT3D_VERSION=0x0700;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
     </ClCompile>

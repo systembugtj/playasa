@@ -108,13 +108,29 @@ RFC 状态应该及时更新：
 
 ### 进行中的工作
 
+- [RFC-0009: 编译错误修复 - 第二阶段](./rfc-0009-compilation-errors-fix-phase2.md) - 🔄 进行中
+  - ✅ 已修复：WavPackSplitter 入口点错误
+  - ✅ 已修复：DirectX 7 头文件和版本定义
+  - ✅ 已修复：PTRDIFF_MAX 全局定义
+  - ✅ 已修复：库依赖问题（dsutil, asyncreader）
+  - ✅ 已修复：snprintf 宏冲突
+  - ⏳ 待处理：字符类型统一、ATL 问题、未解析符号
+
+- [RFC-0010: 全面修复所有编译问题](./rfc-0010-all-issues-fix.md) - 🔄 进行中
+  - ✅ 已修复：库依赖问题（dsutil, asyncreader）
+  - ⏳ 待处理：字符类型统一、未解析符号、其他编译错误
+
+### 已完成的工作
+
 - [RFC-0004: 构建错误修复 - BaseClasses 路径问题](./rfc-0004-build-errors-fix.md) - ✅ 已完成
 - [RFC-0005: mplayerc 项目路径修复](./rfc-0005-mplayerc-project-fix.md) - ✅ 已完成
+- [RFC-0006: 输出目录统一化](./rfc-0006-output-directory-consolidation.md) - ✅ 已完成
+- [RFC-0007: 构建警告和错误修复](./rfc-0007-build-warnings-fix.md) - ✅ 已完成
+- [RFC-0008: 编译错误修复 - 第一阶段](./rfc-0008-compilation-errors-fix.md) - ✅ 已完成
 
 ### 待验证
 
-- [ ] 重新构建项目，验证 RFC-0004 的修复效果
-- [ ] 在 Visual Studio 中验证 RFC-0005 的修复效果
+- [ ] 重新构建项目，验证 RFC-0009 的修复效果
 
 ---
 

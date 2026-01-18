@@ -59,8 +59,16 @@
 |       Win32 specifics
 +---------------------------------------------------------------------*/
 #if defined(WIN32) || defined(_WIN64)
+// MSVC 2015+ (VS2015+) has snprintf/vsnprintf in stdio.h, don't redefine them
+#ifdef _MSC_VER
+#if _MSC_VER < 1900
 #define snprintf _snprintf
 #if _MSC_VER < 1500 
+#define vsnprintf _vsnprintf
+#endif
+#endif
+#else
+#define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #endif
 #if defined(_DEBUG)

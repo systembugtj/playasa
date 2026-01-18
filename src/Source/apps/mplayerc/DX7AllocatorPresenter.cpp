@@ -26,8 +26,12 @@
 #include "..\..\DSUtil\DSUtil.h"
 
 #include <initguid.h>
-#include "DX7AllocatorPresenter.h"
+#ifndef DIRECT3D_VERSION
+#define DIRECT3D_VERSION 0x0700
+#endif
 #include <ddraw.h>
+#include <d3d.h>
+#include "DX7AllocatorPresenter.h"
 #include <d3d.h>
 #include "..\..\SubPic\DX7SubPic.h"
 #include "..\..\..\include\RealMedia\pntypes.h"
