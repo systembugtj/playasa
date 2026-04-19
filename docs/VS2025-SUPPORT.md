@@ -33,7 +33,7 @@ build-fixed.cmd
 
 1. **打开解决方案**:
    ```
-   双击 src\splayer.sln
+   双击 `src\splayer.sln`
    ```
 
 2. **重定向项目**（首次打开时）:
@@ -141,6 +141,6 @@ cd src\BuildScript
 
 ## 相关文档
 
-- [快速开始](../快速开始.md)
+- [快速开始](root-notes/快速开始.md)
 - [构建修复指南](BUILD-FIXES.md)
 - [安装指南](INSTALL-GUIDE.md)

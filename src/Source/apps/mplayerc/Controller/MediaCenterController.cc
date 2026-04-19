@@ -1,6 +1,5 @@
-#include "../StdAfx.h"
+#include "stdafx.h"
 #include "MediaCenterController.h"
-#include <boost/filesystem.hpp>
 
 ////////////////////////////////////////////////////////////////////////////////
 // normal part

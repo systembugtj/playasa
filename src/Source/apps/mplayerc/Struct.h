@@ -23,11 +23,7 @@ typedef LONG KPRIORITY;
 
 typedef void (CALLBACK *PKNORMAL_ROUTINE)(PVOID, PVOID, PVOID);
 
-typedef struct _CLIENT_ID {
-   HANDLE UniqueProcess;
-   HANDLE UniqueThread;
-} CLIENT_ID, *PCLIENT_ID;
-
+// Windows 10+ SDK 的 winternl.h 已提供 CLIENT_ID
 #define InitializeObjectAttributes( p, n, a, r, s ) { \
     (p)->Length = sizeof( OBJECT_ATTRIBUTES );        \
     (p)->RootDirectory = r;                           \
@@ -303,19 +299,7 @@ typedef struct _VM_COUNTERS {
     SIZE_T          PeakPagefileUsage;
 } VM_COUNTERS;
 
-typedef struct _SYSTEM_THREAD_INFORMATION {
-    LARGE_INTEGER   KernelTime;
-    LARGE_INTEGER   UserTime;
-    LARGE_INTEGER   CreateTime;
-    ULONG                 WaitTime;
-    PVOID                 StartAddress;
-    CLIENT_ID     ClientId;
-    KPRIORITY     Priority;
-    KPRIORITY     BasePriority;
-    ULONG                 ContextSwitchCount;
-    LONG                  State;
-    LONG                  WaitReason;
-} SYSTEM_THREAD_INFORMATION, *PSYSTEM_THREAD_INFORMATION;
+// Windows 10+ SDK 的 winternl.h 已提供 SYSTEM_THREAD_INFORMATION
 
 // The size of the SYSTEM_PROCESS_INFORMATION structure is
 // different on NT 4 and Win2K.

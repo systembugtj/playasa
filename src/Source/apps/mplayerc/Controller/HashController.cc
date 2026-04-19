@@ -1,4 +1,4 @@
-#include <stdafx.h>
+#include "stdafx.h"
 #include "HashController.h"
 #include <sphash.h>
 #include <Strings.h>

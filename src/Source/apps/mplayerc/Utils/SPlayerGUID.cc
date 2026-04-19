@@ -1,4 +1,5 @@
-#include "../stdafx.h"
+#include "stdafx.h"
+#include <algorithm>
 #include "SPlayerGUID.h"
 #include <RpcDce.h>
 #include <time.h>

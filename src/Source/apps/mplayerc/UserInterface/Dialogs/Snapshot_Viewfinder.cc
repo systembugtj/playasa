@@ -1,4 +1,4 @@
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include "Snapshot_Viewfinder.h"
 
 //static HANDLE g_h;

@@ -339,7 +339,7 @@ public:
 
 // Implementation
 
-	class Settings : GlobalSettings
+	class Settings : public GlobalSettings
 	{
 		friend class CMPlayerCApp;
 
@@ -687,16 +687,16 @@ public:
 		void AddFav(favtype ft, CString s, BOOL bRecent = FALSE, CString szMatch = _T(""));
 		virtual COLORREF GetColorFromTheme(CString clrName, COLORREF clrDefault);
 
-		virtual void putHardwareDecoderFailCount(int value)
+		virtual void putHardwareDecoderFailCount(int value) override
 		{
 			this->lHardwareDecoderFailCount = value;
 		}
-		virtual int  getHardwareDecoderFailCount()
+		virtual int  getHardwareDecoderFailCount() override
 		{
 			return this->lHardwareDecoderFailCount;
 		}
 
-		virtual void putbUseGPUCUDA(int value)
+		virtual void putUseGPUCUDA(int value)
 		{
 			this->nUseGPUCUDA = value;
 		}
@@ -774,7 +774,7 @@ public:
 			return this->iLanguage;
 		}
 
-		virtual void putWriteProfileIntAutoIconvSubGB2BIG(int value)
+		virtual void putAutoIconvSubGB2BIG(int value)
 		{
 			this->iAutoIconvSubGB2BIG = value;
 		}
@@ -814,16 +814,19 @@ public:
 			CMPlayerCApp* pApp = (CMPlayerCApp*)AfxGetApp();
 			return pApp->GetBottomSubOffset();
 		}
-		virtual UINT GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault)
-		{
-			CMPlayerCApp* pApp = (CMPlayerCApp*)AfxGetApp();
-			return pApp->GetProfileInt(lpszSection, lpszEntry, nDefault);
-		}
-		virtual BOOL WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue)
-		{
-			CMPlayerCApp* pApp = (CMPlayerCApp*)AfxGetApp();
-			return pApp->WriteProfileInt(lpszSection, lpszEntry, nValue);
-		}
+		// 实现在 mplayerc.cpp；声明处需屏蔽 WinUser.h 的 GetProfileInt/WriteProfileInt 宏，否则成员名会变成 *W 与 cpp 定义不一致
+#pragma push_macro("GetProfileInt")
+#pragma push_macro("WriteProfileInt")
+#ifdef GetProfileInt
+#undef GetProfileInt
+#endif
+#ifdef WriteProfileInt
+#undef WriteProfileInt
+#endif
+		virtual UINT GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault);
+		virtual BOOL WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue);
+#pragma pop_macro("WriteProfileInt")
+#pragma pop_macro("GetProfileInt")
 	} m_s;
 
 public:
@@ -845,10 +848,20 @@ public:
 public:
 
 	// Retrieve an integer value from INI file or registry.
+#pragma push_macro("GetProfileInt")
+#pragma push_macro("WriteProfileInt")
+#ifdef GetProfileInt
+#undef GetProfileInt
+#endif
+#ifdef WriteProfileInt
+#undef WriteProfileInt
+#endif
 	UINT GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault);
 
 	// Sets an integer value to INI file or registry.
 	BOOL WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue);
+#pragma pop_macro("WriteProfileInt")
+#pragma pop_macro("GetProfileInt")
 
 	// Retrieve a string value from INI file or registry.
 	CString GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry,

@@ -1,4 +1,4 @@
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include "UsrBehaviorData.h"
 #include "../revision.h"
 #include "../Utils/SPlayerGUID.h"
@@ -64,7 +64,7 @@ UsrBehaviorData::~UsrBehaviorData()
 
 		setenv = true;
 
-		db.open(Strings::WStringToUtf8String(path));
+		db.open(path);
 		// create a new db file
 		db << L"create table usrbhv ("
 			<< "id integer, data text, time real)";
@@ -73,7 +73,7 @@ UsrBehaviorData::~UsrBehaviorData()
 			<< "name text, data text)";
 	}
 	else
-		db.open(Strings::WStringToUtf8String(path));
+		db.open(path);
 
 	db << "PRAGMA synchronous=0";
 	sqlitepp::transaction ts(db);
@@ -110,13 +110,13 @@ void UsrBehaviorData::AppendBhvEntry(int id, std::wstring data)
 	::GetSystemTime(&st);
 	::SystemTimeToVariantTime(&st, &vt);
 
-	UsrBehaviorEntry ube = { id, Strings::WStringToUtf8String(data), vt };
+	UsrBehaviorEntry ube = { id, data, vt };
 	ubhv_entries.push_back(ube);
 }
 
 void UsrBehaviorData::AppendEnvEntry(std::wstring name, std::wstring data)
 {
-	UsrEnvEntry env = { Strings::WStringToUtf8String(name), Strings::WStringToUtf8String(data) };
+	UsrEnvEntry env = { name, data };
 	env_entries.push_back(env);
 }
 
@@ -209,5 +209,5 @@ void UsrBehaviorData::SetEnvironmentData()
 
 	SPlayerGUID::GenerateGUID(var);
 	AppendEnvEntry(L"UUID", var);
-	AppendEnvEntry(L"SPlayer°æ±¾", SVP_REV_STR);
+	AppendEnvEntry(L"SPlayer?", SVP_REV_STR);
 }

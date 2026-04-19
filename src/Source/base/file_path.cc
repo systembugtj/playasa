@@ -1,7 +1,7 @@
 #include "file_path.h"
 
 
-std::auto_ptr<FilePath> FilePath::m_instance;
+std::unique_ptr<FilePath> FilePath::m_instance;
 
 
 // libgen's dirname and basename aren't guaranteed to be thread-safe and aren't

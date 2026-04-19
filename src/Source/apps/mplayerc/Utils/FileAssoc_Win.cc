@@ -1,4 +1,4 @@
-#include "../StdAfx.h"
+#include "stdafx.h"
 #include "FileAssoc_Win.h"
 #include "../svplib/SVPToolBox.h"
 #include "../MediaFormats.h"

@@ -78,7 +78,7 @@
 
 ## 相关文档
 
-- [RFC-0007: 构建警告和错误修复](docs/rfc/rfc-0007-build-warnings-fix.md)
+- [RFC-0007: 构建警告和错误修复](../rfc/rfc-0007-build-warnings-fix.md)
 
 ---
 

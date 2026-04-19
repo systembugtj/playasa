@@ -1,8 +1,6 @@
-
+#include "stdafx.h"
 // mfchostDoc.cpp : CmfchostDoc 类的实现
 //
-
-#include "../../stdafx.h"
 #include <exdispid.h>
 #include "OAuthDlg.h"
 #include "logging.h"

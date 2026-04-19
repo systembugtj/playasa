@@ -120,7 +120,7 @@ $OutputEncoding = [System.Text.Encoding]::UTF8
 - `setup-powershell-chinese-global.ps1` - 全局配置脚本
 - `安装PowerShell中文支持-全局.bat` - 自动安装脚本
 - `test-chinese.ps1` - 测试脚本
-- `docs/POWERSHELL-CHINESE-GLOBAL.md` - 详细文档
+- `../POWERSHELL-CHINESE-GLOBAL.md` - 详细文档
 
 ## 快速参考
 

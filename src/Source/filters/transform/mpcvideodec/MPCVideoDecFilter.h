@@ -22,10 +22,17 @@
 
 #pragma once
 
+// um\dxva.h 在 DIRECT3D_VERSION 未定义或 <0x0800 时会定义 D3DFORMAT/D3DPOOL，与 d3d9types.h 冲突
+#pragma push_macro("DIRECT3D_VERSION")
+#if !defined(DIRECT3D_VERSION) || (DIRECT3D_VERSION < 0x0800)
+#undef DIRECT3D_VERSION
+#define DIRECT3D_VERSION 0x0900
+#endif
+#include <dxva.h>
 #include <d3d9.h>
 #include <Videoacc.h>		// DXVA1
-#include <dxva.h>
 #include <dxva2api.h>		// DXVA2
+#pragma pop_macro("DIRECT3D_VERSION")
 #include "..\BaseVideoFilter\BaseVideoFilter.h"
 
 #include "IMPCVideoDecFilter.h"

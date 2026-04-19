@@ -1,4 +1,4 @@
-#include "..\stdafx.h"
+#include "stdafx.h"
 #include ".\PlaylistParser.h"
 #include "..\Playlist.h"
 #include "..\MediaFormats.h"

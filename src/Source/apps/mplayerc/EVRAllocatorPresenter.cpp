@@ -28,8 +28,18 @@
 #include <Videoacc.h>
 #include <initguid.h>
 #include "..\..\SubPic\ISubPic.h"
+// Clear DirectX 7 version before including DirectX 9
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
 #include <d3d9.h>
+// Use compatibility header for D3DX9 types (functions are loaded dynamically)
+// Try to include d3dx9.h if available, otherwise use compatibility header
+#ifndef D3DX_SDK_VERSION
+#include "../../../include/dx/d3dx9_compat.h"
+#else
 #include <d3dx9.h>
+#endif
 #include <Vmr9.h>
 #include <evr.h>
 #include <mfapi.h> 
@@ -1102,7 +1112,7 @@ HRESULT CEVRAllocatorPresenter::CreateProposedOutputType(IMFMediaType* pMixerTyp
 
   bool bDoneSomething = true;
 
-  //Èç¹û m_AspectRatio.cx Îª 0 »áÎÞÏÞÑ­»·
+  //ï¿½ï¿½ï¿½ m_AspectRatio.cx Îª 0 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ­ï¿½ï¿½
   for(int k = 0; k < 100; k++)
   {
     if(!bDoneSomething){

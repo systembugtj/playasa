@@ -2,8 +2,9 @@
 # 修复解决方案文件中的错误路径
 
 $ErrorActionPreference = "Continue"
-$rootPath = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
-$solutionFile = Join-Path $rootPath "splayer.sln"
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$srcPath = Split-Path -Parent $scriptDir
+$solutionFile = Join-Path $srcPath "splayer.sln"
 
 Write-Host "Fixing solution file paths..." -ForegroundColor Cyan
 Write-Host "Solution: $solutionFile" -ForegroundColor Gray
@@ -23,45 +24,49 @@ Write-Host "Backup created: $backupFile" -ForegroundColor Green
 $content = Get-Content $solutionFile -Raw -Encoding UTF8
 $originalContent = $content
 
-# Fix common path issues
-# Fix: src\Source\filters\src\Source\... -> src\Source\filters\...
-$content = $content -replace 'src\\Source\\([^"]+)\\src\\Source\\', 'src\Source\$1\'
+# 解决方案在 src/ 下，路径以 Source\、lib\、Test\ 开头
+# Fix: Source\filters\Source\... 重复段
+$content = $content -replace 'Source\\([^"]+)\\Source\\', 'Source\$1\'
 
-# Fix: src\Source\zsrc\lib\... -> src\Source\zlib\...
-$content = $content -replace 'src\\Source\\zsrc\\lib\\', 'src\Source\zlib\'
+# Fix: Source\zsrc\lib\... -> Source\zlib\...
+$content = $content -replace 'Source\\zsrc\\lib\\', 'Source\zlib\'
 
-# Fix: src\Source\ui\Resizablesrc\lib\... -> src\Source\ui\ResizableLib\...
-$content = $content -replace 'src\\Source\\ui\\Resizablesrc\\lib\\', 'src\Source\ui\ResizableLib\'
+# Fix: Source\ui\Resizablesrc\lib\... -> Source\ui\ResizableLib\...
+$content = $content -replace 'Source\\ui\\Resizablesrc\\lib\\', 'Source\ui\ResizableLib\'
 
-# Fix: src\Source\svpsrc\lib\... -> src\Source\svplib\...
-$content = $content -replace 'src\\Source\\svpsrc\\lib\\', 'src\Source\svplib\'
+# Fix: Source\svpsrc\lib\... -> Source\svplib\...
+$content = $content -replace 'Source\\svpsrc\\lib\\', 'Source\svplib\'
 
-# Fix: src\lib\lyricsrc\lib\... -> src\lib\lyriclib\...
-$content = $content -replace 'src\\lib\\lyricsrc\\lib\\', 'src\lib\lyriclib\'
+# Fix: lib\lyricsrc\lib\... -> lib\lyriclib\...
+$content = $content -replace 'lib\\lyricsrc\\lib\\', 'lib\lyriclib\'
 
-# Fix: src\lib\id3src\lib\libprj\... -> src\lib\id3lib\...
-$content = $content -replace 'src\\lib\\id3src\\lib\\libprj\\', 'src\lib\id3lib\'
+# Fix: lib\id3src\lib\libprj\... -> lib\id3lib\...
+$content = $content -replace 'lib\\id3src\\lib\\libprj\\', 'lib\id3lib\'
 
-# Fix: src\Test\HotkeySchemeParser_Unitsrc\Test\... -> src\Test\HotkeySchemeParser_UnitTest\...
-$content = $content -replace 'src\\Test\\HotkeySchemeParser_Unitsrc\\Test\\', 'src\Test\HotkeySchemeParser_UnitTest\'
+# Fix: Test\HotkeySchemeParser_Unitsrc\Test\... -> Test\HotkeySchemeParser_UnitTest\...
+$content = $content -replace 'Test\\HotkeySchemeParser_Unitsrc\\Test\\', 'Test\HotkeySchemeParser_UnitTest\'
 
-# Fix: src\Test\RARChunk_unisrc\Test\... -> src\Test\ChuckTest\...
-$content = $content -replace 'src\\Test\\RARChunk_unisrc\\Test\\', 'src\Test\ChuckTest\'
+# Fix: Test\RARChunk_unisrc\Test\... -> Test\ChuckTest\...
+$content = $content -replace 'Test\\RARChunk_unisrc\\Test\\', 'Test\ChuckTest\'
 
-# Fix: src\Test\sqliteppsrc\Test\... -> src\Test\sqliteppTest\...
-$content = $content -replace 'src\\Test\\sqliteppsrc\\Test\\', 'src\Test\sqliteppTest\'
+# Fix: Test\sqliteppsrc\Test\... -> Test\sqliteppTest\...
+$content = $content -replace 'Test\\sqliteppsrc\\Test\\', 'Test\sqliteppTest\'
 
-# Fix: src\Test\MediaTree_src\Test\... -> src\Test\MediaTree_Test\...
-$content = $content -replace 'src\\Test\\MediaTree_src\\Test\\', 'src\Test\MediaTree_Test\'
+# Fix: Test\MediaTree_src\Test\... -> Test\MediaTree_Test\...
+$content = $content -replace 'Test\\MediaTree_src\\Test\\', 'Test\MediaTree_Test\'
 
-# Fix: src\Source\filters\wavpacksrc\lib\... -> src\Source\filters\transform\WavPackDecoder\wavpack\...
-$content = $content -replace 'src\\Source\\filters\\wavpacksrc\\lib\\', 'src\Source\filters\transform\WavPackDecoder\wavpack\'
+# Fix: Source\filters\wavpacksrc\lib\... -> Source\filters\transform\WavPackDecoder\wavpack\...
+$content = $content -replace 'Source\\filters\\wavpacksrc\\lib\\', 'Source\filters\transform\WavPackDecoder\wavpack\'
 
-# Fix: src\Source\apps\shared\sharedsrc\lib\... -> src\Source\apps\shared\sharedlib\...
-$content = $content -replace 'src\\Source\\apps\\shared\\sharedsrc\\lib\\', 'src\Source\apps\shared\sharedlib\'
+# Fix: Source\apps\shared\sharedsrc\lib\... -> Source\apps\shared\sharedlib\...
+$content = $content -replace 'Source\\apps\\shared\\sharedsrc\\lib\\', 'Source\apps\shared\sharedlib\'
 
-# Fix: Prototype\SPlayerNewGui\splayer\... -> src\Prototype\SPlayerNewGui\splayer\...
-$content = $content -replace 'Prototype\\SPlayerNewGui\\', 'src\Prototype\SPlayerNewGui\'
+# Fix: 若出现错误前缀 src\Source\（从根目录方案迁入），去掉 src\
+$content = $content -replace '"src\\Source\\', '"Source\'
+$content = $content -replace '"src\\lib\\', '"lib\'
+$content = $content -replace '"src\\Test\\', '"Test\'
+$content = $content -replace '"src\\Thirdparty\\', '"Thirdparty\'
+$content = $content -replace '"src\\Prototype\\', '"Prototype\'
 
 # Count changes
 $changes = 0

@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "UpdateController.h"
 
 #include "hashcontroller.h"

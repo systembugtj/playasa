@@ -35,6 +35,10 @@
 #include "rv34data.h"
 #include "rv34.h"
 
+#ifdef _MSC_VER
+#include <malloc.h>  // for alloca on MSVC
+#endif
+
 //#define DEBUG
 
 static inline void ZERO8x2(void* dst, int stride)
@@ -103,9 +107,14 @@ static void rv34_gen_vlc(const uint8_t *bits, int size, VLC *vlc, const uint8_t 
 {
     int i;
     int counts[17] = {0}, codes[17];
-    uint16_t cw[size], syms[size];
-    uint8_t bits2[size];
+    uint16_t *cw, *syms;
+    uint8_t *bits2;
     int maxbits = 0, realsize = 0;
+    
+    // MSVC doesn't support VLAs, use alloca for stack allocation
+    cw = (uint16_t *)alloca(size * sizeof(uint16_t));
+    syms = (uint16_t *)alloca(size * sizeof(uint16_t));
+    bits2 = (uint8_t *)alloca(size * sizeof(uint8_t));
 
     for(i = 0; i < size; i++){
         if(bits[i]){

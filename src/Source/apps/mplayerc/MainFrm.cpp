@@ -5798,7 +5798,7 @@ BOOL CMainFrame::OnCopyData(CWnd* pWnd, COPYDATASTRUCT* pCDS)
 						while (pos2)
 						{
 							FilterOverride* f2 = s.filters.GetNext(pos2);
-							if (f2->type == FilterOverride::EXTERNAL && !f2->path.CompareNoCase(f->path))
+							if (f2->type == FilterOverride::kExtSource && !f2->path.CompareNoCase(f->path))
 							{
 								fFound = true;
 								break;

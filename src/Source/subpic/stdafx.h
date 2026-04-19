@@ -26,14 +26,10 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+/* 不使用 WIN32_LEAN_AND_MEAN：否则 Windows SDK 下 ddraw/d3d7（IDirect3DDevice7 等）可能不完整，DX7SubPic 无法编译 */
 #define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// some CString constructors will be explicit
 #ifndef WINVER
 #define WINVER			0x0600
-#endif
-
-#ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 #endif
 
 #include <afx.h>
@@ -45,9 +41,7 @@
 #include <dvdmedia.h>
 #include "..\DSUtil\DSUtil.h"
 
-// DirectX 7 headers
-#ifndef DIRECT3D_VERSION
-#define DIRECT3D_VERSION 0x0700
-#endif
-#include <ddraw.h>
-#include <d3d.h>
+// Note: DirectX headers are NOT included in stdafx.h to avoid conflicts
+// between DirectX 7 and DirectX 9. Include them locally in files that need them:
+// - For DirectX 7: #define DIRECT3D_VERSION 0x0700 before including <ddraw.h> and <d3d.h>
+// - For DirectX 9: #undef DIRECT3D_VERSION before including <d3d9.h>

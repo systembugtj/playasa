@@ -1,9 +1,7 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "MediaTreeModel.h"
-#include <boost/filesystem.hpp>
-// #include <boost/lambda/lambda.hpp>
+#include "..\Utils\FilesystemCompat.h"
 #include <functional>
-//#include <boost/lambda/bind.hpp>
 #include <regex>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -160,15 +158,13 @@ void MediaTreeModel::saveToDB()
 
 void MediaTreeModel::splitPath(const std::wstring &sPath, std::vector<std::wstring> &vtResult)
 {
-  using namespace boost::filesystem;
-
   // analysis the path and add it to the detect_path table
   std::wstring sTemp(sPath);
 
   while (!sTemp.empty() && sTemp != L"\\\\")
   {
     // deal with the path
-    if (is_directory(sTemp))
+    if (mpc_fs::is_directory(mpc_fs::path(sTemp)))
       vtResult.push_back(sTemp);
 
     // remove the back slash to avoid dead loop
@@ -200,8 +196,6 @@ void MediaTreeModel::assignMerit(const MediaPath &mp)
 
 std::wstring MediaTreeModel::makePathPreferred(const std::wstring &sPath)
 {
-  using namespace boost::filesystem;
-  using namespace std::tr1;
   using std::wstring;
 
   // ***************************************************************************
@@ -210,7 +204,7 @@ std::wstring MediaTreeModel::makePathPreferred(const std::wstring &sPath)
   // ***************************************************************************
   // if it's a UNC path, then save the prefix: "\\"
   wstring sPrefix;
-  if (regex_search(sPath, wregex(L"^\\\\\\\\")))
+  if (std::regex_search(sPath, std::wregex(L"^\\\\\\\\")))
     sPrefix = L"\\\\";
 
   wstring sPathResult;
@@ -221,14 +215,14 @@ std::wstring MediaTreeModel::makePathPreferred(const std::wstring &sPath)
 
   // modify the path, let it to be normalized
   // replace all '/' to '\'
-  sPathResult = regex_replace(sPathResult, wregex(L"/"), std::wstring(L"\\"));
+  sPathResult = std::regex_replace(sPathResult, std::wregex(L"/"), std::wstring(L"\\"));
 
   // replace multi '\' to single '\'
-  sPathResult = regex_replace(sPathResult, wregex(L"\\\\+"), std::wstring(L"\\"));
+  sPathResult = std::regex_replace(sPathResult, std::wregex(L"\\\\+"), std::wstring(L"\\"));
 
   // remove the filename in the end
-  if (!is_directory(sPathResult))
-    sPathResult = regex_replace(sPathResult, wregex(L"\\\\[^\\\\]+$"), std::wstring(L"\\"));
+  if (!mpc_fs::is_directory(mpc_fs::path(sPathResult)))
+    sPathResult = std::regex_replace(sPathResult, std::wregex(L"\\\\[^\\\\]+$"), std::wstring(L"\\"));
 
   // append slash to the end if the path
   // after this, the path looks like this: "c:\cjbw1234\test\"

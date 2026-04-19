@@ -27,6 +27,10 @@
 #include "PPageFileInfoDetails.h"
 #include <atlbase.h>
 #include "..\..\DSUtil\DSUtil.h"
+// Clear DirectX 7 version before including DirectX 9
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
 #include "d3d9.h"
 #include "Vmr9.h"
 #include "..\..\..\include\moreuuids.h"

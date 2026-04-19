@@ -1,4 +1,4 @@
-#include "../StdAfx.h"
+#include "stdafx.h"
 #include "PlaylistController.h"
 #include "PlayerPreference.h"
 #include "SPlayerDefs.h"

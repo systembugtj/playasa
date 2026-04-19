@@ -1,4 +1,4 @@
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include "SubtitleStyle.h"
 #include <Strings.h>
 #include "../../mplayerc.h"

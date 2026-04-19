@@ -1,13 +1,26 @@
 #include "rhash_ex.h"
 #include <sstream>
-#include <boost/filesystem.hpp>
+#include <string>
+
+namespace {
+
+// ???·?????????????????? boost::filesystem::path(...).filename()?????????????????? Boost ?????
+std::string path_filename_string(const std::string& file)
+{
+  const size_t pos = file.find_last_of("/\\");
+  if (pos == std::string::npos)
+  {
+    return file;
+  }
+  return file.substr(pos + 1);
+}
+
+} // namespace
 
 // Func : create_link
 // the msg_id can be the combination of RHASH_ED2K, RHASH_SHA1, RHASH_BTIH
 void RHash::create_link(unsigned hash_id, const std::string &file, std::vector<std::string> &result)
 {
-  using namespace boost::filesystem;
-
   // initialization
   rhash ctx = rhash_init(hash_id);
   if (ctx == 0) return;
@@ -32,9 +45,9 @@ void RHash::create_link(unsigned hash_id, const std::string &file, std::vector<s
   b = _get_link_internal(RHASH_ED2K, ctx, value);
   if (b)
   {
-    // ed2k://|file|[WMV和3GP互转工具].4Media.WMV.3GP.Converter.v6.0.2.0415.Incl.Keygen-Lz0.zip|34494025|DEDC307D2C7D6CC67D44D87957F94908|/
+    // ed2k://|file|[WMV??3GP???????].4Media.WMV.3GP.Converter.v6.0.2.0415.Incl.Keygen-Lz0.zip|34494025|DEDC307D2C7D6CC67D44D87957F94908|/
     to_save = "";
-    to_save += "ed2k://|file|" + path(file).filename().string();
+    to_save += "ed2k://|file|" + path_filename_string(file);
     to_save += "|" + ssSize.str();
     to_save += "|" + value + "|/";
     result.push_back(to_save);

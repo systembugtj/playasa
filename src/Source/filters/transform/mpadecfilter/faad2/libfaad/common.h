@@ -315,6 +315,10 @@ char *strchr(), *strrchr();
 
   #if defined(_WIN32) && !defined(_WIN64) && !defined(__MINGW32__)
     #define HAS_LRINTF
+    #if defined(_MSC_VER)
+      /* MSVC 已将 lrintf 作为内建；勿再定义同名函数以免 C2169 */
+      #include <math.h>
+    #else
     static INLINE int lrintf(float f)
     {
         int i;
@@ -325,6 +329,7 @@ char *strchr(), *strrchr();
         }
         return i;
     }
+    #endif
   #elif (defined(__i386__) && defined(__GNUC__) && \
 	!defined(__CYGWIN__) && !defined(__MINGW32__))
     #ifndef HAVE_LRINTF

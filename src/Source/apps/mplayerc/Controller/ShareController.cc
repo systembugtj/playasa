@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "ShareController.h"
 #include <shooterapi.key>
 #include "HashController.h"

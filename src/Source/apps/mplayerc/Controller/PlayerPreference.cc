@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "SPlayerDefs.h"
 #include "PlayerPreference.h"
 #include "../Model/appSQLlite.h"
@@ -222,19 +222,25 @@ void PlayerPreference::Uninit()
 
 }
 
+#pragma push_macro("WriteProfileInt")
+#undef WriteProfileInt
 BOOL PlayerPreference::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue)
 {
 	if (sqlite_setting)
-		return sqlite_setting->WriteProfileInt(lpszSection, lpszEntry, nValue);
+		return SqliteWriteProfileInt(sqlite_setting, lpszSection, lpszEntry, nValue);
 	return FALSE;
 }
+#pragma pop_macro("WriteProfileInt")
 
+#pragma push_macro("GetProfileInt")
+#undef GetProfileInt
 UINT PlayerPreference::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault)
 {
 	if (sqlite_setting)
-		return sqlite_setting->GetProfileInt(lpszSection, lpszEntry, nDefault);
+		return SqliteGetProfileInt(sqlite_setting, lpszSection, lpszEntry, nDefault);
 	return FALSE;
 }
+#pragma pop_macro("GetProfileInt")
 
 BOOL PlayerPreference::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue)
 {

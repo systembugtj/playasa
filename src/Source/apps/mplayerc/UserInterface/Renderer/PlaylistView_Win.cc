@@ -1,4 +1,4 @@
-#include "../../StdAfx.h"
+#include "stdafx.h"
 #include "PlaylistView_Win.h"
 #include "../../resource.h"
 #include <Strings.h>

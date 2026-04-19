@@ -2,8 +2,9 @@
 
 #include <Pdh.h>
 #include <PdhMsg.h>
-#include <boost/thread.hpp>
-#include <boost/shared_ptr.hpp>
+#include <atomic>
+#include <memory>
+#include <thread>
 #include "notify.h"
 
 namespace MT
@@ -21,7 +22,7 @@ namespace MT
     double get_cur_value() const { return m_cur_value; }
 
     // get notifier to add and remove listeners
-    boost::shared_ptr<notifier> get_notifier() { return m_notifier; }
+    std::shared_ptr<notifier> get_notifier() { return m_notifier; }
 
     // query monitor status
     virtual bool is_running() const { return m_is_running; }
@@ -45,10 +46,11 @@ namespace MT
 
   protected:
     // notifier
-    boost::shared_ptr<notifier> m_notifier;
+    std::shared_ptr<notifier> m_notifier;
 
-    // control the thread
-    boost::shared_ptr<boost::thread> m_thread;
+    // control the thread (cooperative stop via m_stop_requested)
+    std::unique_ptr<std::thread> m_thread;
+    std::atomic<bool> m_stop_requested;
     bool m_is_running;
     int m_interval;
     HQUERY m_hQuery;

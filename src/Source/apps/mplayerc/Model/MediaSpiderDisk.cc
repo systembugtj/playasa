@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 
 #include "MediaSpiderDisk.h"
 #include "../Controller/MediaCenterController.h"

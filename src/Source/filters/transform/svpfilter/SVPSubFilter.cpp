@@ -11,7 +11,7 @@
 
 #include <initguid.h>
 #include "..\..\..\..\include\moreuuids.h"
-#include "..\apps\shared\sharedlib\Utility.h"
+#include "..\..\..\apps\shared\sharedlib\Utility.h"
 #include "..\..\..\svplib\svplib.h"
 
 #include "..\..\..\apps\mplayerc\DX7AllocatorPresenter.h"
@@ -26,7 +26,7 @@
 #define  SVP_LogMsg6    __noop
 
 CSVPSubFilter::CSVPSubFilter(LPUNKNOWN lpunk, HRESULT* phr)
-	: CBaseVideoFilter(NAME("SPlayer ×ÖÄ»ÂË¾µ"), lpunk, phr, __uuidof(this), 1),
+	: CBaseVideoFilter(NAME("SPlayer ï¿½ï¿½Ä»ï¿½Ë¾ï¿½"), lpunk, phr, __uuidof(this), 1),
 	m_fDoPreBuffering(1)
 	, m_fFlip(0)
 	, m_bDontUseThis(0)
@@ -247,7 +247,7 @@ bool CSVPSubFilter::AlphaBltSub(SubPicDesc& spd, REFERENCE_TIME rt_sub1, REFEREN
 
 			bltSub1 = true;
 			rcDest1 = rcSource1;
-			//Mempic ²»Ö§³Ö±äÐÎ
+			//Mempic ï¿½ï¿½Ö§ï¿½Ö±ï¿½ï¿½ï¿½
 		}
 	}
 
@@ -608,7 +608,7 @@ void CSVPSubFilter::InitSubPicQueue()
 	m_hbm = CreateDIBSection(m_hdc, (BITMAPINFO*)&b, DIB_RGB_COLORS, NULL, NULL, 0);
 
 	CString szName(this->m_pName);
-	if ((szName.Find(_T("SPlayer")) < 0) && (szName.Find(_T("ÉäÊÖ")) < 0)){
+	if ((szName.Find(_T("SPlayer")) < 0) && (szName.Find(_T("ï¿½ï¿½ï¿½ï¿½")) < 0)){
 		//AfxMessageBox(szName);
 		m_pSubPicQueue = NULL;
 		m_pSubPicQueue2 = NULL;

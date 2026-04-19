@@ -2,15 +2,17 @@
 
 #include "monitor.h"
 #include "constant.h"
-#include <boost/tuple/tuple.hpp>
+#include <map>
+#include <memory>
+#include <tuple>
 
 namespace MT
 {
   class factory
   {
   public:
-    typedef boost::shared_ptr<monitor_base> monitor_ptr;
-    typedef boost::tuple<monitor_type_enum, std::wstring> key_type;
+    typedef std::shared_ptr<monitor_base> monitor_ptr;
+    typedef std::tuple<monitor_type_enum, std::wstring> key_type;
     
   public:
     static monitor_ptr get_monitor(monitor_type_enum type, const std::wstring& counter_object = L"_Total");

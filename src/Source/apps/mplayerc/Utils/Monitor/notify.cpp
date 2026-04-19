@@ -4,7 +4,8 @@
 // add listeners
 void MT::notifier::add_listener_direct(MT::notifier::direct_type func)
 {
-  m_sig.connect(func);
+  if (func)
+    m_direct_listeners.push_back(func);
 }
 
 void MT::notifier::add_listener_sendmsg(HWND hwnd)
@@ -20,21 +21,21 @@ void MT::notifier::add_listener_postmsg(HWND hwnd)
 // delete listeners
 void MT::notifier::del_listener_direct(direct_type func)
 {
-  m_sig.disconnect(func);
+  const auto it = std::find(m_direct_listeners.begin(), m_direct_listeners.end(), func);
+  if (it != m_direct_listeners.end())
+    m_direct_listeners.erase(it);
 }
 
 void MT::notifier::del_listener_sendmsg(HWND hwnd)
 {
-  std::vector<HWND>::iterator it;
-  it = std::find(m_sendmsg.begin(), m_sendmsg.end(), hwnd);
+  const auto it = std::find(m_sendmsg.begin(), m_sendmsg.end(), hwnd);
   if (it != m_sendmsg.end())
     m_sendmsg.erase(it);
 }
 
 void MT::notifier::del_listener_postmsg(HWND hwnd)
 {
-  std::vector<HWND>::iterator it;
-  it = std::find(m_postmsg.begin(), m_postmsg.end(), hwnd);
+  const auto it = std::find(m_postmsg.begin(), m_postmsg.end(), hwnd);
   if (it != m_postmsg.end())
     m_postmsg.erase(it);
 }
@@ -42,12 +43,15 @@ void MT::notifier::del_listener_postmsg(HWND hwnd)
 // notify the observer
 void MT::notifier::notify()
 {
-  if (!m_sig.empty())
-    m_sig();
+  for (direct_type f : m_direct_listeners)
+  {
+    if (f)
+      f();
+  }
 
   for (size_t i = 0; i < m_sendmsg.size(); ++i)
     ::SendMessage(m_sendmsg[i], WM_COMMAND, (WPARAM)ID_MONITOR_CHANGED, 0);
 
   for (size_t i = 0; i < m_postmsg.size(); ++i)
-    ::PostMessage(m_sendmsg[i], WM_COMMAND, (WPARAM)ID_MONITOR_CHANGED, 0);
+    ::PostMessage(m_postmsg[i], WM_COMMAND, (WPARAM)ID_MONITOR_CHANGED, 0);
 }

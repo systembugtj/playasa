@@ -1,4 +1,4 @@
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include "OptionAssociationPage_Win.h"
 #include "../../Utils/FileAssoc_Win.h"
 #include "../../Controller/PlayerPreference.h"

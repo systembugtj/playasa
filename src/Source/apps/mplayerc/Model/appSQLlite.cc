@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "appSQLlite.h"
 
 #include <vector>
@@ -10,11 +10,43 @@
 
 using namespace sqlitepp;
 
+namespace {
+
+/* SQLITEPP_UTF16 时 sqlitepp::string_t 为 UTF-16；否则为 UTF-8（与 Strings::WStringToUtf8String 一致） */
+inline sqlitepp::string_t ToSqliteString(const std::wstring& ws)
+{
+#if defined(SQLITEPP_UTF16)
+	return sqlitepp::string_t(ws.c_str(), ws.size());
+#else
+	return Strings::WStringToUtf8String(ws);
+#endif
+}
+
+inline sqlitepp::string_t ToSqliteString(LPCTSTR s)
+{
+	return ToSqliteString(std::wstring(s));
+}
+
+inline int SqliteStringToInt(const sqlitepp::string_t& s, int dflt)
+{
+#if defined(SQLITEPP_UTF16)
+	if (s.empty())
+		return dflt;
+	return _wtoi(s.c_str());
+#else
+	if (s.empty())
+		return dflt;
+	return atoi(s.c_str());
+#endif
+}
+
+}  // namespace
+
 SQLliteapp::SQLliteapp(std::wstring dbfile) :db_open(0)
 {
 	try
 	{
-		m_dbfile = Strings::WStringToUtf8String(dbfile);
+		m_dbfile = ToSqliteString(dbfile);
 		m_db.open(m_dbfile);
 		db_open = 1;
 	}
@@ -40,7 +72,7 @@ void SQLliteapp::begin_transaction()
 
 int SQLliteapp::exec_sql(std::wstring ws_exe)
 {
-	sqlitepp::string_t s_exe = Strings::WStringToUtf8String(ws_exe);
+	sqlitepp::string_t s_exe = ToSqliteString(ws_exe);
 	vdata.clear();
 	nrow = 0;
 
@@ -71,7 +103,7 @@ int SQLliteapp::get_single_int_from_sql(std::wstring szSQL, int nDefault)
 {
 	exec_sql(szSQL);
 	if (nrow == 1)
-		return  atoi(vdata.at(0).c_str());
+		return SqliteStringToInt(vdata.at(0), nDefault);
 	else
 		return nDefault;
 }
@@ -86,14 +118,16 @@ int SQLliteapp::exec_insert_update_sql_u(std::wstring szSQL, std::wstring szUpda
 }
 
 
+#pragma push_macro("GetProfileInt")
+#undef GetProfileInt
 UINT SQLliteapp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault, bool fallofftoreg)
 {
 	if (!lpszSection || !lpszEntry)
 		return nDefault;
 
 	sqlitepp::string_t str;
-	sqlitepp::string_t str2 = Strings::WStringToUtf8String(std::wstring(lpszSection));
-	sqlitepp::string_t str3 = Strings::WStringToUtf8String(std::wstring(lpszEntry));
+	sqlitepp::string_t str2 = ToSqliteString(std::wstring(lpszSection));
+	sqlitepp::string_t str3 = ToSqliteString(std::wstring(lpszEntry));
 
 	if (str3.empty() || str2.empty())
 		return nDefault;
@@ -108,24 +142,31 @@ UINT SQLliteapp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefa
 
 		if (str.empty())
 			return nDefault;
-		//return atoi(Strings::WStringToString(str).c_str());
-		return atoi(str.c_str());
+		return SqliteStringToInt(str, nDefault);
 	}
 	catch (...)
 	{
 		if (fallofftoreg)
+		{
+#pragma pop_macro("GetProfileInt")
 			return AfxGetApp()->GetProfileInt(lpszSection, lpszEntry, nDefault);
+#pragma push_macro("GetProfileInt")
+#undef GetProfileInt
+		}
 	}
 	return nDefault;
 }
+#pragma pop_macro("GetProfileInt")
 
+#pragma push_macro("WriteProfileInt")
+#undef WriteProfileInt
 BOOL SQLliteapp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue, bool fallofftoreg)
 {
 	if (!lpszSection || !lpszEntry)
 		return false;
 
-	sqlitepp::string_t str1 = Strings::WStringToUtf8String(std::wstring(lpszSection));
-	sqlitepp::string_t str2 = Strings::WStringToUtf8String(std::wstring(lpszEntry));
+	sqlitepp::string_t str1 = ToSqliteString(std::wstring(lpszSection));
+	sqlitepp::string_t str2 = ToSqliteString(std::wstring(lpszEntry));
 
 	if (str1.empty() || str2.empty())
 		return false;
@@ -139,10 +180,16 @@ BOOL SQLliteapp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nVa
 	catch (...)
 	{
 		if (fallofftoreg)
+		{
+#pragma pop_macro("WriteProfileInt")
 			return AfxGetApp()->WriteProfileInt(lpszSection, lpszEntry, nValue);
+#pragma push_macro("WriteProfileInt")
+#undef WriteProfileInt
+		}
 	}
 	return false;
 }
+#pragma pop_macro("WriteProfileInt")
 
 
 CString SQLliteapp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault, bool fallofftoreg)
@@ -151,8 +198,8 @@ CString SQLliteapp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPC
 		return lpszDefault;
 
 	sqlitepp::string_t str;
-	sqlitepp::string_t str2 = Strings::WStringToUtf8String(std::wstring(lpszSection));
-	sqlitepp::string_t str3 = Strings::WStringToUtf8String(std::wstring(lpszEntry));
+	sqlitepp::string_t str2 = ToSqliteString(std::wstring(lpszSection));
+	sqlitepp::string_t str3 = ToSqliteString(std::wstring(lpszEntry));
 
 	if (str3.empty() || str2.empty())
 		return lpszDefault;
@@ -166,7 +213,13 @@ CString SQLliteapp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPC
 		st.exec();
 
 		if (!str.empty())
+		{
+#if defined(SQLITEPP_UTF16)
+			return CString(str.c_str());
+#else
 			return CString(Strings::Utf8StringToWString(str).c_str());
+#endif
+		}
 	}
 	catch (...)
 	{
@@ -185,8 +238,8 @@ BOOL SQLliteapp::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCT
 	if (!lpszSection || !lpszEntry)
 		return false;
 
-	sqlitepp::string_t str = Strings::WStringToUtf8String(std::wstring(lpszSection));
-	sqlitepp::string_t str2 = Strings::WStringToUtf8String(std::wstring(lpszEntry));
+	sqlitepp::string_t str = ToSqliteString(std::wstring(lpszSection));
+	sqlitepp::string_t str2 = ToSqliteString(std::wstring(lpszEntry));
 
 	if (str.empty() || str2.empty())
 		return false;
@@ -197,7 +250,7 @@ BOOL SQLliteapp::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCT
 		sqlitepp::string_t str3;
 		if (lpszValue)
 		{
-			str3 = str2 = Strings::WStringToUtf8String(std::wstring(lpszValue));
+			str3 = str2 = ToSqliteString(std::wstring(lpszValue));
 			st << "INSERT OR REPLACE INTO settingstring (hkey, sect, vstring) VALUES (:hkey, :sect, :vstring)",
 				sqlitepp::use(str), sqlitepp::use(str2), sqlitepp::use(str3);
 		}
@@ -227,8 +280,8 @@ BOOL SQLliteapp::GetProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry,
 	*pBytes = -1;
 
 	std::vector<char> bin;
-	sqlitepp::string_t s1 = Strings::WStringToUtf8String(std::wstring(lpszSection));
-	sqlitepp::string_t s2 = Strings::WStringToUtf8String(std::wstring(lpszEntry));
+	sqlitepp::string_t s1 = ToSqliteString(std::wstring(lpszSection));
+	sqlitepp::string_t s2 = ToSqliteString(std::wstring(lpszEntry));
 
 	if (s1.empty() || s2.empty())
 		return false;
@@ -268,8 +321,8 @@ BOOL SQLliteapp::WriteProfileBinary(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPBY
 	std::vector<char> bin(nBytes);
 	memcpy(&bin[0], pData, nBytes);
 
-	sqlitepp::string_t s1 = Strings::WStringToUtf8String(std::wstring(lpszSection));
-	sqlitepp::string_t s2 = Strings::WStringToUtf8String(std::wstring(lpszEntry));
+	sqlitepp::string_t s1 = ToSqliteString(std::wstring(lpszSection));
+	sqlitepp::string_t s2 = ToSqliteString(std::wstring(lpszEntry));
 
 	if (s1.empty() || s2.empty())
 		return false;

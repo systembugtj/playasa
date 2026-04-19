@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "OSDController.h"
 
 void OSDController::SetWindow(HWND hwnd)

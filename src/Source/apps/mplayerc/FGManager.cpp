@@ -32,6 +32,10 @@
 #include <initguid.h>
 #include "..\..\..\include\moreuuids.h"
 #include <dmodshow.h>
+// Clear DirectX 7 version before including DirectX 9
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
 #include <D3d9.h>
 #include <Vmr9.h>
 #include "../../svplib/SVPToolBox.h"
@@ -231,7 +235,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 			POSITION pos2 = pFGF->m_chkbytes.GetHeadPosition();
 			while(pos2)
 			{
-				//RARTODO : Ö§³Ö RarÄÚÎÄ¼þµÄ  CheckBytes
+				//RARTODO : Ö§ï¿½ï¿½ Rarï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½  CheckBytes
 				if(CheckBytes(hFile, pFGF->m_chkbytes.GetNext(pos2)) || bIsRAR)
 				{
 					SVP_LogMsg5(_T("FGM: AddSourceFilter1 '%s' %s\n"), CStringFromGUID(pFGF->GetCLSID()) , pFGF->GetName());
@@ -294,7 +298,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
 
 			fl.Insert(new CFGFilterRegistry(CLSID_URLReader), 6);
 		}
-		else if(!s.fBUltraFastMode) //¼±ËÙÄ£Ê½
+		else if(!s.fBUltraFastMode) //ï¿½ï¿½ï¿½ï¿½Ä£Ê½
 		{
 			// check bytes
 
@@ -365,7 +369,7 @@ HRESULT CFGManager::EnumSourceFilters(LPCWSTR lpcwstrFileName, CFGFilterList& fl
       }
     }
 
-		if(!ext.IsEmpty() && !s.fBUltraFastMode)  //¼±ËÙÄ£Ê½
+		if(!ext.IsEmpty() && !s.fBUltraFastMode)  //ï¿½ï¿½ï¿½ï¿½Ä£Ê½
 		{
 			// file extension
 			CRegKey key;
@@ -1749,9 +1753,9 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, UINT src, UINT
 
  	
  		//if(src & SRC_MPEG) {
- 	 		pFGF = new CFGFilterInternal<CMpegSplitterFilter>(L"Mpeg ·ÖÀëÆ÷", MERIT64_ABOVE_DSHOW + 1000);
+ 	 		pFGF = new CFGFilterInternal<CMpegSplitterFilter>(L"Mpeg ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", MERIT64_ABOVE_DSHOW + 1000);
  	 	//} else {
- 	 	//	pFGF = new CFGFilterInternal<CMpegSplitterFilter>(L"Mpeg ·ÖÀëÆ÷ (±¸ÓÃ·½°¸)", MERIT64_UNLIKELY);
+ 	 	//	pFGF = new CFGFilterInternal<CMpegSplitterFilter>(L"Mpeg ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½Ã·ï¿½ï¿½ï¿½)", MERIT64_UNLIKELY);
  	 	//}
  	 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG1System);
  	 	pFGF->AddType(MEDIATYPE_Stream, MEDIASUBTYPE_MPEG2_PROGRAM);
@@ -2262,7 +2266,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, UINT src, UINT
 #if INTERNAL_DECODER_VC1 | INTERNAL_DECODER_VC1_DXVA
 	if ((ffmpeg_filters & FFM_VC1) || (dxva_filters & MPCDXVA_VC1))
 	{
-		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_WVC1); //²»Ö§³Ö¸ôÐÐVC1 :(
+		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_WVC1); //ï¿½ï¿½Ö§ï¿½Ö¸ï¿½ï¿½ï¿½VC1 :(
 		pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_wvc1);
 	}
 #endif
@@ -2790,7 +2794,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, UINT src, UINT
 	//szaExtFilterPaths.Add( svptoolbox.GetPlayerPath(_T("svplayer.bin\\real\\Codecs\\drvc.dll")) );
 	
 	for(int l = 0; l < szaExtFilterPaths.GetCount(); l++){
-		CString szFPath = szaExtFilterPaths.GetAt(l); //ÒÔÎÄ¼þÄ£Ê½µ÷Èë½âÂëÆ÷
+		CString szFPath = szaExtFilterPaths.GetAt(l); //ï¿½ï¿½ï¿½Ä¼ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		CString szLog ; 
 		if(svptoolbox.ifFileExist(szFPath)){
 			SVP_LogMsg5(_T("Loading %s"), szFPath);
@@ -2893,23 +2897,23 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, UINT src, UINT
 	{
 		FilterOverride* fo = s.filters.GetPrev(pos);
 
-		if(fo->fDisabled || fo->type == FilterOverride::EXTERNAL && !CPath(MakeFullPath(fo->path)).FileExists()) 
+		if(fo->fDisabled || fo->type == FilterOverride::kExtSource && !CPath(MakeFullPath(fo->path)).FileExists()) 
 			continue;
 
 		ULONGLONG merit = 
-			fo->iLoadType == FilterOverride::PREFERRED ? MERIT64_ABOVE_DSHOW : 
-			fo->iLoadType == FilterOverride::MERIT ? MERIT64(fo->dwMerit) : 
+			fo->iLoadType == FilterOverride::kPrefLoad ? MERIT64_ABOVE_DSHOW :
+			fo->iLoadType == FilterOverride::kMeritLoad ? MERIT64(fo->dwMerit) :
 			MERIT64_DO_NOT_USE; // fo->iLoadType == FilterOverride::BLOCKED
 
 		merit += merit_low++;
 
 		CFGFilter* pFGF = NULL;
 
-		if(fo->type == FilterOverride::REGISTERED)
+		if(fo->type == FilterOverride::kRegSource)
 		{
 			pFGF = new CFGFilterRegistry(fo->dispname, merit);
 		}
-		else if(fo->type == FilterOverride::EXTERNAL)
+		else if(fo->type == FilterOverride::kExtSource)
 		{
 			pFGF = new CFGFilterFile(fo->clsid, fo->path, CStringW(fo->name), merit);
 		}
@@ -3024,10 +3028,10 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, UINT src, UINT
 	CComPtr<IBaseFilter> pBF;
 	CInterfaceList<IUnknown, &IID_IUnknown> pUnks;
 	HRESULT d3dhr;
-	CFGFilterVideoRenderer* pFGRVMR9 = new CFGFilterVideoRenderer(m_hWnd, CLSID_VMR9AllocatorPresenter, L"DX9(VMR)äÖÈ¾Æ÷", m_vrmerit);
+	CFGFilterVideoRenderer* pFGRVMR9 = new CFGFilterVideoRenderer(m_hWnd, CLSID_VMR9AllocatorPresenter, L"DX9(VMR)ï¿½ï¿½È¾ï¿½ï¿½", m_vrmerit);
 	CFGFilterVideoRenderer* pFGREVR;
 	if ( (CMPlayerCApp::IsVista()  ) && !s.bDisableEVR ) {
-		pFGREVR = new CFGFilterVideoRenderer(m_hWnd, CLSID_EVRAllocatorPresenter, L"EVRäÖÈ¾Æ÷", m_vrmerit+1);
+		pFGREVR = new CFGFilterVideoRenderer(m_hWnd, CLSID_EVRAllocatorPresenter, L"EVRï¿½ï¿½È¾ï¿½ï¿½", m_vrmerit+1);
 		d3dhr = pFGREVR->Create(&pBF, pUnks);
 	}else{
 		d3dhr = pFGRVMR9->Create(&pBF, pUnks);
@@ -3079,8 +3083,8 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, UINT src, UINT
 
 	if(s.bIsIVM){
 
-		m_transform.AddTail(new CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer, L"IVMäÖÈ¾Æ÷(DX7)", m_vrmerit+10));
-		m_transform.AddTail(new CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"IVMäÖÈ¾Æ÷(DX9)", m_vrmerit + ( (s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) ? 12 : 8 ) ));
+		m_transform.AddTail(new CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer, L"IVMï¿½ï¿½È¾ï¿½ï¿½(DX7)", m_vrmerit+10));
+		m_transform.AddTail(new CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"IVMï¿½ï¿½È¾ï¿½ï¿½(DX9)", m_vrmerit + ( (s.iDSVideoRendererType == VIDRNDT_DS_VMR9RENDERLESS) ? 12 : 8 ) ));
 	}
 
 	if(s.iDSVideoRendererType == VIDRNDT_DS_OLDRENDERER)
@@ -3093,7 +3097,7 @@ CFGManagerPlayer::CFGManagerPlayer(LPCTSTR pName, LPUNKNOWN pUnk, UINT src, UINT
 			else if(s.iDSVideoRendererType == VIDRNDT_DS_VMR9WINDOWED)
 				m_transform.AddTail(new CFGFilterVideoRenderer(m_hWnd, CLSID_VideoMixingRenderer9, L"Video Mixing Render 9 (Windowed)", m_vrmerit));
 			else if(s.iDSVideoRendererType == VIDRNDT_DS_VMR7RENDERLESS)
-				m_transform.AddTail(new CFGFilterVideoRenderer(m_hWnd, CLSID_VMR7AllocatorPresenter, L"DX7(VMR)äÖÈ¾Æ÷", m_vrmerit));*/
+				m_transform.AddTail(new CFGFilterVideoRenderer(m_hWnd, CLSID_VMR7AllocatorPresenter, L"DX7(VMR)ï¿½ï¿½È¾ï¿½ï¿½", m_vrmerit));*/
 	}
 	else if(s.iDSVideoRendererType == VIDRNDT_DS_DXR)
 		m_transform.AddTail(new CFGFilterVideoRenderer(m_hWnd, CLSID_DXRAllocatorPresenter, L"Haali's Video Renderer", m_vrmerit));

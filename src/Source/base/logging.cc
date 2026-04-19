@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include <fstream>
 
-std::auto_ptr<LogController> LogController::m_instance;
+std::unique_ptr<LogController> LogController::m_instance;
 
 LogController::LogController(void) :
 m_PerfFrequency(0)

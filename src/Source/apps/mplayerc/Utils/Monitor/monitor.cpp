@@ -1,16 +1,17 @@
 #include "stdafx.h"
 #include "monitor.h"
-#include <boost/bind.hpp>
+#include <chrono>
 #pragma comment(lib, "pdh.lib")
 
 ////////////////////////////////////////////////////////////////////////////////
 // monitor_base
 MT::monitor_base::monitor_base()
-: m_is_running(false)
+: m_notifier(std::make_shared<notifier>())
+, m_stop_requested(false)
+, m_is_running(false)
 , m_interval(100)
 , m_hQuery(0)
 , m_cur_value(0)
-, m_notifier(new notifier())
 {
 
 }
@@ -24,7 +25,10 @@ MT::monitor_base::~monitor_base()
 void MT::monitor_base::start_monitoring()
 {
   if (!m_thread)
-    m_thread.reset(new boost::thread(boost::bind(&MT::monitor_base::thread_worker, this)));
+  {
+    m_stop_requested = false;
+    m_thread.reset(new std::thread(&MT::monitor_base::thread_worker, this));
+  }
 
   m_is_running = true;
 }
@@ -45,10 +49,9 @@ void MT::monitor_base::stop_thread()
 {
   stop_monitoring();
 
-  // stop the thread
+  m_stop_requested = true;
   if (m_thread)
   {
-    m_thread->interrupt();
     m_thread->join();
     m_thread.reset();
   }
@@ -78,12 +81,12 @@ void MT::monitor_base::thread_worker()
     return;
   }
 
-  while (true)
+  while (!m_stop_requested)
   {
     // check if running
     if (!m_is_running)
     {
-      boost::this_thread::sleep(boost::posix_time::milliseconds(300));
+      std::this_thread::sleep_for(std::chrono::milliseconds(300));
       continue;
     }
 
@@ -100,8 +103,10 @@ void MT::monitor_base::thread_worker()
     }
 
     // sleep for next notify
-    boost::this_thread::sleep(boost::posix_time::milliseconds(m_interval));
+    std::this_thread::sleep_for(std::chrono::milliseconds(m_interval));
   }
+
+  clean_pdh();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

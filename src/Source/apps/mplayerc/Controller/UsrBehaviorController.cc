@@ -1,4 +1,4 @@
-#include "../StdAfx.h"
+#include "stdafx.h"
 
 #include "UsrBehaviorController.h"
 #include <CriticalSection.h>

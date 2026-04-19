@@ -1,4 +1,4 @@
-#include "../StdAfx.h"
+#include "stdafx.h"
 #include "../Model/HotkeySchemeParser.h"
 #include "Hotkey_Controller.h"
 #include <sstream>

@@ -23,6 +23,10 @@
 
 #include "ISubPic.h"
 
+/* ddraw/d3d 仅在 .cpp 中包含，避免与 SDK 的 d3dtypes.h 重复解析；此处前向声明供 CComPtr 使用 */
+struct IDirect3DDevice7;
+struct IDirectDrawSurface7;
+
 // CDX7SubPic
 
 class CDX7SubPic : public ISubPicImpl

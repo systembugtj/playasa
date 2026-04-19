@@ -5,8 +5,8 @@
 #include "mplayerc.h"
 #include "MainFrm.h"
 #include "Controller/HashController.h"
-#include <boost/filesystem.hpp>
-#include <boost/regex.hpp>
+#include "Utils/FilesystemCompat.h"
+#include <regex>
 #include "jpeg.h"
 #include "FGManager.h"
 #include "KeyProvider.h"
@@ -1006,17 +1006,14 @@ void CGraphCore::CloseMediaPrivate()
 // command line: splayer /snapshot "\\file_01\reflections\-=Test File=-\01.rmvb" 128_128 5
 void CGraphCore::GetSnapShotSliently(const std::vector<std::wstring> &args)
 {
-	using namespace boost;
-	using namespace boost::filesystem;
-
 	// deal arguments
 	std::wstring sFilePath = args.front();
 	std::pair<int, int> prSnapshotSize;  // e.g: 128 * 128
 	int nSnapshotTime = 5;  // e.g: default is 5 minutes, unit is minute now
 
-	wsmatch what;
-	wregex pattern(L"(\\d+)_(\\d+)");
-	if (regex_search(args[1], what, pattern))
+	std::wsmatch what;
+	const std::wregex pattern(L"(\\d+)_(\\d+)");
+	if (std::regex_search(args[1], what, pattern))
 	{
 		prSnapshotSize.first = ::_wtoi(what.str(1).c_str());
 		prSnapshotSize.second = ::_wtoi(what.str(2).c_str());
@@ -1031,7 +1028,7 @@ void CGraphCore::GetSnapShotSliently(const std::vector<std::wstring> &args)
 	if (!args[2].empty())
 		nSnapshotTime = ::_wtoi(args[2].c_str());
 
-	if (!exists(sFilePath))
+	if (!mpc_fs::exists(mpc_fs::path(sFilePath)))
 		return;
 
 	// do snapshot

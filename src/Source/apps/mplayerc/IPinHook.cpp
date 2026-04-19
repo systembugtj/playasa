@@ -22,8 +22,12 @@
 #include "stdafx.h"
 #include <moreuuids.h>
 #include "IPinHook.h"
+// DX9AllocatorPresenter.h already includes d3d9.h, so we don't need to include it again
+// But if we do, we need to clear DIRECT3D_VERSION first
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
 #include "DX9AllocatorPresenter.h"
-#include <d3d9.h>
 #include <dxva.h>
 #include <dxva2api.h>
 #include "../../svplib/svplib.h"

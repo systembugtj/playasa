@@ -1,4 +1,4 @@
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include "CustomizeFontDlg.h"
 #include <Windows.h>
 #include <set>

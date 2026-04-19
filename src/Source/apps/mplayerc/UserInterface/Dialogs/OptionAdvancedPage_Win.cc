@@ -1,4 +1,4 @@
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include "OptionAdvancedPage_Win.h"
 #include <Strings.h>
 #include "../../mplayerc.h"

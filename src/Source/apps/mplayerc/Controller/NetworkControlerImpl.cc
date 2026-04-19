@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "NetworkControlerImpl.h"
 #include "../revision.h"
 #include "../Utils/SPlayerGUID.h"

@@ -69,10 +69,10 @@ HRESULT CPixelShaderCompiler::CompileShader(
 	if(!m_pD3DXCompileShader || !m_pD3DXDisassembleShader)
 		return E_FAIL;
 
-	HRESULT hr;
-    
-    return hr;
+	// 着色器编译路径曾依赖 D3DX；当前工程改为 ID3DBlob 接口后此处保留为显式失败，避免未初始化返回值
+	return E_FAIL;
 #if 0
+	HRESULT hr;
 	CComPtr<ID3DXBuffer> pShader, pDisAsm, pErrorMsgs;
 	hr = m_pD3DXCompileShader(pSrcData, strlen(pSrcData), NULL, NULL, pFunctionName, pProfile, Flags, &pShader, &pErrorMsgs, NULL);
 

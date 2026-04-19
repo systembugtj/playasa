@@ -30,15 +30,16 @@ class FilterOverride
 {
 public:
 	bool fDisabled, fTemporary;
-	enum {REGISTERED, EXTERNAL} type;
-	// REGISTERED
+	// 避免与 d3d / Windows 头文件中可能存在的 REGISTERED、EXTERNAL、BLOCK 等宏冲突
+	enum { kRegSource, kExtSource } type;
+	// kRegSource
 	CStringW dispname;
-	// EXTERNAL
+	// kExtSource
 	CString path, name;
 	CLSID clsid;
 	// props
 	CAtlList<GUID> guids, backup;
-	enum {PREFERRED, BLOCK, MERIT};
+	enum { kPrefLoad, kBlockLoad, kMeritLoad };
 	int iLoadType;
 	DWORD dwMerit;
 

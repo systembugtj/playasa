@@ -5,7 +5,7 @@
 ### ✅ 所有检查通过
 
 - ✅ **95 个项目文件** 已升级到 v144 工具集
-- ✅ **解决方案文件** 在根目录 (`splayer.sln`)
+- ✅ **解决方案文件** 在 `src\splayer.sln`
 - ✅ **Windows SDK** 已更新到 Windows 10
 - ✅ **包含目录** 存在且正确
 - ✅ **Key 文件** 已创建
@@ -104,9 +104,9 @@ build-fixed.cmd
 
 ## 相关文档
 
-- [构建状态报告](docs/BUILD-STATUS.md) - 详细状态
+- [构建状态报告](../BUILD-STATUS.md) - 详细状态
 - [VS2025 快速开始](VS2025-快速开始.md) - 安装指南
-- [构建修复指南](docs/BUILD-FIXES.md) - 故障排除
+- [构建修复指南](../BUILD-FIXES.md) - 故障排除
 
 ---
 

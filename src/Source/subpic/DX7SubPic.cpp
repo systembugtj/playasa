@@ -19,9 +19,22 @@
  *
  */
 
-#include "stdafx.h"
+/*
+ * 须在 stdafx.h（MFC/ATL 会间接包含 d3d9types.h）之前固定 DIRECT3D_VERSION=0x0700 并包含 d3d7：
+ * 否则预编译头里已以 0x0900 展开 d3d9types，再包含 um/d3dtypes.h 会与同一枚举标签冲突（C2011）。
+ * 本文件使用 NotUsing 预编译头，故 stdafx 不必在首行。
+ */
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
+#define DIRECT3D_VERSION 0x0700
+/* ddraw 会间接包含 windows.h；MFC 要求在此之前先包含 Winsock2，否则会 C1189 */
+#include <winsock2.h>
+#include <windows.h>
+/* Do not include initguid.h before ddraw.h (breaks IDirect3DDevice7 on some SDKs). */
 #include <ddraw.h>
 #include <d3d.h>
+#include "stdafx.h"
 #include "DX7SubPic.h"
 
 //
@@ -285,6 +298,7 @@ bool CDX7SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 	if(FAILED(pDD->CreateSurface(&ddsd, &pSurface, NULL)))
 		return(false);
 
+	/* CComPtr 在部分 ATL 版本无 Get()，依赖到 T* 的隐式转换 */
 	if(!(*ppSubPic = new CDX7SubPic(m_pD3DDev, pSurface)))
 		return(false);
 

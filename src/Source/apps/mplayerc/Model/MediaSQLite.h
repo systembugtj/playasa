@@ -2,7 +2,6 @@
 
 #include <sqlitepp/sqlitepp.hpp>
 #include "../../../base/CriticalSection.h"
-#include <Strings.h>
 
 extern sqlitepp::session g_dbMediaSQLite;
 extern CriticalSection g_csMediaSQLite;
@@ -21,7 +20,8 @@ public:
 		, T5 *pRet5 = 0)
 	{
 		g_csMediaSQLite.lock();
-		sqlitepp::string_t sql = Strings::WStringToUtf8String(wsql);
+		// UTF-16 sqlitepp：SQL 使用宽字符 string_t，与 WStringToUtf8String（std::string）区分开
+		const sqlitepp::string_t sql = sqlitepp::utf(wsql);
 		try
 		{
 			init();
@@ -93,7 +93,7 @@ public:
 		, std::vector<T5 > *pRet5 = 0)
 	{
 		g_csMediaSQLite.lock();
-		sqlitepp::string_t sql = Strings::WStringToUtf8String(wsql);
+		const sqlitepp::string_t sql = sqlitepp::utf(wsql);
 		try
 		{
 			init();
@@ -192,7 +192,7 @@ protected:
 		{
 			try
 			{
-				sqlitepp::string_t dbPath = Strings::WStringToUtf8String(std::wstring(GetModuleFolder() + L"media.db"));
+				const sqlitepp::string_t dbPath = sqlitepp::utf(std::wstring(GetModuleFolder() + L"media.db"));
 				g_dbMediaSQLite.open(dbPath);
 
 				g_dbMediaSQLite << L"CREATE TABLE IF NOT EXISTS media_data ("

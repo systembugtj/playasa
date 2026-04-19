@@ -117,7 +117,7 @@ src\out\bin\Release Unicode\splayer.exe
 **原因**: 解决方案文件路径不正确
 
 **解决**:
-- 解决方案文件应在根目录: `splayer.sln`
+- 解决方案文件应在: `src\splayer.sln`
 - 或运行 `restructure-project.ps1` 修复
 
 ### 错误 3: PlatformToolset v144 not found
@@ -153,13 +153,13 @@ src\out\bin\Release Unicode\splayer.exe
 
 - [ ] Visual Studio 2025 或 Build Tools 已安装
 - [ ] 运行 `fix-build-issues.ps1` 无错误
-- [ ] 解决方案文件在根目录 (`splayer.sln`)
+- [ ] 解决方案文件存在 (`src\splayer.sln`)
 - [ ] Key 文件已创建
 - [ ] revision.h 已存在
 - [ ] 输出目录已创建
 
 ## 相关文档
 
-- [VS2025 快速开始](../VS2025-快速开始.md)
+- [VS2025 快速开始](root-notes/VS2025-快速开始.md)
 - [构建修复指南](BUILD-FIXES.md)
 - [安装指南](INSTALL-GUIDE.md)

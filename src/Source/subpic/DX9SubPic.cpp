@@ -19,10 +19,15 @@
  *
  */
 
+// Undefine DirectX 7 version BEFORE including stdafx.h (which defines it)
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
 #include "stdafx.h"
-#include <d3d9.h>
+// Redefine to ensure DirectX 9 is used
+#undef DIRECT3D_VERSION
+#include "DX9SubPic.h"  // This header now includes d3d9.h
 #include <Vmr9.h>
-#include "DX9SubPic.h"
 
 //
 // CDX9SubPic
@@ -216,7 +221,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 	if(!pTexture || FAILED(pTexture->GetDevice(&pD3DDev)) || !pD3DDev)
 		return E_NOINTERFACE;
 
-	//pD3DDev->ColorFill(m_pSurface, m_rcDirty, 0xff000000); //Fix  Ç°ºó×ÖÄ»ÖØµþÎÊÌâ ??
+	//pD3DDev->ColorFill(m_pSurface, m_rcDirty, 0xff000000); //Fix  Ç°ï¿½ï¿½ï¿½ï¿½Ä»ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ ??
 
 	HRESULT hr;
 

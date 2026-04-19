@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include <sys/stat.h>
 #include "SubTransFormat.h"
 
@@ -7,12 +7,13 @@
 
 #undef __MACTYPES__
 #include "../../../zlib/zlib.h"
-#include "unrar.hpp"
+#include "../../../../Thirdparty/pkg/unrar.hpp"
 #include "../resource.h"
 #include <shooterclient.key>
 
 #include <vector>
 #include <fstream>
+#include <algorithm>  // For std::transform
 
 #include "..\Controller\HashController.h"
 #include <logging.h>

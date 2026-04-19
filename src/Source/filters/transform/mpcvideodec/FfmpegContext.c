@@ -212,7 +212,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 
     if (pBuffer != NULL)
     {
-        av_h264_decode_frame (pAVCtx, pBuffer, nSize, FALSE);
+        av_h264_decode_frame(pAVCtx, pBuffer, nSize);
     }
 
     cur_sps		= pContext->sps_buffers[0];
@@ -309,7 +309,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
     int isATI = 0;
 
 	if (pBuffer != NULL)
-        av_h264_decode_frame (pAVCtx, pBuffer, nSize, FALSE);
+        av_h264_decode_frame(pAVCtx, pBuffer, nSize);
 
     
 	cur_sps		= pContext->sps_buffers[0];

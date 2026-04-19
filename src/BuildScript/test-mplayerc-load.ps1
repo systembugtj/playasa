@@ -11,6 +11,9 @@ Write-Host ""
 
 $msbuild = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe"
 
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$srcPath = Split-Path -Parent $scriptDir
+
 if (-not (Test-Path $msbuild)) {
     Write-Host "[ERROR] MSBuild not found at: $msbuild" -ForegroundColor Red
     exit 1
@@ -22,7 +25,7 @@ Write-Host ""
 # Test loading the solution
 Write-Host "Testing solution load..." -ForegroundColor Yellow
 
-$solutionFile = "splayer.sln"
+$solutionFile = Join-Path $srcPath "splayer.sln"
 if (-not (Test-Path $solutionFile)) {
     Write-Host "[ERROR] Solution file not found: $solutionFile" -ForegroundColor Red
     exit 1

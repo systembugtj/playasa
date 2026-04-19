@@ -281,7 +281,7 @@ normal:
 		mov edx, +255 // clip max
 		mov ecx, 8
 		align 16
-	__floor:
+	d2v_idct_floor_loop:
 		  fld   qword ptr [esi+0*8]
 			fistp dword ptr [int0]
 			  mov eax,[int0]
@@ -351,10 +351,10 @@ normal:
 			add edi, 8*2
 
 		sub ecx,0x80000001
-		js  __floor
+		js  d2v_idct_floor_loop
 			  //align 16
 				test ecx,ecx // align jump &| redo flags
-		jnz __floor
+		jnz d2v_idct_floor_loop
 
 		// set x87 to default mode
 		fldcw [fpold]

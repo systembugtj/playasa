@@ -1453,7 +1453,8 @@ public:
 	}
 
 // COM Server methods
-	LONG Unlock()
+	// noexcept matches ATL::CAtlModule::Unlock (VS 2017+ /std:c++17 and later toolsets)
+	LONG Unlock() noexcept
 	{
 		LONG lRet = CComModule::Unlock();
 		if(lRet == 0)

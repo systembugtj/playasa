@@ -1,4 +1,4 @@
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include "MediaCenterView.h"
 #include "../../Model/MediaComm.h"
 

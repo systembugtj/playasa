@@ -34,7 +34,7 @@
 
 ## 相关文档
 
-- [RFC-0008: 编译错误修复](docs/rfc/rfc-0008-compilation-errors-fix.md)
+- [RFC-0008: 编译错误修复](../rfc/rfc-0008-compilation-errors-fix.md)
 
 ---
 

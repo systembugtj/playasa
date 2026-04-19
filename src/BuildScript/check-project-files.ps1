@@ -65,26 +65,13 @@ Write-Host ""
 Write-Host "[3] Checking solution file..." -ForegroundColor Yellow
 
 $rootPath = Split-Path -Parent $srcPath
-$solutionPaths = @(
-    "$rootPath\splayer.sln",
-    "$srcPath\splayer.sln"
-)
+# 唯一支持的解决方案在 src/（与 MSBuild 脚本一致）
+$solutionFile = Join-Path $srcPath "splayer.sln"
 
-$found = $false
-foreach ($path in $solutionPaths) {
-    if (Test-Path $path) {
-        Write-Host "  [OK] Found: $path" -ForegroundColor Green
-        $found = $true
-        break
-    }
-}
-
-if (-not $found) {
-    Write-Host "  [X] Solution file not found!" -ForegroundColor Red
-    Write-Host "  Searched:" -ForegroundColor Yellow
-    foreach ($path in $solutionPaths) {
-        Write-Host "    - $path" -ForegroundColor Gray
-    }
+if (Test-Path $solutionFile) {
+    Write-Host "  [OK] Found: $solutionFile" -ForegroundColor Green
+} else {
+    Write-Host "  [X] Solution file not found: $solutionFile" -ForegroundColor Red
 }
 
 Write-Host ""

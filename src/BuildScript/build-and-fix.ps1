@@ -11,6 +11,10 @@ Write-Host ""
 
 $msbuild = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe"
 
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$srcPath = Split-Path -Parent $scriptDir
+$solutionFile = Join-Path $srcPath "splayer.sln"
+
 if (-not (Test-Path $msbuild)) {
     Write-Host "[ERROR] MSBuild not found at: $msbuild" -ForegroundColor Red
     exit 1
@@ -23,7 +27,7 @@ Write-Host ""
 
 # Build the solution
 Write-Host "Building solution..." -ForegroundColor Yellow
-$result = & $msbuild "splayer.sln" /p:Configuration="Release Unicode" /p:Platform=Win32 /m /v:minimal /nologo 2>&1
+$result = & $msbuild $solutionFile /p:Configuration="Release Unicode" /p:Platform=Win32 /m /v:minimal /nologo 2>&1
 
 # Capture all output
 $output = $result | Out-String

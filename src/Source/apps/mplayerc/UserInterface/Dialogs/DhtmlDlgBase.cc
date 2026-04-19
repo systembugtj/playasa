@@ -1,8 +1,6 @@
-
+#include "stdafx.h"
 // mfchostDoc.cpp : CmfchostDoc 类的实现
 //
-
-#include "../../stdafx.h"
 #include "DhtmlDlgBase.h"
 #include "../../resource.h"
 

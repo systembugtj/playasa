@@ -1,8 +1,8 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "ContentType.h"
 #include "Strings.h"
 #include <atlutil.h>
-#include <atlrx.h>
+#include "../../../lib/ATL Server/include/atlrx.h"
 #include <afxsock.h>
 #include "TextFile.h"
 

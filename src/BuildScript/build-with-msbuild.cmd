@@ -57,11 +57,8 @@ echo Found MSBuild: !MSBUILD_PATH!
 echo Using: !VS_VERSION!
 echo.
 
-REM Find solution file
+REM 解决方案位于 src\splayer.sln（本脚本在 src\BuildScript 下运行）
 set SOLUTION_PATH=..\splayer.sln
-if not exist "%SOLUTION_PATH%" (
-    set SOLUTION_PATH=..\..\splayer.sln
-)
 
 if not exist "%SOLUTION_PATH%" (
     echo ERROR: Solution file not found!

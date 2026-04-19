@@ -1,4 +1,4 @@
-#include "..\StdAfx.h"
+#include "stdafx.h"
 #include "ThemePkg.h"
 
 bool ThemePkg::ReadThemeFromDir(std::wstring input_dir)

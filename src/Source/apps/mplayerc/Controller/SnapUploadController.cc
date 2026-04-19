@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "SnapUploadController.h"
 #include "PlayerPreference.h"
 #include "SPlayerDefs.h"

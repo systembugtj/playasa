@@ -1,5 +1,4 @@
-
-#include "../stdafx.h"
+#include "stdafx.h"
 #include <sinet.h>
 #include "../../../filters/switcher/audioswitcher/AudioSwitcher.h"
 #include "pHashController.h"

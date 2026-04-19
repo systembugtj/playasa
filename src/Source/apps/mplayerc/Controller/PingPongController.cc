@@ -1,5 +1,4 @@
-
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "PingPongController.h"
 #include "PlayerPreference.h"
 #include "SPlayerDefs.h"

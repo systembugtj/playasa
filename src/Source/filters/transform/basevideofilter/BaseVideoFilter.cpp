@@ -27,7 +27,7 @@
 
 #include <initguid.h>
 #include "..\..\..\..\include\moreuuids.h"
-#include "..\apps\shared\sharedlib\Utility.h"
+#include "..\..\..\apps\shared\sharedlib\Utility.h"
 #include <afxtempl.h>
 
 #undef   SVP_LogMsg5
@@ -300,9 +300,9 @@ HRESULT CBaseVideoFilter::CopyBuffer(BYTE* pOut, BYTE* pIn, int w, int h, int pi
 }
 #include "../../../svplib/svplib.h"
 /*
-R = Y + 1.4075 *£¨V-128£©
-G = Y ¨C 0.3455 *£¨U ¨C128£© ¨C 0.7169 *£¨V ¨C128£©
-B = Y + 1.779 *£¨U ¨C 128£©
+R = Y + 1.4075 *ï¿½ï¿½V-128ï¿½ï¿½
+G = Y ï¿½C 0.3455 *ï¿½ï¿½U ï¿½C128ï¿½ï¿½ ï¿½C 0.7169 *ï¿½ï¿½V ï¿½C128ï¿½ï¿½
+B = Y + 1.779 *ï¿½ï¿½U ï¿½C 128ï¿½ï¿½
 */
 #define SVPBB_YUY2   3
 #define YUV444 1

@@ -115,11 +115,8 @@ echo Building SPlayer project ...
 echo This may take a while...
 echo.
 
-REM Check if solution is in root or src directory
+REM 解决方案位于 src\splayer.sln
 set SOLUTION_PATH=..\splayer.sln
-if not exist "%SOLUTION_PATH%" (
-    set SOLUTION_PATH=..\..\splayer.sln
-)
 
 if not exist "%SOLUTION_PATH%" (
     echo ERROR: Solution file not found!

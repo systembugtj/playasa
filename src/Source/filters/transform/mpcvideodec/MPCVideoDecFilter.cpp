@@ -520,7 +520,9 @@ const AMOVIESETUP_MEDIATYPE CMPCVideoDecFilter::sudPinTypesOut[] =
 };
 const int CMPCVideoDecFilter::sudPinTypesOutCount = countof(CMPCVideoDecFilter::sudPinTypesOut);
 
-BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
+namespace {
+
+BOOL CALLBACK EnumFindProcessWnd(HWND hwnd, LPARAM lParam)
 {
 	DWORD	procid = 0;
 	TCHAR	WindowClass [40];
@@ -535,6 +537,9 @@ BOOL CALLBACK EnumFindProcessWnd (HWND hwnd, LPARAM lParam)
 	}
 	return TRUE;
 }
+
+} // namespace
+
 CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr) 
 	: CBaseVideoFilter(NAME("MPC - Video decoder"), lpunk, phr, __uuidof(this))
 	, m_nGoFaster(0)
@@ -1516,7 +1521,8 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
                             SVP_LogMsg5( L"CMPCVideoDecFilter::CompleteConnect DxvaGui != NULL Failed");
                         }
 			
-						GlobalSettings s = SysUtil.CurrentSettings;
+						// 按值会切片并实例化 GlobalSettings，其虚函数无独立实现，链接器会报 LNK2001；必须用引用保持动态类型。
+						GlobalSettings& s = SysUtil.CurrentSettings;
 						if(hrDXVA == VFW_E_INVALIDMEDIATYPE){
 							//SVP_LogMsg5(_T("Create DXVA Failed"));
 							//With static definition.

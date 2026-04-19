@@ -1,6 +1,6 @@
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include "Strings.h"
-#include "../../../../Thirdparty\jsoncpp\include\json\json.h"
+#include "../../../../Thirdparty/jsoncpp/include/json/json.h"
 #include "FontParamsManage.h"
 #include "../../Controller/SPlayerDefs.h"
 #include "../../Controller/PlayerPreference.h"

@@ -23,6 +23,15 @@
 
 #include "ISubPic.h"
 
+// Ensure DirectX 9 headers are included before using DirectX 9 types
+// d3d9.h does NOT use DIRECT3D_VERSION - it's independent
+// But we need to undefine it to avoid conflicts with d3d.h (DirectX 7)
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
+#include <d3d9.h>
+#include <atlbase.h>  // For CComPtr
+
 // CDX9SubPic
 
 class CDX9SubPic : public ISubPicImpl

@@ -1,12 +1,7 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "MediaCheckDB.h"
 #include "..\..\..\base\logging.h"
 #include "..\Model\MediaDB.h"
-#include <boost/filesystem.hpp>
-#include <regex>
-
-using namespace boost::filesystem;
-using namespace std::tr1;
 
 ////////////////////////////////////////////////////////////////////////////////
 // normal part
@@ -75,7 +70,7 @@ void MediaCheckDB::CheckDetectPath()
 			if (ShouldExit())
 				return;
 
-			if (!it->empty() && !::PathFileExists(Strings::Utf8StringToWString(*it).c_str()))
+			if (!it->empty() && !::PathFileExists(it->c_str()))
 			{
 				std::wstringstream ss;
 				ss << L"DELETE FROM detect_path WHERE path='" << it->c_str() << L"'";
@@ -118,10 +113,10 @@ void MediaCheckDB::CheckMediaData()
 			if (ShouldExit())
 				return;
 
-			std::wstring sFullPath = Strings::Utf8StringToWString(*itPath);
+			std::wstring sFullPath(*itPath);
 			if (sFullPath[sFullPath.size() - 1] != L'\\')
 				sFullPath += L"\\";
-			sFullPath += Strings::Utf8StringToWString(*itFilename);
+			sFullPath += *itFilename;
 
 			if (!sFullPath.empty() && !::PathFileExists(sFullPath.c_str()))
 			{

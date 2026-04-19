@@ -1,4 +1,4 @@
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include "MediaScrollbar.h"
 #include "../../resource.h"
 #include <ResLoader.h>

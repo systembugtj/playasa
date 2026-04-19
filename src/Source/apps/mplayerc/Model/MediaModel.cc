@@ -1,4 +1,4 @@
-#include "../StdAfx.h"
+#include "stdafx.h"
 #include "MediaModel.h"
 #include <logging.h>
 #include "MediaDB.h"
@@ -115,7 +115,7 @@ void MediaModel::FindAll(MediaPaths& data)
 	{
 		MediaPath mp;
 		mp.uniqueid = vtUniqueID[i];
-		mp.path = Strings::Utf8StringToWString(vtPath[i]);
+		mp.path = vtPath[i];
 		mp.merit = vtMerit[i];
 
 		data.push_back(mp);
@@ -138,9 +138,9 @@ void MediaModel::FindAll(MediaDatas& data)
 	{
 		MediaData md;
 		md.uniqueid = vtUniqueID[i];
-		md.path = Strings::Utf8StringToWString(vtPath[i]);
-		md.filename = Strings::Utf8StringToWString(vtFilename[i]);
-		md.thumbnailpath = Strings::Utf8StringToWString(vtThumbnailPath[i]);
+		md.path = vtPath[i];
+		md.filename = vtFilename[i];
+		md.thumbnailpath = vtThumbnailPath[i];
 		md.videotime = vtVideoTime[i];
 
 		data.push_back(md);
@@ -168,9 +168,9 @@ void MediaModel::FindOne(MediaData& data, const MediaFindCondition& condition)
 				, &nUniqueID, &sPath, &sFilename, &sThumbnailPath, &nVideoTime);
 
 			data.uniqueid = nUniqueID;
-			data.path = Strings::Utf8StringToWString(sPath);
-			data.filename = Strings::Utf8StringToWString(sFilename);
-			data.thumbnailpath = Strings::Utf8StringToWString(sThumbnailPath);
+			data.path = std::wstring(sPath);
+			data.filename = std::wstring(sFilename);
+			data.thumbnailpath = std::wstring(sThumbnailPath);
 			data.videotime = nVideoTime;
 		}
 		catch (std::runtime_error const& err)
@@ -192,9 +192,9 @@ void MediaModel::FindOne(MediaData& data, const MediaFindCondition& condition)
 				, &nUniqueID, &sPath, &sFilename, &sThumbnailPath, &nVideoTime);
 
 			data.uniqueid = nUniqueID;
-			data.path = Strings::Utf8StringToWString(sPath);
-			data.filename = Strings::Utf8StringToWString(sFilename);
-			data.thumbnailpath = Strings::Utf8StringToWString(sThumbnailPath);
+			data.path = std::wstring(sPath);
+			data.filename = std::wstring(sFilename);
+			data.thumbnailpath = std::wstring(sThumbnailPath);
 			data.videotime = nVideoTime;
 		}
 		catch (std::runtime_error const& err)
@@ -231,9 +231,9 @@ void MediaModel::Find(MediaDatas& data, const MediaFindCondition& condition,
 		{
 			MediaData md;
 			md.uniqueid = vtUniqueID[i];
-			md.path = Strings::Utf8StringToWString(vtPath[i]);
-			md.filename = Strings::Utf8StringToWString(vtFilename[i]);
-			md.thumbnailpath = Strings::Utf8StringToWString(vtThumbnailPath[i]);
+			md.path = std::wstring(vtPath[i]);
+			md.filename = std::wstring(vtFilename[i]);
+			md.thumbnailpath = std::wstring(vtThumbnailPath[i]);
 			md.videotime = vtVideoTime[i];
 
 			data.push_back(md);
@@ -263,9 +263,9 @@ void MediaModel::Find(MediaDatas& data, const MediaFindCondition& condition,
 		{
 			MediaData md;
 			md.uniqueid = vtUniqueID[i];
-			md.path = Strings::Utf8StringToWString(vtPath[i]);
-			md.filename = Strings::Utf8StringToWString(vtFilename[i]);
-			md.thumbnailpath = Strings::Utf8StringToWString(vtThumbnailPath[i]);
+			md.path = std::wstring(vtPath[i]);
+			md.filename = std::wstring(vtFilename[i]);
+			md.thumbnailpath = std::wstring(vtThumbnailPath[i]);
 			md.videotime = vtVideoTime[i];
 
 			data.push_back(md);

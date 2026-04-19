@@ -1,24 +1,4 @@
-#ifndef LAZYINSTANCE_H
-#define LAZYINSTANCE_H
+#pragma once
 
-template<class T>
-class LazyInstanceImpl
-{
-public:
-  static std::auto_ptr<T> m_instance;
-  static T* GetInstance()
-  {
-    if (m_instance.get())
-      return m_instance.get();
-    else
-    {
-      m_instance.reset(new T());
-      return m_instance.get();
-    }
-  }
-};
-
-#define DECLARE_LAZYINSTANCE(classname) \
-  std::auto_ptr<classname> LazyInstanceImpl<classname>::m_instance;
-
-#endif // LAZYINSTANCE_H
+// Single implementation lives in base (historically two headers shared LAZYINSTANCE_H and broke ODR).
+#include "../../base/LazyInstance.h"

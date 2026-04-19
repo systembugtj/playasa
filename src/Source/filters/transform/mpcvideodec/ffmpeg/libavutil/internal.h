@@ -291,6 +291,8 @@ static av_always_inline av_const double log2(double x)
 }
 #endif
 
+/* MSVC 将 lrint/lrintf 作为内建；再定义会 C2169 */
+#if !(defined(_MSC_VER) && _MSC_VER >= 1700)
 #ifndef lrint
 static av_always_inline av_const long int lrint(double x)
 {
@@ -304,6 +306,7 @@ static av_always_inline av_const long int lrintf(float x)
     return (int)(rint(x));
 }
 #endif
+#endif /* !_MSC_VER >= 1700 */
 
 #ifndef round
 static av_always_inline av_const double round(double x)

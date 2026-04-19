@@ -39,7 +39,7 @@
 4. 勾选 **"MFC 和 ATL 支持 (v145)"**
 5. 安装并重启
 
-详细步骤: [INSTALL-MFC.md](docs/INSTALL-MFC.md)
+详细步骤: [INSTALL-MFC.md](../INSTALL-MFC.md)
 
 ### 问题 2: 缺失的头文件（可选）
 
@@ -108,9 +108,9 @@ build-with-msbuild.cmd
 
 ## 相关文档
 
-- [MFC 安装指南](docs/INSTALL-MFC.md)
-- [构建进度报告](docs/BUILD-PROGRESS.md)
-- [构建问题详情](docs/BUILD-ISSUES-FOUND.md)
+- [MFC 安装指南](../INSTALL-MFC.md)
+- [构建进度报告](../BUILD-PROGRESS.md)
+- [构建问题详情](../BUILD-ISSUES-FOUND.md)
 
 ---
 

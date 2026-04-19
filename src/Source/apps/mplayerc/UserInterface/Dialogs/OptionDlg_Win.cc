@@ -1,4 +1,4 @@
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include "OptionDlg_Win.h"
 #include "OptionBasicPage_Win.h"
 #include "OptionSubtitlePage_Win.h"

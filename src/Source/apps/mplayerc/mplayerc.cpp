@@ -32,6 +32,10 @@
 #include "..\..\DSUtil\DSUtil.h"
 #include "revision.h"
 #include <locale.h> 
+// Clear DirectX 7 version before including DirectX 9
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
 #include <d3d9.h>
 #include "DlgChkUpdater.h"
 #include <dsound.h>
@@ -3601,12 +3605,12 @@ void CMPlayerCApp::Settings::UpdateData(bool fSave)
 
 				pApp->WriteProfileInt(key, _T("SourceType"), (int)f->type);
 				pApp->WriteProfileInt(key, _T("Enabled"), (int)!f->fDisabled);
-				if (f->type == FilterOverride::REGISTERED)
+				if (f->type == FilterOverride::kRegSource)
 				{
 					pApp->WriteProfileString(key, _T("DisplayName"), CString(f->dispname));
 					pApp->WriteProfileString(key, _T("Name"), f->name);
 				}
-				else if (f->type == FilterOverride::EXTERNAL)
+				else if (f->type == FilterOverride::kExtSource)
 				{
 					pApp->WriteProfileString(key, _T("Path"), f->path);
 					pApp->WriteProfileString(key, _T("Name"), f->name);
@@ -4243,13 +4247,13 @@ void CMPlayerCApp::Settings::UpdateData(bool fSave)
 				UINT j = pApp->GetProfileInt(key, _T("SourceType"), -1);
 				if (j == 0)
 				{
-					f->type = FilterOverride::REGISTERED;
+					f->type = FilterOverride::kRegSource;
 					f->dispname = CStringW(pApp->GetProfileString(key, _T("DisplayName"), _T("")));
 					f->name = pApp->GetProfileString(key, _T("Name"), _T(""));
 				}
 				else if (j == 1)
 				{
-					f->type = FilterOverride::EXTERNAL;
+					f->type = FilterOverride::kExtSource;
 					f->path = pApp->GetProfileString(key, _T("Path"), _T(""));
 					f->name = pApp->GetProfileString(key, _T("Name"), _T(""));
 					f->clsid = GUIDFromCString(pApp->GetProfileString(key, _T("CLSID"), _T("")));
@@ -4641,28 +4645,40 @@ void CMPlayerCApp::Settings::ParseCommandLine(CAtlList<CString>& cmdln)
 	//SVP_LogMsg5(L"cls end %x", nCLSwitches);
 }
 
-// Retrieve an integer value from INI file or registry.
+// Retrieve an integer value from INI file or registry。
+#pragma push_macro("GetProfileInt")
+#undef GetProfileInt
 UINT  CMPlayerCApp::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault)
 {
 	if (sqlite_setting){
-		return sqlite_setting->GetProfileInt(lpszSection, lpszEntry, nDefault);
+		return SqliteGetProfileInt(sqlite_setting, lpszSection, lpszEntry, nDefault);
 	}
 	else{
+#pragma pop_macro("GetProfileInt")
 		return __super::GetProfileInt(lpszSection, lpszEntry, nDefault);
+#pragma push_macro("GetProfileInt")
+#undef GetProfileInt
 	}
 }
+#pragma pop_macro("GetProfileInt")
 
-// Sets an integer value to INI file or registry.
+// Sets an integer value to INI file or registry。
+#pragma push_macro("WriteProfileInt")
+#undef WriteProfileInt
 BOOL  CMPlayerCApp::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue)
 {
 	if (sqlite_setting){
-		return sqlite_setting->WriteProfileInt(lpszSection, lpszEntry, nValue);
+		return SqliteWriteProfileInt(sqlite_setting, lpszSection, lpszEntry, nValue);
 	}
 	else{
 		SVP_LogMsg6("dwqdwq");
+#pragma pop_macro("WriteProfileInt")
 		return __super::WriteProfileInt(lpszSection, lpszEntry, nValue);
+#pragma push_macro("WriteProfileInt")
+#undef WriteProfileInt
 	}
 }
+#pragma pop_macro("WriteProfileInt")
 
 // Retrieve a string value from INI file or registry.
 CString  CMPlayerCApp::GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry,
@@ -5413,4 +5429,36 @@ LONGLONG CMPlayerCApp::GetPerfCounter()
 		SVP_LogMsg(_T("No m_PerfFrequency!!"));
 	}
 	return 0;
+}
+
+#pragma push_macro("GetProfileInt")
+#undef GetProfileInt
+UINT CMPlayerCApp::Settings::GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault)
+{
+	CMPlayerCApp* pApp = (CMPlayerCApp*)AfxGetApp();
+	return pApp->GetProfileInt(lpszSection, lpszEntry, nDefault);
+}
+#pragma pop_macro("GetProfileInt")
+
+#pragma push_macro("WriteProfileInt")
+#undef WriteProfileInt
+BOOL CMPlayerCApp::Settings::WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue)
+{
+	CMPlayerCApp* pApp = (CMPlayerCApp*)AfxGetApp();
+	return pApp->WriteProfileInt(lpszSection, lpszEntry, nValue);
+}
+#pragma pop_macro("WriteProfileInt")
+
+// SysUtil 全局对象与 Utility 构造：各子工程引用 SysUtil，但未链接 sharedlib 静态库时在此提供定义，避免链接阶段 LNK2001。
+#include "../shared/sharedlib/Utility.h"
+
+Utility SysUtil;
+
+Utility::Utility()
+{
+	m_pCurrrentSettings = NULL;
+}
+
+Utility::~Utility()
+{
 }

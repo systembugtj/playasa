@@ -33,8 +33,18 @@ private:
 	void Init();
 	void Uninit();
 
+#pragma push_macro("GetProfileInt")
+#pragma push_macro("WriteProfileInt")
+#ifdef GetProfileInt
+#undef GetProfileInt
+#endif
+#ifdef WriteProfileInt
+#undef WriteProfileInt
+#endif
 	BOOL WriteProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nValue);
 	UINT GetProfileInt(LPCTSTR lpszSection, LPCTSTR lpszEntry, int nDefault);
+#pragma pop_macro("WriteProfileInt")
+#pragma pop_macro("GetProfileInt")
 
 	BOOL WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszValue);
 	CString GetProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCTSTR lpszDefault);

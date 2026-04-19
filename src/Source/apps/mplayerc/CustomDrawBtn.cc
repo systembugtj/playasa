@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "CustomDrawBtn.h"
 #include "UserInterface/Renderer/PlaylistView_Win.h"
 

@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include <algorithm>
+#include <cwctype>
 #include "SkinFolderManager.h"
 #include "UnCompressZip.h"
 #include "Strings.h"
@@ -20,7 +22,9 @@ std::wstring SkinFolderManager::UnSkinzip(std::wstring path)
 {
   UnCompressZip zip;
 
-  std::transform(path.begin(), path.end(), path.begin(), tolower);
+  std::transform(path.begin(), path.end(), path.begin(), [](wchar_t c) {
+    return static_cast<wchar_t>(towlower(static_cast<wint_t>(c)));
+  });
   std::wstring dir = path.substr(0, path.find(L".zip"));
   dir += L"\\";
 
@@ -55,32 +59,38 @@ void SkinFolderManager::SeachFile(const wchar_t* lpath)
       m_foldername = filename;
       SeachFile(dir.c_str());
     }
-    else if ((std::transform(filename.begin(), filename.end(), filename.begin(), tolower)
-            , filename.find(L".zip")) != std::wstring::npos)
-    {
-      std::wstring dir = lpath;
-      dir += filename;
-
-      m_foldername = filename.substr(0, filename.find(L".zip"));
-      SeachFile(UnSkinzip(dir).c_str());
-    }
     else if (!filename.empty())
     {
-      if (filename == L"skin.ini")
+      std::wstring lower_fn = filename;
+      std::transform(lower_fn.begin(), lower_fn.end(), lower_fn.begin(), [](wchar_t c) {
+        return static_cast<wchar_t>(towlower(static_cast<wint_t>(c)));
+      });
+      if (lower_fn.find(L".zip") != std::wstring::npos)
       {
         std::wstring dir = lpath;
         dir += filename;
-        char val[MAX_PATH];
-        GetPrivateProfileSectionA("name", val, MAX_PATH, Strings::WStringToString(dir).c_str());
 
-        AddSkinName(m_foldername, L"", Strings::Utf8StringToWString(std::string(val)));
+        m_foldername = filename.substr(0, filename.find(L".zip"));
+        SeachFile(UnSkinzip(dir).c_str());
       }
-      // load resource
-      std::wstring res = filename.substr(0, filename.find(L"."));
-      if (m_foldername == res)
+      else
       {
-        res = lpath + filename;
-        m_skinnametobmp_map[m_foldername] = res;
+        if (filename == L"skin.ini")
+        {
+          std::wstring dir = lpath;
+          dir += filename;
+          char val[MAX_PATH];
+          GetPrivateProfileSectionA("name", val, MAX_PATH, Strings::WStringToString(dir).c_str());
+
+          AddSkinName(m_foldername, L"", Strings::Utf8StringToWString(std::string(val)));
+        }
+        // load resource
+        std::wstring res = filename.substr(0, filename.find(L"."));
+        if (m_foldername == res)
+        {
+          res = lpath + filename;
+          m_skinnametobmp_map[m_foldername] = res;
+        }
       }
     }
   }

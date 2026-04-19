@@ -26,7 +26,7 @@
 #include <afxtempl.h>
 
 #include "..\svplib\svplib.h"
-#include "..\apps\shared\sharedlib\Utility.h"
+#include "..\..\apps\shared\sharedlib\Utility.h"
 //#define  LOGSUBRECT
 
 #undef  SVP_LogMsg5

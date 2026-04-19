@@ -43,7 +43,7 @@
 
 ## 相关文档
 
-- [RFC-0006: 输出目录统一化](docs/rfc/rfc-0006-output-directory-consolidation.md)
+- [RFC-0006: 输出目录统一化](../rfc/rfc-0006-output-directory-consolidation.md)
 - `src/BuildScript/fix-output-directories.ps1` - 修复脚本
 
 ---

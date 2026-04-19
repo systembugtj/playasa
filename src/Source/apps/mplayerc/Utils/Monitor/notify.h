@@ -1,7 +1,8 @@
 #pragma once
 
 #include <Windows.h>
-#include <boost/signals2.hpp>
+#include <algorithm>
+#include <vector>
 
 #define ID_MONITOR_CHANGED 100
 
@@ -12,7 +13,6 @@ namespace MT
   {
   public:
     typedef void (*direct_type)();
-    typedef boost::signals2::signal<void ()> type_direct_sig;
 
   public:
     // add listeners, 3 ways
@@ -29,7 +29,7 @@ namespace MT
     void notify();
 
   private:
-    type_direct_sig m_sig;
+    std::vector<direct_type> m_direct_listeners;
     std::vector<HWND> m_sendmsg;
     std::vector<HWND> m_postmsg;
   };

@@ -2,6 +2,8 @@
 
 这是一个基于 Media Player Classic 的 Windows 媒体播放器项目。
 
+**原根目录下的安装/构建类 Markdown 与构建日志** 已迁入 [`docs/root-notes/`](docs/root-notes/README.md)，便于与 RFC、安装指南等统一查阅。
+
 ## 项目状态
 
 - **当前版本**: 基于 Visual Studio 2013 (v120)
@@ -17,14 +19,14 @@
 
 1. **升级项目**（已完成）:
    - ✅ 95 个项目文件已升级到 v144 工具集
-   - ✅ 解决方案文件已移动到根目录
+   - ✅ 解决方案文件位于 `src\splayer.sln`
    - ✅ Windows SDK 已更新
 
 2. **安装 Visual Studio 2026**:
    ```powershell
    .\install-visual-studio.ps1
    ```
-   或查看 [VS2026 快速开始.md](VS2026-快速开始.md)
+   或查看 [VS2026 升级说明](docs/root-notes/VS2026-UPDATE.md)
 
 3. **验证安装**:
    ```powershell
@@ -39,7 +41,7 @@
    build-fixed.cmd           # 使用 Visual Studio
    ```
 
-**项目已准备好构建！** 查看 [BUILD-READY.md](BUILD-READY.md) 了解当前状态。
+**项目已准备好构建！** 查看 [BUILD-READY.md](docs/root-notes/BUILD-READY.md) 了解当前状态。
 
 ### 使用其他 Visual Studio 版本
 
@@ -57,7 +59,7 @@
 - DirectShow SDK
 - MFC 库（包含在 Visual Studio 中）
 
-**遇到构建问题？** 查看 [快速修复构建问题.md](快速修复构建问题.md) 或 [详细构建修复指南](docs/BUILD-FIXES.md)
+**遇到构建问题？** 查看 [快速修复构建问题](docs/root-notes/快速修复构建问题.md) 或 [详细构建修复指南](docs/BUILD-FIXES.md)
 
 ### 依赖项
 

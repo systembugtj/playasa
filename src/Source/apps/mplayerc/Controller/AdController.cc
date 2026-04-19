@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "AdController.h"
 #include <regex>
 #include "PlayerPreference.h"

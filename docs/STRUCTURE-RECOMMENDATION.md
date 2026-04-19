@@ -9,7 +9,7 @@
 ### ✅ 符合 Windows 标准的部分
 
 1. **解决方案文件位置** ✅
-   - `splayer.sln` 现在在根目录
+   - `splayer.sln` 位于 `src\`
    - 符合 Windows 项目标准
 
 2. **源代码组织** ✅
@@ -75,7 +75,7 @@ project/
 
 ```
 playasa/
-├── splayer.sln           # ✅ 解决方案（根目录）
+├── src/splayer.sln       # ✅ 解决方案（src 目录）
 ├── src/                  # 源代码目录
 │   ├── Source/          # 主要源代码
 │   ├── include/         # 头文件

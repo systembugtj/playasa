@@ -1,7 +1,7 @@
 #ifndef OPTIONSUBTITLEPAGE_WIN_H
 #define OPTIONSUBTITLEPAGE_WIN_H
 #include "../../resource.h"
-#include "../../stdafx.h"
+#include "stdafx.h"
 
 #include "../Support/FontParamsManage.h"
 #include "../Support/SubtitleStyle.h"

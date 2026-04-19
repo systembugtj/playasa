@@ -26,6 +26,16 @@
 
 #pragma once
 
+// Must precede any header that may pull in src/include/stdint.h, which omits
+// INTMAX_MAX in C++ unless __STDC_LIMIT_MACROS is already defined (needed by <ratio>/<chrono>).
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS 1
+#endif
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS 1
+#endif
+#include <stdint.h>
+
 #ifndef _SECURE_ATL
 #define _SECURE_ATL 1
 #endif

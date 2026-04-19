@@ -79,7 +79,7 @@ if ($foundMsbuilds.Count -eq 0) {
         Write-Host "  $recommended" -ForegroundColor Green
         Write-Host ""
         Write-Host "You can use it with:" -ForegroundColor Yellow
-        Write-Host "  `"$recommended`" `"$((Get-Location).Path)\..\..\splayer.sln`" /p:Configuration=`"Release Unicode`" /p:Platform=Win32" -ForegroundColor White
+        Write-Host "  `"$recommended`" `"$((Get-Location).Path)\..\splayer.sln`" /p:Configuration=`"Release Unicode`" /p:Platform=Win32" -ForegroundColor White
     }
 }
 

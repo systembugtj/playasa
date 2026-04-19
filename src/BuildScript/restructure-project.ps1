@@ -18,43 +18,28 @@ Write-Host "  Root: $rootPath" -ForegroundColor Gray
 Write-Host "  Source: $srcPath" -ForegroundColor Gray
 Write-Host ""
 
-# Option 1: Minimal change - just move solution file
-Write-Host "[Option 1] Minimal Change - Move Solution File Only" -ForegroundColor Cyan
-Write-Host "  This is the recommended approach for minimal risk." -ForegroundColor White
+# Option 1: 规范位置为 src\splayer.sln；若仅有根目录旧方案则迁入 src
+Write-Host "[Option 1] Solution file location (canonical: src\splayer.sln)" -ForegroundColor Cyan
 Write-Host ""
 
-$solutionFile = Join-Path $srcPath "splayer.sln"
-$newSolutionPath = Join-Path $rootPath "splayer.sln"
+$canonicalSln = Join-Path $srcPath "splayer.sln"
+$rootSln = Join-Path $rootPath "splayer.sln"
 
-if (Test-Path $solutionFile) {
-    Write-Host "  Solution file found: $solutionFile" -ForegroundColor Green
-    
-    # Check if already in root
-    if (Test-Path $newSolutionPath) {
-        Write-Host "  [INFO] Solution file already exists in root" -ForegroundColor Yellow
-    } else {
-        Write-Host "  Would move to: $newSolutionPath" -ForegroundColor Cyan
-        
-        # Read solution file and update paths
-        $content = Get-Content $solutionFile -Raw -Encoding UTF8
-        
-        # Update project paths (add "src\" prefix)
-        $content = $content -replace 'Source\\', 'src\Source\'
-        $content = $content -replace 'lib\\', 'src\lib\'
-        $content = $content -replace 'Thirdparty\\', 'src\Thirdparty\'
-        $content = $content -replace 'Test\\', 'src\Test\'
-        $content = $content -replace 'Updater\\', 'src\Updater\'
-        
-        # Backup original
-        Copy-Item $solutionFile "$solutionFile.backup" -Force
-        
-        # Write to new location
-        [System.IO.File]::WriteAllText($newSolutionPath, $content, [System.Text.Encoding]::UTF8)
-        
-        Write-Host "  [OK] Solution file moved and paths updated" -ForegroundColor Green
-    }
+if (Test-Path $canonicalSln) {
+    Write-Host "  [INFO] Canonical solution present: $canonicalSln" -ForegroundColor Green
+} elseif (Test-Path $rootSln) {
+    Write-Host "  [INFO] Found root-level solution; converting paths for src layout..." -ForegroundColor Yellow
+    $content = Get-Content $rootSln -Raw -Encoding UTF8
+    $content = $content -replace 'src\\Source\\', 'Source\\'
+    $content = $content -replace 'src\\lib\\', 'lib\\'
+    $content = $content -replace 'src\\Thirdparty\\', 'Thirdparty\\'
+    $content = $content -replace 'src\\Test\\', 'Test\\'
+    $content = $content -replace 'src\\Prototype\\', 'Prototype\\'
+    Copy-Item $rootSln "$rootSln.backup" -Force
+    [System.IO.File]::WriteAllText($canonicalSln, $content, [System.Text.Encoding]::UTF8)
+    Write-Host "  [OK] Wrote: $canonicalSln (root file backed up)" -ForegroundColor Green
 } else {
-    Write-Host "  [WARNING] Solution file not found" -ForegroundColor Yellow
+    Write-Host "  [WARNING] No splayer.sln under src or repo root" -ForegroundColor Yellow
 }
 
 Write-Host ""
@@ -75,7 +60,7 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Recommendation" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "For Windows projects, the solution file should be in the root." -ForegroundColor Yellow
+Write-Host "This repo keeps splayer.sln under src\ (see BuildScript *.cmd / *.ps1)." -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Current structure is acceptable if:" -ForegroundColor White
 Write-Host "  - The project is already working" -ForegroundColor Gray

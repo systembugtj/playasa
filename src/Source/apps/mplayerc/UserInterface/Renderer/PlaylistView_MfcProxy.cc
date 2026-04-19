@@ -1,4 +1,4 @@
-#include "../../StdAfx.h"
+#include "stdafx.h"
 #include "PlaylistView_MfcProxy.h"
 #include "PlaylistView_Win.h"
 

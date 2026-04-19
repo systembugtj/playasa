@@ -15,7 +15,7 @@
 ### 升级的文件
 
 - 所有 `*.vcxproj` 文件：v120 → v144
-- `src\splayer.sln`：VS2013 → VS2025
+- 解决方案使用 `src\splayer.sln`（工程路径相对 `src` 目录）
 - `src\Source\common.props`：Windows 7 SDK → Windows 10/11 SDK
 
 ## 下一步操作
@@ -89,8 +89,8 @@ Get-ChildItem -Path src -Filter "*.backup" -Recurse | ForEach-Object {
 ## 相关文档
 
 - [VS2025 快速开始](VS2025-快速开始.md) - 详细安装和构建指南
-- [VS2025 支持指南](docs/VS2025-SUPPORT.md) - 技术细节和故障排除
-- [构建修复指南](docs/BUILD-FIXES.md) - 常见构建问题
+- [VS2025 支持指南](../VS2025-SUPPORT.md) - 技术细节和故障排除
+- [构建修复指南](../BUILD-FIXES.md) - 常见构建问题
 
 ## 状态
 

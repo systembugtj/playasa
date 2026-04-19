@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "Ed2kController.h"
 #include "../../../../Thirdparty/librhash/librhash/rhash_ex.h"
 #include "Strings.h"

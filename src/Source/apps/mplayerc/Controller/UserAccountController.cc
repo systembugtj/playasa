@@ -1,4 +1,4 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "UserAccountController.h"
 #include "..\Utils\SPlayerGUID.h"
 #include "..\..\..\base\Strings.h"

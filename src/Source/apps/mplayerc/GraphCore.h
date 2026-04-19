@@ -8,6 +8,10 @@
 #include "../../../include/IChapterInfo.h"
 #include "../../../include/IKeyFrameInfo.h"
 #include "../../../include/IBufferInfo.h"
+// Clear DirectX 7 version before including DirectX 9
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
 #include <D3d9.h>
 #include <Vmr9.h>
 #include <evr.h>

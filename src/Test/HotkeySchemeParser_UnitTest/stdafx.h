@@ -5,8 +5,9 @@
 
 #pragma once
 
-#define WINVER    0x0501
-#define _WIN32_WINNT  0x0600
+/* 与解决方案 common.props 及 VS2022+ ATL 头文件一致，避免 LCMapStringEx 等 API 声明缺失 */
+#define WINVER 0x0A00
+#define _WIN32_WINNT 0x0A00
 #define _WIN32_IE  0x0700
 #define _RICHEDIT_VER  0x0200
 

@@ -123,7 +123,7 @@ build-fixed.cmd
 
 ### 在 Visual Studio IDE 中
 
-1. 打开 `splayer.sln`
+1. 打开 `src\splayer.sln`
 2. 选择配置: "Release Unicode"
 3. 选择平台: "Win32"
 4. 生成 → 生成解决方案
@@ -131,8 +131,8 @@ build-fixed.cmd
 ## 相关文档
 
 - [构建准备状态](BUILD-READY.md)
-- [构建状态报告](docs/BUILD-STATUS.md)
-- [安装指南](docs/INSTALL-GUIDE.md)
+- [构建状态报告](../BUILD-STATUS.md)
+- [安装指南](../INSTALL-GUIDE.md)
 
 ---
 

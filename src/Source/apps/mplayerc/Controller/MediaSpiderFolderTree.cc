@@ -1,10 +1,8 @@
-#include "../stdafx.h"
+#include "stdafx.h"
 #include "MediaSpiderFolderTree.h"
 #include "..\Controller\PlayerPreference.h"
 #include "..\Controller\SPlayerDefs.h"
-#include <boost/filesystem.hpp>
-#include <boost/lambda/lambda.hpp>
-#include <boost/lambda/bind.hpp>
+#include "..\Utils\FilesystemCompat.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // Normal part
@@ -64,7 +62,6 @@ bool _sort_tree_folders(const MediaTreeFolder &treeFolder1, const MediaTreeFolde
 
 void MediaSpiderFolderTree::_Thread()
 {
-  using namespace boost::lambda;
   using std::wstring;
   using std::vector;
   using std::list;
@@ -77,7 +74,9 @@ void MediaSpiderFolderTree::_Thread()
 
     // sort the path according the merit by descending order
     MediaTreeFolders treeFolders = m_treeModel.mediaTreeFolders();
-    treeFolders.sort(bind(&MediaTreeFolder::nMerit, _1) > bind(&MediaTreeFolder::nMerit, _2));
+    treeFolders.sort([](const MediaTreeFolder &a, const MediaTreeFolder &b) {
+      return a.nMerit > b.nMerit;
+    });
 
     //// for test
     //MediaTreeFolders::const_iterator itTest = treeFolders.begin();
@@ -117,34 +116,28 @@ void MediaSpiderFolderTree::Search(const std::wstring &sFolder)
 {
   using std::wstring;
   using std::vector;
-  using namespace boost::filesystem;
-
   // see if need to be stop
   if (_Exit_state(0))
     return;  
 
   // if the folder is not exist or the folder is been exclude, then return
-  if (!is_directory(sFolder) || IsExcludePath(sFolder))
+  if (!mpc_fs::is_directory(mpc_fs::path(sFolder)) || IsExcludePath(sFolder))
     return;
 
   // search the folder
-  wpath folder(sFolder);
-  directory_iterator itCur(folder);
-  directory_iterator itEnd;
-
-  while (itCur != itEnd)
+  const mpc_fs::path folder(sFolder);
+  for (const mpc_fs::directory_entry &ent : mpc_fs::directory_iterator(folder))
   {
-    if (is_regular_file(itCur->path()) && IsSupportExtension(itCur->path().wstring()))
+    const mpc_fs::path entryPath = ent.path();
+    if (mpc_fs::is_regular_file(entryPath) && IsSupportExtension(entryPath.wstring()))
     {
       // add it to the folder tree
       MediaData md;
       md.path = sFolder;
-      md.filename = itCur->path().filename().wstring();
+      md.filename = entryPath.filename().wstring();
       
       m_treeModel.addFile(md);
     }
-
-    ++itCur;
 
     // sleep for a moment
     ::Sleep(50);

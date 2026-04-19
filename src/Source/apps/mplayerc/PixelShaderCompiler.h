@@ -23,6 +23,10 @@
 
 #pragma once
 
+// Clear DirectX 7 version before including DirectX 9
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
 #include <d3d9helper.h>
 #include <d3d9.h>
 

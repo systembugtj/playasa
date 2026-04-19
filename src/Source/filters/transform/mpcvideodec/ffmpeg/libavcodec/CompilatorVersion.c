@@ -11,6 +11,10 @@
 		char	FfmpegCompiler[] = "VS 2002";
 	#elif (_MSC_VER == 1800)
 		char	FfmpegCompiler[] = "VS 2013";
+	#elif (_MSC_VER >= 1950)
+		char	FfmpegCompiler[] = "VS 2026";
+	#else
+		char	FfmpegCompiler[] = "VS Unknown";
 	#endif
 
 	char* GetFfmpegCompiler()

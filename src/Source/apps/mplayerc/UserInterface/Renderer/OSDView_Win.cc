@@ -1,4 +1,4 @@
-#include "../../stdafx.h"
+#include "stdafx.h"
 #include "OSDView_Win.h"
 
 void OSDView::Open(HWND hwnd_parent)

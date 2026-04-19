@@ -21,6 +21,10 @@
  *
  */
 
+// Undefine DirectX 7 version BEFORE including stdafx.h (which may define it)
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
 #include "stdafx.h"
 #include "mplayerc.h"
 #include <atlbase.h>
@@ -31,9 +35,16 @@
 #include <Videoacc.h>
 
 #include <initguid.h>
-#include "DX9AllocatorPresenter.h"
-#include <d3d9.h>
+// Redefine to ensure DirectX 9 is used
+#undef DIRECT3D_VERSION
+#include "DX9AllocatorPresenter.h"  // This header now includes d3d9.h
+// Use compatibility header for D3DX9 types (functions are loaded dynamically)
+// Try to include d3dx9.h if available, otherwise use compatibility header
+#ifndef D3DX_SDK_VERSION
+#include "../../../include/dx/d3dx9_compat.h"
+#else
 #include <d3dx9.h>
+#endif
 #include <Vmr9.h>
 #include "..\..\SubPic\DX9SubPic.h"
 #include <RealMedia\pntypes.h>
@@ -1358,7 +1369,7 @@ HRESULT CDX9AllocatorPresenter::TextureResizeBicubic2pass(CComPtr<IDirect3DTextu
 		{(float)dst1.left, (float)dst1.bottom,	0.5f, 2.0f, tx0, ty1},
 		{(float)dst1.right, (float)dst1.bottom, 0.5f, 2.0f, tx1, ty1},
 	};
-	AdjustQuad(vx, 1.0, 0.0);		// Casimir666 : bug ici, génére des bandes verticales! TODO : pourquoi ??????
+	AdjustQuad(vx, 1.0, 0.0);		// Casimir666 : bug ici, gï¿½nï¿½re des bandes verticales! TODO : pourquoi ??????
 	MYD3DVERTEX<1> vy[] =
 	{
 		{dst[0].x, dst[0].y, dst[0].z, 1.0/dst[0].z, tx0_2, ty0_2},

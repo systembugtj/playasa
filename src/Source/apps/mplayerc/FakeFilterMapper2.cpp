@@ -963,11 +963,11 @@ STDMETHODIMP CFilterMapper2::RegisterFilter(REFCLSID clsidFilter, LPCWSTR Name, 
 		if(FilterOverride* f = new FilterOverride)
 		{
 			f->fDisabled = false;
-			f->type = FilterOverride::EXTERNAL;
+			f->type = FilterOverride::kExtSource;
 			f->path = m_path;
 			f->name = CStringW(Name);
 			f->clsid = clsidFilter;
-			f->iLoadType = FilterOverride::MERIT;
+			f->iLoadType = FilterOverride::kMeritLoad;
 			f->dwMerit = prf2->dwMerit;
 
 			if(prf2->dwVersion == 1)

@@ -45,28 +45,14 @@ if ($null -eq $msbuildPath) {
 # 2. Check solution file
 Write-Host "[2] Checking solution file..." -ForegroundColor Yellow
 
-$solutionPaths = @(
-    "$rootPath\splayer.sln",
-    "$srcPath\splayer.sln"
-)
+# 唯一支持的解决方案在 src/
+$solutionPath = Join-Path $srcPath "splayer.sln"
 
-$solutionPath = $null
-foreach ($path in $solutionPaths) {
-    if (Test-Path $path) {
-        Write-Host "  [OK] Found: $path" -ForegroundColor Green
-        $solutionPath = $path
-        break
-    }
-}
-
-if ($null -eq $solutionPath) {
-    Write-Host "  [X] Solution file not found" -ForegroundColor Red
-    Write-Host "  Searched:" -ForegroundColor Yellow
-    foreach ($path in $solutionPaths) {
-        Write-Host "    - $path" -ForegroundColor Gray
-    }
+if (-not (Test-Path $solutionPath)) {
+    Write-Host "  [X] Solution file not found: $solutionPath" -ForegroundColor Red
     exit 1
 }
+Write-Host "  [OK] Found: $solutionPath" -ForegroundColor Green
 
 # 3. Check project files
 Write-Host "[3] Checking project files..." -ForegroundColor Yellow

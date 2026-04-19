@@ -19,6 +19,18 @@
  *
  */
 
+/*
+ * 与 DX7SubPic.cpp 相同：预编译头已带入 d3d9types 时若再包含旧 d3dtypes 会 C2011。
+ * 本文件禁用 PCH，并在 stdafx 之前以 DIRECT3D_VERSION=0x0700 拉入 ddraw/d3d。
+ */
+#ifdef DIRECT3D_VERSION
+#undef DIRECT3D_VERSION
+#endif
+#define DIRECT3D_VERSION 0x0700
+#include <winsock2.h>
+#include <windows.h>
+#include <ddraw.h>
+#include <d3d.h>
 #include "stdafx.h"
 #include "mplayerc.h"
 #include <atlbase.h>
@@ -26,13 +38,7 @@
 #include "..\..\DSUtil\DSUtil.h"
 
 #include <initguid.h>
-#ifndef DIRECT3D_VERSION
-#define DIRECT3D_VERSION 0x0700
-#endif
-#include <ddraw.h>
-#include <d3d.h>
 #include "DX7AllocatorPresenter.h"
-#include <d3d.h>
 #include "..\..\SubPic\DX7SubPic.h"
 #include "..\..\..\include\RealMedia\pntypes.h"
 #include "..\..\..\include\RealMedia\pnwintyp.h"

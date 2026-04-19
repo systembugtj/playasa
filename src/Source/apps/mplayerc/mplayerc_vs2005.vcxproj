@@ -55,45 +55,44 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)src\Source\common.props" />
-    <Import Project="$(SolutionDir)src\Source\debug.props" />
+    <Import Project="$(SolutionDir)Source\common.props" />
+    <Import Project="$(SolutionDir)Source\debug.props" />
     <Import Project="wtl_integration.props" />
-    <Import Project="$(SolutionDir)src\Source\apps\mplayerc\atlserver_integration.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\sinet.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\unrar_dll.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)Source\apps\mplayerc\atlserver_integration.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
+    <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)src\Source\common.props" />
-    <Import Project="$(SolutionDir)src\Source\release.props" />
+    <Import Project="$(SolutionDir)Source\common.props" />
+    <Import Project="$(SolutionDir)Source\release.props" />
     <Import Project="wtl_integration.props" />
-    <Import Project="$(SolutionDir)src\Source\apps\mplayerc\atlserver_integration.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\sinet.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\unrar_dll.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)Source\apps\mplayerc\atlserver_integration.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
+    <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)src\Source\common.props" />
-    <Import Project="$(SolutionDir)src\Source\debug.props" />
+    <Import Project="$(SolutionDir)Source\common.props" />
+    <Import Project="$(SolutionDir)Source\debug.props" />
     <Import Project="wtl_integration.props" />
-    <Import Project="$(SolutionDir)src\Source\apps\mplayerc\atlserver_integration.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\sinet.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\unrar_dll.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)Source\apps\mplayerc\atlserver_integration.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
+    <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Source\common.props" />
+    <Import Project="$(SolutionDir)Source\release.props" />
     <Import Project="wtl_integration.props" />
-    <Import Project="$(SolutionDir)src\Source\apps\mplayerc\atlserver_integration.props" />
-    <Import Project="$(SolutionDir)src\Source\common.props" />
-    <Import Project="$(SolutionDir)src\Source\release.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\sinet.props" />
+    <Import Project="$(SolutionDir)Source\apps\mplayerc\atlserver_integration.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
     <Import Project="..\..\..\Thirdparty\sqlitepp.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\sphash.props" />
-    <Import Project="$(SolutionDir)src\Thirdparty\unrar_dll.props" />
-    <Import Project="..\..\..\Thirdparty\boost.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
     <Import Project="..\..\..\Thirdparty\tcl.props" />
     <Import Project="..\..\..\Thirdparty\jsoncpp.props" />
     <Import Project="..\..\..\Thirdparty\librhash.props" />
@@ -106,21 +105,21 @@
     <GenerateManifest>true</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
     <IncludePath>$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
-    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
-    <IncludePath>$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(SolutionDir)src\Source\filters\BaseClasses;$(SolutionDir)src\Thirdparty\wtl\include;$(SolutionDir)src\Thirdparty\boost\;</IncludePath>
-    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
+    <IncludePath>$(IncludePath);C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(SolutionDir)Source\filters\BaseClasses;$(SolutionDir)Thirdparty\wtl\include;</IncludePath>
+    <OutDir>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(DXSDK_DIR)include;$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
-    <LibraryWPath>$(WindowsSDK_MetadataPath);$(SolutionDir)out\lib\$(Platform)\;$(SolutionDir)lib\;$(SolutionDir)out\bin\;</LibraryWPath>
+    <LibraryWPath>$(WindowsSDK_MetadataPath);$(SolutionDir)..\out\lib\$(Platform)\;$(SolutionDir)lib\;$(SolutionDir)..\out\bin\;</LibraryWPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)src\out\bin\</OutDir>
-    <IntDir>$(SolutionDir)src\out\obj\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(SolutionDir)..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <EmbedManifest>true</EmbedManifest>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
@@ -141,7 +140,7 @@
       <AdditionalOptions>/D "CURL_STATICLIB"  /MP %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <AdditionalIncludeDirectories>..\..\ZenLib\Source;..\..\..\include;..\..\mediainfo\Source\;..\..\mediainfo\Source\MediaInfo\;..\..\filters\BaseClasses;..\..\filters\transform\webm\vp8_sdk\include;..\..\filters\transform\webm\IDL;..\..\filters\transform\webm\common;..\..\filters\transform\mpcvideodec;..\..\svplib;..\..\..\thirdparty;..\..\..\include\dx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;DIRECT3D_VERSION=0x0700;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <OpenMPSupport>false</OpenMPSupport>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -153,12 +152,12 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalOptions>/MACHINE:I386  /LTCG  %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>subpic.lib;Rpcrt4.lib;Winmm.lib;Wbemuuid.lib;Dsound.lib;Imm32.lib;Dbghelp.lib;Psapi.lib;libssf.lib;detours.lib;unrar.lib;sphash.lib;qtmlClient.lib;dxguid.lib;libsamplerate.a;libzmq.lib;libphashaudio.a;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\out\bin;../../../Thirdparty/sqlitepp/lib;../../../lib;../../../lib/wm7;../../../lib/qt6;../../../lib/detours;../../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/MACHINE:I386  /LTCG /FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;subpic.lib;Rpcrt4.lib;Winmm.lib;Wbemuuid.lib;Dsound.lib;Imm32.lib;Dbghelp.lib;Psapi.lib;libssf.lib;detours.lib;delayimp.lib;unrar.lib;qtmlClient.lib;dxguid.lib;libsamplerate.a;libzmq.lib;libphashaudio.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\;$(SolutionDir)\out\bin;$(SolutionDir)Thirdparty\unrar;../../../Thirdparty/sqlitepp/lib;../../../lib;../../../lib/wm7;../../../lib/qt6;../../../lib/detours;../../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <IgnoreSpecificDefaultLibraries>MSVCRT;nafxcw.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <DelayLoadDLLs>d3d9.dll;gdiplus.dll;psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+      <DelayLoadDLLs>unrar.dll;d3d9.dll;gdiplus.dll;psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <MidlCommandFile />
       <GenerateMapFile>true</GenerateMapFile>
       <MapFileName>$(TargetDir)$(TargetName).map</MapFileName>
@@ -171,7 +170,16 @@
     <Manifest>
       <AdditionalManifestFiles>res\mplayerc.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
-    <PostBuildEvent />
+    <PostBuildEvent>
+      <Command>REM Copy unrar.dll next to splayer.exe (Win32 build needs 32-bit DLL from WinRAR x86 path).
+if exist "$(SolutionDir)Thirdparty\unrar\unrar.dll" (copy /Y "$(SolutionDir)Thirdparty\unrar\unrar.dll" "$(OutDir)unrar.dll" &amp; goto UnrarCopyDone)
+if exist "$(ProgramFiles(x86))\WinRAR\UnRAR.dll" (copy /Y "$(ProgramFiles(x86))\WinRAR\UnRAR.dll" "$(OutDir)unrar.dll" &amp; goto UnrarCopyDone)
+if exist "$(ProgramFiles)\WinRAR\UnRAR.dll" (copy /Y "$(ProgramFiles)\WinRAR\UnRAR.dll" "$(OutDir)unrar.dll" &amp; goto UnrarCopyDone)
+echo WARNING: unrar.dll not copied. Place unrar.dll in $(OutDir) or put it at $(SolutionDir)Thirdparty\unrar\unrar.dll then rebuild.
+:UnrarCopyDone
+exit /b 0
+      </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <PreBuildEvent>
@@ -201,7 +209,7 @@
       <AdditionalDependencies>libsqliteD.lib;libeay32.lib;ssleay32.lib;Delayimp.lib;psapi.lib;detours.lib;qtmlClient.lib;wmstub.lib;Dsound.lib;dxguid.lib;strmbaseDU.lib;dsutilDU.lib;subpicDU.lib;subtitlesDU.lib;libssfDU.lib;asyncreaderDU.lib;bufferfilter.lib;cddareader.lib;cdxareader.lib;d2vsource.lib;decssfilter.lib;flicsource.lib;dtsac3source.lib;basesource.lib;subtitlesource.lib;wavdest.lib;shoutcastsource.lib;streamdrivethru.lib;vtsreader.lib;basesplitterlib;MatroskaSplitter.lib;MatroskaMuxer.lib;RealMediaSplitter.lib;AviSplitter.lib;Mpeg2DecFilter.lib;MpaDecFilter.lib;RoQSplitter.lib;OggSplitter.lib;NutSplitter.lib;MpegSplitter.lib;DiracSplitter.lib;MpaSplitter.lib;DSMSplitter.lib;MP4Splitter.lib;BaseMuxer.lib;DSMMuxer.lib;UDPReader.lib;FLVSplitter.lib;zlibD.lib;filtersDU.lib;libvorbisidecD.lib;SSFSplitterDU.lib;libpngD.lib;comsuppwd.lib;Imm32.lib;Winmm.lib;Wbemuuid.lib;base.lib;courgette_lib.lib;lzma_sdk.lib;modp_b64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)out\lib\$(Platform)\;$(SolutionDir)lib\;$(SolutionDir)out\bin\;$(SolutionDir)lib/wm7;;$(SolutionDir)lib\qt6;../../../lib/detours;../../../thirdparty/courgette\debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\out\lib\$(Platform)\;$(SolutionDir)lib\;$(SolutionDir)..\out\bin\;$(SolutionDir)lib/wm7;;$(SolutionDir)lib\qt6;../../../lib/detours;../../../thirdparty/courgette\debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT;uafxcw.lib;nafxcwd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <DelayLoadDLLs>d3d9.dll;msimg32.dll;gdiplus.dll;psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
       <SubSystem>Windows</SubSystem>
@@ -284,7 +292,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile>
       <AdditionalOptions> /MP %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>..\..\..\include;..\..\filters\BaseClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;DIRECT3D_VERSION=0x0700;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
     </ClCompile>
@@ -328,6 +336,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile Include="MediaFormats.cpp" />
     <ClCompile Include="MediaTypesDlg.cpp" />
     <ClCompile Include="mplayerc.cpp" />
+    <ClCompile Include="mingw_crt_compat.cpp" />
     <ClCompile Include="NEWOSDWnd.cpp" />
     <ClCompile Include="OpenCapDeviceDlg.cpp" />
     <ClCompile Include="OpenDlg.cpp" />
@@ -398,6 +407,9 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile Include="Controller\AdController.cc" />
     <ClCompile Include="Controller\Ed2kController.cpp" />
     <ClCompile Include="Controller\HashController.cc" />
+    <ClCompile Include="$(SolutionDir)Thirdparty\pkg\sphash_stub.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Controller\Hotkey_Controller.cc" />
     <ClCompile Include="Controller\MediaCenterController.cc" />
     <ClCompile Include="Controller\MediaCheckDB.cc" />
@@ -441,7 +453,9 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="CShockwaveFlash.cpp" />
-    <ClCompile Include="DX7AllocatorPresenter.cpp" />
+    <ClCompile Include="DX7AllocatorPresenter.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="DX9AllocatorPresenter.cpp" />
     <ClCompile Include="EVRAllocatorPresenter.cpp" />
     <ClCompile Include="FakeFilterMapper2.cpp" />

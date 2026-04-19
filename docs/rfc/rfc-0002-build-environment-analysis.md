@@ -38,7 +38,7 @@ SPlayer 项目当前使用以下技术栈：
 
 1. 运行 `src/BuildScript/build.cmd`
 2. 脚本会先构建依赖项 (sphash, sinet)
-3. 然后构建主项目 `splayer.sln`
+3. 然后构建主项目 `src\splayer.sln`
 
 ## 2. 问题分析
 

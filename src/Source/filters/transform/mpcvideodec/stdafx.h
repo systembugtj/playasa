@@ -24,12 +24,15 @@
 #pragma once
 #include "..\..\..\DSUtil\SharedInclude.h"
 
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// some CString constructors will be explicit
-
-#ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
+/* Match common.props; omit WIN32_LEAN_AND_MEAN so gesture constants in afxwin.h resolve (GID_* and GC_*). */
+#ifndef WINVER
+#define WINVER 0x0A00
 #endif
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0A00
+#endif
+
+#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// some CString constructors will be explicit
 
 #include <afx.h>
 #include <afxwin.h>         // MFC core and standard components
