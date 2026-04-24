@@ -66,19 +66,22 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
-      <Command>$(SolutionDir)tools\python_bin\python $(ProjectDir)compile_rsc.py -i $(ProjectDir)splayer_rsc.yaml
+      <Command>python $(ProjectDir)compile_rsc.py -i $(ProjectDir)splayer_rsc.yaml
+if errorlevel 1 exit /b 1
 copy /y $(ProjectDir)splayer_rsc.yaml_bz $(OutDir)splayer.rsc</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
-      <Command>$(SolutionDir)tools\python_bin\python $(ProjectDir)compile_rsc.py -i $(ProjectDir)splayer_rsc.yaml
+      <Command>python $(ProjectDir)compile_rsc.py -i $(ProjectDir)splayer_rsc.yaml
+if errorlevel 1 exit /b 1
 copy /y $(ProjectDir)splayer_rsc.yaml_bz $(OutDir)splayer.rsc</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <PreBuildEvent>
-      <Command>$(SolutionDir)tools\python_bin\python $(ProjectDir)compile_rsc.py -i $(ProjectDir)splayer_rsc.yaml
+      <Command>python $(ProjectDir)compile_rsc.py -i $(ProjectDir)splayer_rsc.yaml
+if errorlevel 1 exit /b 1
 copy /y $(ProjectDir)splayer_rsc.yaml_bz $(OutDir)splayer.rsc</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>

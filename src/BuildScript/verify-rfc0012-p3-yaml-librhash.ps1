@@ -17,6 +17,7 @@ $YAML_EXPECT_FILE = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/rfc0012-expect
 $YAML_H = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/include/yaml.h'
 $YAML_PUBLIC_H = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/include/yaml-cpp/yaml.h'
 $YAML_CMAKE = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/CMakeLists.txt'
+$YAML_UTIL_READ = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/util/read.cpp'
 $YAML_PROJ = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/yamlcpp.vcxproj'
 $YAML_RSC_FORMAT = Join-Path $REPO_ROOT 'src/Prototype/SPlayerNewGui/splayer/Model/rsc_format.cc'
 
@@ -42,6 +43,7 @@ Test-RequiredFile $YAML_EXPECT_FILE
 Test-RequiredFile $YAML_H
 Test-RequiredFile $YAML_PUBLIC_H
 Test-RequiredFile $YAML_CMAKE
+Test-RequiredFile $YAML_UTIL_READ
 Test-RequiredFile $YAML_PROJ
 Test-RequiredFile $YAML_RSC_FORMAT
 $yamlTag = Read-FirstNonEmptyLine $YAML_EXPECT_FILE

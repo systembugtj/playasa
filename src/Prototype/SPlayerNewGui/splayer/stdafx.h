@@ -6,10 +6,18 @@
 #pragma once
 
 // Change these values to use different versions
-#define WINVER		0x0600
-#define _WIN32_WINNT	0x0600
-#define _WIN32_IE	0x0600
-#define _RICHEDIT_VER	0x0200
+#ifndef WINVER
+#define WINVER 0x0600
+#endif
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0600
+#endif
+#ifndef _WIN32_IE
+#define _WIN32_IE 0x0600
+#endif
+#ifndef _RICHEDIT_VER
+#define _RICHEDIT_VER 0x0200
+#endif
 
 #define _WTL_NO_CSTRING
 

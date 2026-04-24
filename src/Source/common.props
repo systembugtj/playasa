@@ -12,14 +12,14 @@
     <ClCompile>
       <!-- 多 TU 并行写同一 PDB（含 /MP）时需 /FS，否则 C1041 -->
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)include\dx;$(SolutionDir)Source\base;$(SolutionDir)Source\filters\BaseClasses;$(SolutionDir)Thirdparty\sqlitepp;$(SolutionDir)Thirdparty\wtl\include;$(SolutionDir)Thirdparty\sinet;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)..\include\;$(MSBuildThisFileDirectory)..\include\dx;$(MSBuildThisFileDirectory)base;$(MSBuildThisFileDirectory)filters\BaseClasses;$(MSBuildThisFileDirectory)..\Thirdparty\sqlitepp;$(MSBuildThisFileDirectory)..\Thirdparty\wtl\include;$(MSBuildThisFileDirectory)..\Thirdparty\sinet;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WINVER=0x0A00;_WIN32_WINNT=0x0A00;NTDDI_VERSION=NTDDI_WIN10_RS1;PSAPI_VERSION=1;_CRT_STDINT_H;PTRDIFF_MAX=0x7fffffff;_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4995;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration);$(SolutionDir)lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\out\bin\$(Platform)\$(Configuration);$(MSBuildThisFileDirectory)..\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup />

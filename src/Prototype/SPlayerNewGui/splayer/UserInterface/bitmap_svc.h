@@ -38,7 +38,7 @@ public:
                  int* top_bound, int* right_bound, int* bottom_bound);
 
 private:
-  typedef struct BitmapParameter{
+  struct BitmapParameter {
     int total_width;
     int total_height;
     int cell_height;

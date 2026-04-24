@@ -8,7 +8,7 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 
-namespace rsc_format
+namespace
 {
 
 const char kStringNodeName[] = "string";
@@ -44,6 +44,11 @@ bool CopyBinaryMap(const YAML::Node& node, std::map<std::wstring, std::vector<un
   return true;
 }
 
+} // namespace
+
+namespace rsc_format
+{
+
 bool Parse(const wchar_t* filename, std::map<std::wstring, std::wstring>& str_output,
            std::map<std::wstring, std::vector<unsigned char> >& buf_output)
 {
@@ -56,14 +61,15 @@ bool Parse(const wchar_t* filename, std::map<std::wstring, std::wstring>& str_ou
     return false;
 
   fs.seekg(0, std::ios::end);
-  std::ifstream::pos_type file_size = fs.tellg();
+  const std::ifstream::pos_type file_size = fs.tellg();
   fs.seekg(0, std::ios::beg);
 
-  if (static_cast<int>(file_size) == 0)
+  if (file_size <= 0)
     return false;
 
-  std::vector<unsigned char> buffer(file_size);
-  fs.read((char*)&buffer[0], file_size);
+  const size_t buffer_size = static_cast<size_t>(file_size);
+  std::vector<unsigned char> buffer(buffer_size);
+  fs.read(reinterpret_cast<char*>(&buffer[0]), static_cast<std::streamsize>(buffer_size));
   fs.close();
 
   std::vector<unsigned char> yaml_utf8s = zlib_utils::Uncompress(buffer);
@@ -84,7 +90,7 @@ bool Parse(const wchar_t* filename, std::map<std::wstring, std::wstring>& str_ou
     if (!CopyBinaryMap(doc[kBinaryNodeName], buf_output))
       return false;
   }
-  catch (const YAML::Exception& e)
+  catch (YAML::Exception& e)
   {
     UNREFERENCED_LOCAL_VARIABLE(e);
     return false;

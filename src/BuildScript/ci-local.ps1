@@ -163,7 +163,7 @@ function Invoke-RevisionStep {
     if ($SkipRevision) {
         if (-not (Test-Path -LiteralPath $revFile)) {
             if (-not (Test-Path -LiteralPath $dummyFile)) {
-                throw "缺少 revision_dummy.h，无法生成 revision.h（SkipRevision）: $dummyFile"
+                throw "Missing revision_dummy.h; cannot generate revision.h (SkipRevision): $dummyFile"
             }
             Copy-Item -LiteralPath $dummyFile -Destination $revFile -Force
         }
@@ -172,9 +172,21 @@ function Invoke-RevisionStep {
     $hg = Join-Path $BuildScriptRoot 'hg_bin\hg.exe'
     $hgWorks = $false
     if (Test-Path -LiteralPath $hg) {
-        $null = & $hg id -n 2>$null
-        if ($LASTEXITCODE -eq 0) {
-            $hgWorks = $true
+        $hgStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
+        $hgStartInfo.FileName = $hg
+        $hgStartInfo.Arguments = 'id -n'
+        $hgStartInfo.WorkingDirectory = $BuildScriptRoot
+        $hgStartInfo.UseShellExecute = $false
+        $hgStartInfo.RedirectStandardOutput = $true
+        $hgStartInfo.RedirectStandardError = $true
+        try {
+            $hgProc = [System.Diagnostics.Process]::Start($hgStartInfo)
+            $hgProc.WaitForExit()
+            if ($hgProc.ExitCode -eq 0) {
+                $hgWorks = $true
+            }
+        } catch {
+            $hgWorks = $false
         }
     }
     if (-not $hgWorks) {
@@ -190,7 +202,7 @@ function Invoke-RevisionStep {
     if (-not $comSpec) {
         $comSpec = Join-Path $env:SystemRoot 'System32\cmd.exe'
     }
-    # 从 Git Bash 启动时 PATH 可能含 MSYS 的 find，导致 revision.cmd 中 FIND 错乱；子进程强制前置 System32
+    # Git Bash PATH can contain MSYS find.exe; put System32 first for revision.cmd.
     $startInfo = [System.Diagnostics.ProcessStartInfo]::new()
     $startInfo.FileName = $comSpec
     $startInfo.Arguments = '/c call revision.cmd'
@@ -202,11 +214,11 @@ function Invoke-RevisionStep {
     $proc = [System.Diagnostics.Process]::Start($startInfo)
     $proc.WaitForExit()
     if ($proc.ExitCode -ne 0) {
-        Write-Warning "revision.cmd 退出码 $($proc.ExitCode)，必要时将使用 revision_dummy.h"
+        Write-Warning "revision.cmd exited with $($proc.ExitCode); revision_dummy.h will be used if needed"
     }
     if (-not (Test-Path -LiteralPath $revFile)) {
         if (-not (Test-Path -LiteralPath $dummyFile)) {
-            throw "revision 步骤失败且缺少 revision_dummy.h: $dummyFile"
+            throw "revision step failed and revision_dummy.h is missing: $dummyFile"
         }
         Copy-Item -LiteralPath $dummyFile -Destination $revFile -Force
     }
@@ -228,7 +240,7 @@ function Invoke-SolutionBuild {
     Write-Host "MSBuild: $MsBuild $($msbuildArgs -join ' ')" -ForegroundColor Cyan
     & $MsBuild @msbuildArgs
     if ($LASTEXITCODE -ne 0) {
-        throw "MSBuild 解决方案失败，退出码 $LASTEXITCODE"
+        throw "MSBuild solution failed with exit code $LASTEXITCODE"
     }
 }
 
@@ -239,7 +251,7 @@ function Invoke-SqliteppTestBuild {
     )
     $proj = Join-Path $SrcRoot 'Test\sqliteppTest\sqliteppTest.vcxproj'
     if (-not (Test-Path -LiteralPath $proj)) {
-        throw "未找到 sqliteppTest 工程: $proj"
+        throw "sqliteppTest project not found: $proj"
     }
     $solutionDir = Join-Path $SrcRoot ''
     if (-not $solutionDir.EndsWith('\')) {
@@ -257,7 +269,7 @@ function Invoke-SqliteppTestBuild {
     Write-Host "MSBuild (sqliteppTest): $MsBuild $($msbuildArgs -join ' ')" -ForegroundColor Cyan
     & $MsBuild @msbuildArgs
     if ($LASTEXITCODE -ne 0) {
-        throw "MSBuild sqliteppTest 失败，退出码 $LASTEXITCODE"
+        throw "MSBuild sqliteppTest failed with exit code $LASTEXITCODE"
     }
 }
 
@@ -269,37 +281,37 @@ Push-Location $repoRoot
 try {
     if (-not $SkipVerify) {
         $verify = Join-Path $buildScriptRoot 'verify-rfc0012-all.ps1'
-        Write-Host "步骤: RFC-0012 门闩 -> $verify" -ForegroundColor Yellow
+        Write-Host "Step: RFC-0012 verifier -> $verify" -ForegroundColor Yellow
         & $verify
     }
 
     if (-not $SkipPreBuild) {
-        Write-Host '步骤: 预构建（密钥占位与 out 目录）' -ForegroundColor Yellow
+        Write-Host 'Step: prebuild placeholders and out directories' -ForegroundColor Yellow
         Invoke-RfcPreBuild -BuildScriptRoot $buildScriptRoot -SrcRoot $srcRoot
     }
 
-    Write-Host '步骤: revision.h' -ForegroundColor Yellow
+    Write-Host 'Step: revision.h' -ForegroundColor Yellow
     Invoke-RevisionStep -BuildScriptRoot $buildScriptRoot -SrcRoot $srcRoot -SkipRevision:$SkipRevision
 
     if (-not $SkipBuild) {
         $msbuild = Get-MsBuildExecutable
         if (-not $msbuild) {
-            throw '未找到 MSBuild。请安装 Visual Studio / Build Tools，或确保 vswhere 可用。'
+            throw 'MSBuild was not found. Install Visual Studio / Build Tools or ensure vswhere is available.'
         }
-        Write-Host "使用 MSBuild: $msbuild" -ForegroundColor Green
+        Write-Host "Using MSBuild: $msbuild" -ForegroundColor Green
         $solutionPath = Join-Path $srcRoot 'splayer.sln'
         if (-not (Test-Path -LiteralPath $solutionPath)) {
-            throw "未找到解决方案: $solutionPath"
+            throw "Solution not found: $solutionPath"
         }
-        Write-Host '步骤: 全量构建 splayer.sln' -ForegroundColor Yellow
+        Write-Host 'Step: full build splayer.sln' -ForegroundColor Yellow
         Invoke-SolutionBuild -MsBuild $msbuild -SolutionPath $solutionPath
         if ($RunSqliteppTest) {
-            Write-Host '步骤: 构建 sqliteppTest' -ForegroundColor Yellow
+            Write-Host 'Step: build sqliteppTest' -ForegroundColor Yellow
             Invoke-SqliteppTestBuild -MsBuild $msbuild -SrcRoot $srcRoot
         }
     }
 
-    Write-Host 'ci-local: 完成' -ForegroundColor Green
+    Write-Host 'ci-local: completed' -ForegroundColor Green
 }
 finally {
     Pop-Location

@@ -82,7 +82,7 @@ bool IsBase64(char c)
 	return false;
 }
 
-std::vector<unsigned char> Decode(std::string& input)
+std::vector<unsigned char> Decode(const std::string& input)
 {
   std::vector<unsigned char> ret;
 

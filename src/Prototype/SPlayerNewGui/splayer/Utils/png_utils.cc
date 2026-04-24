@@ -68,9 +68,10 @@ HBITMAP LoadBuffer(std::vector<unsigned char>& input_png)
    
   // now for a tonne of ugly DIB setup crap
    
-  int width = info_ptr->width;
-  int height = info_ptr->height;
-  int bpp = info_ptr->channels * 8;
+  const int width = static_cast<int>(png_get_image_width(png_ptr, info_ptr));
+  const int height = static_cast<int>(png_get_image_height(png_ptr, info_ptr));
+  const int channels = static_cast<int>(png_get_channels(png_ptr, info_ptr));
+  int bpp = channels * 8;
   int memWidth = (width * (bpp >> 3) + 3) & ~3;
    
   LPBITMAPINFO lpbi = (LPBITMAPINFO) new char[sizeof(BITMAPINFOHEADER) + (256 * sizeof(RGBQUAD))];
@@ -102,7 +103,7 @@ HBITMAP LoadBuffer(std::vector<unsigned char>& input_png)
   {
     // now copy the rows
     for (int i = 0; i < height; i++)
-      memcpy(pixelData + memWidth * i, row_pointers[i], width * info_ptr->channels);
+      memcpy(pixelData + memWidth * i, row_pointers[i], width * channels);
   }
 
   // premultiply bitmap data for fast displaying
@@ -187,9 +188,10 @@ HBITMAP LoadFile(const wchar_t* filename)
    
   // now for a tonne of ugly DIB setup crap
    
-  int width = info_ptr->width;
-  int height = info_ptr->height;
-  int bpp = info_ptr->channels * 8;
+  const int width = static_cast<int>(png_get_image_width(png_ptr, info_ptr));
+  const int height = static_cast<int>(png_get_image_height(png_ptr, info_ptr));
+  const int channels = static_cast<int>(png_get_channels(png_ptr, info_ptr));
+  int bpp = channels * 8;
   int memWidth = (width * (bpp >> 3) + 3) & ~3;
    
   LPBITMAPINFO lpbi = (LPBITMAPINFO) new char[sizeof(BITMAPINFOHEADER) + (256 * sizeof(RGBQUAD))];
@@ -221,7 +223,7 @@ HBITMAP LoadFile(const wchar_t* filename)
   {
     // now copy the rows
     for (int i = 0; i < height; i++)
-      memcpy(pixelData + memWidth * i, row_pointers[i], width * info_ptr->channels);
+      memcpy(pixelData + memWidth * i, row_pointers[i], width * channels);
   }
    
   delete (char*) lpbi;

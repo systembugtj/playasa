@@ -5,7 +5,7 @@ namespace base64_utils
 {
 
 std::string Encode(std::vector<unsigned char>& buffer);
-std::vector<unsigned char> Decode(std::string& input);
+std::vector<unsigned char> Decode(const std::string& input);
 
 } // namespace base64_utils
 
