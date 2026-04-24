@@ -74,7 +74,7 @@
 - **`src/Thirdparty/pkg`**：与 `sphash` / `unrar` 等相关的头文件与 stub（非旧文档中的 `trunk` 外置树）
 - **`src/Thirdparty/sinet`**：网络相关头文件
 - **`src/Thirdparty/unrar`**、**`sqlitepp`**、**`jsoncpp`**、**`zeromq`**、**`yaml-cpp`** 等：见各子目录与对应 `.vcxproj`
-- **`src/Source/zlib`**、**`src/Source/libpng`**：随主解决方案编译的静态库（当前 zlib 版本见该目录下 `zlib.h`）
+- **`src/Source/zlib`**、**`src/Source/libpng`**：随主解决方案编译的静态库（当前为 **zlib 1.3.1**、**libpng 1.6.47**，见各目录下 `zlib.h` / `png.h`）
 
 具体升级顺序与风险见 **[RFC-0012](.spec/rfc/rfc-0012-thirdparty-library-upgrades.md)**。
 

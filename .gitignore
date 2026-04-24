@@ -105,6 +105,9 @@ lang/
 /src/ipch
 /src/UpgradeLog.htm
 
+# Local upstream extract / scratch (RFC-0012 P1 等)
+.tmp/
+
 # Temporary files
 *.tmp
 *.temp

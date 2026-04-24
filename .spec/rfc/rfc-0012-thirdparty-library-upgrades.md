@@ -20,8 +20,8 @@
 
 | 区域 | 代表内容 | 大致年代 / 风险 | 备注 |
 |------|-----------|-----------------|------|
-| `src/Source/zlib` | zlib 静态库工程 | **1.2.3**；含已弃用 `gzio.c` | `SVPToolBox.cpp` 使用 `gzopen`/`gzread`；升级需换为现代 zlib 中 `gz*.c` 组合并回归压缩相关功能 |
-| `src/Source/libpng` | libpng | 与 zlib 强绑定 | 建议与 zlib **同一阶段**升级并跑图像相关用例 |
+| `src/Source/zlib` | zlib 静态库工程 | **已升级 1.3.1**（`gzio.c` 已移除） | `SVPToolBox.cpp` 仍用 `gzopen`/`gzread`（API 保持）；回归压缩路径 |
+| `src/Source/libpng` | libpng | **已升级 1.6.47**；`pnglibconf.h` 来自 `scripts/pnglibconf.h.prebuilt`，`PNG_ZLIB_VERNUM` 对齐 `0x1310` | 与 zlib 同阶段；静态库不含 `pngtest.c` |
 | `src/Thirdparty/openssl-0.9.8x` | OpenSSL | **0.9.8x**；协议与 API 与 3.x 不兼容 | 主工程若未直接链接 SSL，可先审计引用再决定是否移除或替换 |
 | `src/Thirdparty/jsoncpp` | jsoncpp 老目录布局 | 无 `JSONCPP_VERSION` 宏的早期形态 | 与上游 1.9.x 差异大；需 API 与 `lib_json.vcxproj` 双迁移 |
 | `src/Thirdparty/yaml-cpp` | yaml-cpp | 中等 | 工程体量小于 OpenSSL；适合 jsoncpp 之后单独阶段 |
@@ -43,7 +43,7 @@
 | 阶段 | 目标 | 退出条件 |
 |------|------|----------|
 | **P0** | 修正文档与工程中对依赖路径、版本的描述；建立本表为单一事实来源 | README / TASK / 关键 `docs` 与现状一致 |
-| **P1** | **zlib + libpng** 同步升级到当前稳定主线（如 zlib 1.3.x + 匹配 libpng） | `zlib`/`libpng` 工程全配置链接通过；压缩/解 PNG 路径手测 |
+| **P1** | **zlib + libpng** 同步升级到当前稳定主线（**zlib 1.3.1** + **libpng 1.6.47**） | 源码与工程已合入；**须在本地 VS 上**全配置 `MSBuild` 通过并完成 gzip/PNG 手测（见 §10 脚本） |
 | **P2** | **jsoncpp** 迁移至维护分支（或 `Json::Value` 用法适配后的上游 tag） | 依赖 JSON 的配置/网络模块编译 + 最小解析测试 |
 | **P3** | **yaml-cpp**、**librhash** 等中小库 | 单元测试或启动路径覆盖 |
 | **P4** | **zeromq**、**sqlitepp** 等与运行时强相关组件 | 与网络/数据库相关功能手测 |
@@ -76,6 +76,7 @@
 |------|------|------|
 | 2026-04-19 | 采用分阶段升级，拒绝单 PR「全库最新」 | 降低链接/运行时回归风险；与内嵌源码现实一致 |
 | 2026-04-19 | 默认路线 A（内嵌升级），vcpkg 为后续可选 | 与当前 MSBuild 仓结构一致，可交付增量 PR |
+| 2026-04-24 | 完成 P1：zlib **1.3.1** + libpng **1.6.47** 内嵌升级 | 工程与 `pnglibconf.h` 对齐；`verify-rfc0012-zlib-libpng.ps1` 供 CI 轻检 |
 
 ## 9. 可执行计划：P1（zlib + libpng）检查清单
 
@@ -121,6 +122,12 @@ MSBuild ..\Source\libpng\libpng_vs2005.vcxproj /m /p:Configuration="Release Unic
 ```
 
 （若某配置在单项目中不存在，以 `zlib_vs2005.vcxproj` 内 `<ProjectConfiguration>` 为准。）
+
+无 MSBuild 时的**最小自检**（仅校验头文件版本号）：
+
+```powershell
+.\src\BuildScript\verify-rfc0012-zlib-libpng.ps1
+```
 
 ## 11. P2 及之后（纲要，执行前展开为检查清单）
 

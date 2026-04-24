@@ -6,7 +6,7 @@
 |------|-----|------|
 | 完成 | RFC-0011：输出目录脚本收敛 + BUILD-FIXES 文档归位 | `fix-output-directories-rfc0011.ps1`、旧 `fix-output-directories*.ps1` 已删、`docs/root-notes/BUILD-FIXES-SUMMARY.md` |
 | 完成 | 仓库根散落物清理 | 已删本地 `lang/`、`lib/`、`Release/`、`tools/`（空）、`nul`；README 链接修正；`.gitignore` 增加 `/lang/` |
-| 待办 | **RFC-0012 P1**：zlib + libpng 升级到当前稳定主线 | 按 RFC-0012 **§9** 15 步检查清单；上游 tag 写进 PR；路线 A 内嵌源码 |
+| 完成 | **RFC-0012 P1**：zlib **1.3.1** + libpng **1.6.47** | `zlib_vs2005`/`libpng_vs2005` 源清单与 `.filters` 已更新；`verify-rfc0012-zlib-libpng.ps1`；全量 MSBuild 需在本地 VS 上再跑 |
 | 待办 | **RFC-0012 P2**：jsoncpp 现代化 | RFC-0012 **§11**；`rg Json::` 摸底后选上游 tag |
 | 待办 | **RFC-0012 P3**：yaml-cpp / librhash | 单库 MSBuild → 全解；见 RFC-0012 **§5** 表 |
 | 待办 | **RFC-0012 P4**：zeromq / sqlitepp | 运行时手测 + 已有 `test-*.ps1` 则接入 |
