@@ -1,0 +1,45 @@
+# 托管机上的 MSVC 工具集与工作负载（MFC/ATL 等）可能与本地 VS 不一致；
+# 若 msbuild job 失败，请在安装 v145 与所需工作负载的环境运行: pwsh ./src/BuildScript/ci-local.ps1
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  rfc0012-gates:
+    name: RFC-0012 pins (no MSBuild)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run verify-rfc0012-all.ps1
+        shell: pwsh
+        run: |
+          Set-Location "${{ github.workspace }}"
+          ./src/BuildScript/verify-rfc0012-all.ps1
+
+  msbuild:
+    name: MSBuild (splayer + optional tests)
+    needs: [rfc0012-gates]
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: ci-local.ps1 (skip duplicate verify)
+        shell: pwsh
+        run: |
+          Set-Location "${{ github.workspace }}"
+          ./src/BuildScript/ci-local.ps1 -SkipVerify -SkipRevision

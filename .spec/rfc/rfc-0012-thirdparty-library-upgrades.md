@@ -229,7 +229,9 @@ MSBuild ..\Source\libpng\libpng_vs2005.vcxproj /m /p:Configuration="Release Unic
 | P2 钉扎 | 防止 jsoncpp 被误替换或 include 路径漂移 | `verify-rfc0012-jsoncpp.ps1` + `Thirdparty/jsoncpp/rfc0012-expected.txt` |
 | P3 钉扎 | 防止 yaml-cpp / librhash 静默漂移 | `verify-rfc0012-p3-yaml-librhash.ps1` + 两库各自 `rfc0012-expected.txt` |
 | 一键门闩 | 本地 / 无 VS CI 串行跑 P1–P3 钉扎 | `verify-rfc0012-all.ps1` |
-| 全量真相源 | 发布与回归仍以 MSBuild 为准 | `build-with-msbuild.cmd`；CI 若无法装 VS，**不得**将「仅头文件 grep」冒充为全量通过 |
+| 本地/CI 统一入口（PowerShell） | 门闩 + 预构建 + revision + MSBuild；避免 Git Bash 下裸 `/m` 与 MSYS `find` 污染 `revision.cmd` | `src/BuildScript/ci-local.ps1`（参数见脚本注释）；GitHub：`/.github/workflows/ci.yml` |
+| 仓库根日常入口 | 子命令：`verify` / `build` / `buildFast` / `run` / `ship`（见 `./dev.ps1 help`） | 根目录 **`dev.ps1`** |
+| 全量真相源 | 发布与回归仍以 MSBuild 为准 | `build-with-msbuild.cmd` 或 `ci-local.ps1`；CI 若托管机缺少 v145/MFC 等工作负载，**不得**将「仅头文件门闩」冒充为全量通过 |
 
 ## 13. 旁系事项（不阻塞 P2，但勿遗忘）
 
