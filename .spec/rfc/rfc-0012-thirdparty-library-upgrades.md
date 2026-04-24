@@ -24,7 +24,8 @@
 | `src/Source/libpng` | libpng | **已升级 1.6.47**；`pnglibconf.h` 来自 `scripts/pnglibconf.h.prebuilt`，`PNG_ZLIB_VERNUM` 对齐 `0x1310` | 与 zlib 同阶段；静态库不含 `pngtest.c` |
 | `src/Thirdparty/openssl-0.9.8x` | OpenSSL | **0.9.8x**；协议与 API 与 3.x 不兼容 | 主工程若未直接链接 SSL，可先审计引用再决定是否移除或替换 |
 | `src/Thirdparty/jsoncpp` | jsoncpp | **已升级 1.9.5**（`JSONCPP_VERSION_STRING`）；`lib_json.vcxproj` 源清单已对齐 | 应用侧仍用 `Json::Reader`/`StyledWriter`（1.9.5 仍提供，已弃用）；全量 MSBuild 须在本地再跑 |
-| `src/Thirdparty/yaml-cpp` | yaml-cpp | 中等 | 工程体量小于 OpenSSL；适合 jsoncpp 之后单独阶段 |
+| `src/Thirdparty/yaml-cpp` | yaml-cpp | **已升级 0.9.0** | Prototype `rsc_format.cc` 已迁移到新版 `YAML::Load` / `YAML::Node::as<T>()` API；静态库工程显式 `YAML_CPP_STATIC_DEFINE` + C++14 |
+| `src/Thirdparty/librhash` | RHash / librhash | **已对齐上游 v1.4.6**（`RHASH_HASH_COUNT = 32`）；本仓 `rhash_ex.cpp` 封装 ED2K/磁力 | `plug_openssl.c` 仍参与编译；与 `src/include/stdint.h` 并存时有 C4005 告警，后续可收紧包含路径 |
 | `src/Thirdparty/zeromq` | libzmq | 依赖网络栈与编译选项 | 与业务消息路径相关，需运行时验证 |
 | `src/Source/filters/transform/mpcvideodec/ffmpeg` | FFmpeg/libav 衍生 | 体量大、许可证与符号导出敏感 | **单独 RFC 或子阶段**；不在 RFC-0012 首波范围 |
 | `src/Thirdparty/boost` | 头文件树 | 体量大 | 通常随编译器升级渐进替换用法，而非整树替换 |
@@ -80,6 +81,8 @@
 | 2026-04-23 | P2 门闩：`verify-rfc0012-jsoncpp.ps1` + `rfc0012-expected.txt` | 无 MSBuild 时可钉扎 legacy 或 SemVer；P2 PR 须更新期望首行 |
 | 2026-04-23 | P3 门闩：`verify-rfc0012-p3-yaml-librhash.ps1` + `verify-rfc0012-all.ps1` | yaml-cpp / librhash 期望文件与脚本分支；P3 PR 须同步更新 |
 | 2026-04-23 | **P2 执行**：内嵌 jsoncpp 换为上游 **1.9.5** | `include/json` + `src/lib_json` + 测试目录同步；`rfc0012-expected.txt` = `1.9.5` |
+| 2026-04-24 | **P3 执行**：librhash 换为上游 **RHash v1.4.6** 树；`RHASH_HASH_COUNT`=**32**；保留 `rhash_ex.*` 并适配 API | `librhash/rfc0012-expected.txt` 钉扎 `rhash-upstream-1.4.6`；`rhash_ex.cpp` 已适配新 `rhash_final`/`rhash_print` |
+| 2026-04-24 | **P3 执行**：yaml-cpp 换为上游 **0.9.0** 树；Prototype YAML 资源解析迁移到新版 API | `yaml-cpp/rfc0012-expected.txt` 钉扎 `yaml-cpp-0.9.0`；`verify-rfc0012-p3-yaml-librhash.ps1` 校验公共头、MSBuild 清单和旧 API 残留 |
 
 ## 9. 可执行计划：P1（zlib + libpng）检查清单
 
@@ -145,8 +148,8 @@ MSBuild ..\Source\libpng\libpng_vs2005.vcxproj /m /p:Configuration="Release Unic
 | 组件 | 期望文件 | 当前首行含义 |
 |------|-----------|--------------|
 | jsoncpp | `src/Thirdparty/jsoncpp/rfc0012-expected.txt` | 当前 **`1.9.5`**，与 `include/json/version.h` 中 **`JSONCPP_VERSION_STRING`** 一致；以后再升上游时只改此首行 |
-| yaml-cpp | `src/Thirdparty/yaml-cpp/rfc0012-expected.txt` | **`legacy-yaml-h-62b23520`**（`yaml.h` include guard）；P3 升级后改脚本分支或新标记 |
-| librhash | `src/Thirdparty/librhash/rfc0012-expected.txt` | **`legacy-hash-count-22`**（`rhash.h` 中 `RHASH_HASH_COUNT`）；P3 升级后同步更新 |
+| yaml-cpp | `src/Thirdparty/yaml-cpp/rfc0012-expected.txt` | **`yaml-cpp-0.9.0`**；脚本校验上游 CMake 版本、`include/yaml-cpp/yaml.h`、`yamlcpp.vcxproj` 关键清单与 `rsc_format.cc` 新 API 迁移 |
+| librhash | `src/Thirdparty/librhash/rfc0012-expected.txt` | **`rhash-upstream-1.4.6`**（`rhash.h` 中 `RHASH_HASH_COUNT = 32`）；回退旧树时用脚本内 `legacy-hash-count-22` 分支 |
 
 ## 11. P2–P5 可执行纲要（按阶段开分支；每阶段一份 PR）
 

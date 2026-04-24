@@ -1,26 +1,33 @@
 /* plug_openssl.h - plug-in openssl algorithms */
 #ifndef RHASH_PLUG_OPENSSL_H
 #define RHASH_PLUG_OPENSSL_H
-#ifdef USE_OPENSSL
+#if defined(USE_OPENSSL) || defined(OPENSSL_RUNTIME)
+
+#include "algorithms.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int plug_openssl(void); /* load openssl algorithms */
+int rhash_plug_openssl(void); /* load openssl algorithms */
+unsigned rhash_get_openssl_supported_hash_mask(void);
+unsigned rhash_get_openssl_available_hash_mask(void);
+unsigned rhash_get_openssl_enabled_hash_mask(void);
+void rhash_set_openssl_enabled_hash_mask(unsigned mask);
 
-#define OPENSSL_SUPPORTED_HASHES_MASK (RHASH_MD4 | RHASH_MD5 | RHASH_SHA1 | \
-	RHASH_SHA224 | RHASH_SHA256 | RHASH_SHA384 | RHASH_SHA512 | \
-	RHASH_RIPEMD160 | RHASH_WHIRLPOOL)
-
-#define OPENSSL_DEFAULT_HASH_MASK (RHASH_MD5 | RHASH_SHA1 | \
-	RHASH_SHA224 | RHASH_SHA256 | RHASH_SHA384 | RHASH_SHA512 | RHASH_WHIRLPOOL)
-
-extern unsigned openssl_hash_mask; /* mask of hash sums to use */
+extern rhash_hash_info rhash_openssl_hash_info[9];
+#define rhash_ossl_sha1_init() (rhash_openssl_hash_info[2].init)
+#define rhash_ossl_sha1_update() (rhash_openssl_hash_info[2].update)
+#define rhash_ossl_sha1_final() (rhash_openssl_hash_info[2].final)
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif /* __cplusplus */
 
-#endif /* USE_OPENSSL */
+#else
+# define rhash_get_openssl_supported_hash_mask() (0)
+# define rhash_get_openssl_available_hash_mask() (0)
+# define rhash_get_openssl_enabled_hash_mask() (0)
+# define rhash_set_openssl_enabled_hash_mask(mask) {}
+#endif /* defined(USE_OPENSSL) || defined(OPENSSL_RUNTIME) */
 #endif /* RHASH_PLUG_OPENSSL_H */

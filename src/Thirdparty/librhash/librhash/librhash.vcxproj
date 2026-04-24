@@ -71,7 +71,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;RHASH_XVERSION=0;RHASH_SSE4_SHANI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -84,7 +84,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;RHASH_XVERSION=0;RHASH_SSE4_SHANI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader />
@@ -96,7 +96,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;RHASH_XVERSION=0;RHASH_SSE4_SHANI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
@@ -106,69 +106,77 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="aich.c" />
+    <!-- 与上游 RHash v1.4.6 librhash/Makefile SOURCES 对齐；另含本仓 rhash_ex.cpp -->
     <ClCompile Include="algorithms.c" />
     <ClCompile Include="byte_order.c" />
+    <ClCompile Include="plug_openssl.c" />
+    <ClCompile Include="rhash.c" />
+    <ClCompile Include="rhash_torrent.c" />
+    <ClCompile Include="aich.c" />
+    <ClCompile Include="blake2b.c" />
+    <ClCompile Include="blake2s.c" />
+    <ClCompile Include="blake3.c" />
     <ClCompile Include="crc32.c" />
     <ClCompile Include="ed2k.c" />
     <ClCompile Include="edonr.c" />
-    <ClCompile Include="gost.c" />
-    <ClCompile Include="has160.c" />
     <ClCompile Include="hex.c" />
     <ClCompile Include="md4.c" />
     <ClCompile Include="md5.c" />
-    <ClCompile Include="plug_openssl.c" />
-    <ClCompile Include="rhash.c" />
-    <ClCompile Include="rhash_ex.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="ripemd-160.c" />
     <ClCompile Include="sha1.c" />
+    <ClCompile Include="sha_ni.c" />
     <ClCompile Include="sha256.c" />
     <ClCompile Include="sha512.c" />
+    <ClCompile Include="sha3.c" />
+    <ClCompile Include="ripemd-160.c" />
+    <ClCompile Include="gost12.c" />
+    <ClCompile Include="gost94.c" />
+    <ClCompile Include="has160.c" />
     <ClCompile Include="snefru.c" />
-    <ClCompile Include="test_sums.c" />
     <ClCompile Include="tiger.c" />
     <ClCompile Include="tiger_sbox.c" />
-    <ClCompile Include="timing.c" />
-    <ClCompile Include="torrent.c" />
     <ClCompile Include="tth.c" />
+    <ClCompile Include="torrent.c" />
     <ClCompile Include="util.c" />
     <ClCompile Include="whirlpool.c" />
     <ClCompile Include="whirlpool_sbox.c" />
+    <ClCompile Include="rhash_ex.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="aich.h" />
     <ClInclude Include="algorithms.h" />
     <ClInclude Include="byte_order.h" />
-    <ClInclude Include="config.h" />
+    <ClInclude Include="plug_openssl.h" />
+    <ClInclude Include="rhash.h" />
+    <ClInclude Include="rhash_torrent.h" />
+    <ClInclude Include="aich.h" />
+    <ClInclude Include="blake2b.h" />
+    <ClInclude Include="blake2s.h" />
+    <ClInclude Include="blake3.h" />
     <ClInclude Include="crc32.h" />
-    <ClInclude Include="dirent.h" />
     <ClInclude Include="ed2k.h" />
     <ClInclude Include="edonr.h" />
-    <ClInclude Include="gost.h" />
-    <ClInclude Include="has160.h" />
     <ClInclude Include="hex.h" />
     <ClInclude Include="md4.h" />
     <ClInclude Include="md5.h" />
-    <ClInclude Include="platform-dependent.h" />
-    <ClInclude Include="plug_openssl.h" />
-    <ClInclude Include="rhash.h" />
-    <ClInclude Include="rhash_ex.h" />
-    <ClInclude Include="ripemd-160.h" />
     <ClInclude Include="sha1.h" />
+    <ClInclude Include="sha_ni.h" />
     <ClInclude Include="sha256.h" />
     <ClInclude Include="sha512.h" />
+    <ClInclude Include="sha3.h" />
+    <ClInclude Include="ripemd-160.h" />
+    <ClInclude Include="gost12.h" />
+    <ClInclude Include="gost94.h" />
+    <ClInclude Include="has160.h" />
     <ClInclude Include="snefru.h" />
-    <ClInclude Include="stdint.h" />
-    <ClInclude Include="test_sums.h" />
     <ClInclude Include="tiger.h" />
-    <ClInclude Include="timing.h" />
-    <ClInclude Include="torrent.h" />
     <ClInclude Include="tth.h" />
-    <ClInclude Include="unistd.h" />
+    <ClInclude Include="torrent.h" />
+    <ClInclude Include="ustd.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="whirlpool.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="rhash_ex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

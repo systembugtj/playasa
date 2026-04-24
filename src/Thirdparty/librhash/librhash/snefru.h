@@ -1,7 +1,7 @@
 /* snefru.h */
 #ifndef SNEFRU_H
 #define SNEFRU_H
-#include "stdint.h"
+#include "ustd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,19 +19,19 @@ extern "C" {
 /* algorithm context */
 typedef struct snefru_ctx
 {
-  unsigned hash[8];         /* algorithm 512-bit hashing state */
-  unsigned char buffer[48]; /* 384-bit message block */
-  uint64_t length;          /* processed message length */
-  unsigned index;           /* index in the buffer of the last byte stored */
-  unsigned digest_length;   /* length of the algorithm digest in bytes */
+	unsigned hash[8];         /* algorithm 512-bit hashing state */
+	unsigned char buffer[48]; /* 384-bit message block */
+	uint64_t length;          /* processed message length */
+	unsigned index;           /* index in the buffer of the last byte stored */
+	unsigned digest_length;   /* length of the algorithm digest in bytes */
 } snefru_ctx;
 
 /* hash functions */
 
-void snefru128_init(snefru_ctx *ctx);
-void snefru256_init(snefru_ctx *ctx);
-void snefru_update(snefru_ctx *ctx, const unsigned char *data, size_t size);
-void snefru_final(snefru_ctx *ctx, unsigned char* result);
+void rhash_snefru128_init(snefru_ctx* ctx);
+void rhash_snefru256_init(snefru_ctx* ctx);
+void rhash_snefru_update(snefru_ctx* ctx, const unsigned char* data, size_t size);
+void rhash_snefru_final(snefru_ctx* ctx, unsigned char* result);
 
 #ifdef __cplusplus
 } /* extern "C" */

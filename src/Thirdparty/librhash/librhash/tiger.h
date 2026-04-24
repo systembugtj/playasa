@@ -1,7 +1,7 @@
 /* tiger.h */
 #ifndef TIGER_H
 #define TIGER_H
-#include "stdint.h"
+#include "ustd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,18 +13,21 @@ extern "C" {
 /* algorithm context */
 typedef struct tiger_ctx
 {
-  /* the order of the fields slightly influence the algorithm speed */
-  uint64_t hash[3]; /* algorithm 192-bit state */
-  unsigned char message[tiger_block_size]; /* 512-bit buffer for leftovers */
-  uint64_t length;  /* processed message length */
-  int tiger2;       /* flag, 1 for Tiger2 algorithm, default is 0 */
+	/* the order of the fields slightly influence the algorithm speed */
+	uint64_t hash[3]; /* algorithm 192-bit state */
+	unsigned char message[tiger_block_size]; /* 512-bit buffer for leftovers */
+	uint64_t length;  /* processed message length */
 } tiger_ctx;
 
 /* hash functions */
 
-void tiger_init(tiger_ctx *ctx);
-void tiger_update(tiger_ctx *ctx, const unsigned char* msg, size_t size);
-void tiger_final(tiger_ctx *ctx, unsigned char result[24]);
+#ifndef NO_TIGER2
+void rhash_tiger2_init(tiger_ctx* ctx);
+#endif /* NO_TIGER2 */
+
+void rhash_tiger_init(tiger_ctx* ctx);
+void rhash_tiger_update(tiger_ctx* ctx, const unsigned char* msg, size_t size);
+void rhash_tiger_final(tiger_ctx* ctx, unsigned char result[24]);
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -1,7 +1,7 @@
 /* has160.h */
 #ifndef HAS160_H
 #define HAS160_H
-#include "stdint.h"
+#include "ustd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,16 +12,16 @@ extern "C" {
 
 typedef struct has160_ctx
 {
-  unsigned message[has160_block_size/4]; /* 512-bit buffer for leftovers */
-  uint64_t length;     /* number of processed bytes */
-  unsigned hash[5];   /* 160-bit algorithm internal hashing state */
+	unsigned message[has160_block_size / 4]; /* 512-bit buffer for leftovers */
+	uint64_t length;     /* number of processed bytes */
+	unsigned hash[5];   /* 160-bit algorithm internal hashing state */
 } has160_ctx;
 
 /* hash functions */
 
-void has160_init(has160_ctx *ctx);
-void has160_update(has160_ctx *ctx, const unsigned char* msg, size_t size);
-void has160_final(has160_ctx *ctx, unsigned char* result);
+void rhash_has160_init(has160_ctx* ctx);
+void rhash_has160_update(has160_ctx* ctx, const unsigned char* msg, size_t size);
+void rhash_has160_final(has160_ctx* ctx, unsigned char* result);
 
 #ifdef __cplusplus
 } /* extern "C" */

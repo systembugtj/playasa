@@ -1,7 +1,7 @@
 /* md4.h */
 #ifndef MD4_HIDER
 #define MD4_HIDER
-#include "stdint.h"
+#include "ustd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,16 +13,16 @@ extern "C" {
 /* algorithm context */
 typedef struct md4_ctx
 {
-  unsigned message[md4_block_size/4]; /* 512-bit buffer for leftovers */
-  uint64_t length;   /* number of processed bytes */
-  unsigned hash[4];  /* 128-bit algorithm internal hashing state */
+	unsigned hash[4];  /* 128-bit algorithm internal hashing state */
+	unsigned message[md4_block_size / 4]; /* 512-bit buffer for leftovers */
+	uint64_t length;   /* number of processed bytes */
 } md4_ctx;
 
 /* hash functions */
 
-void md4_init(md4_ctx *ctx);
-void md4_update(md4_ctx *ctx, const unsigned char* msg, size_t size);
-void md4_final(md4_ctx *ctx, unsigned char result[16]);
+void rhash_md4_init(md4_ctx* ctx);
+void rhash_md4_update(md4_ctx* ctx, const unsigned char* msg, size_t size);
+void rhash_md4_final(md4_ctx* ctx, unsigned char result[16]);
 
 #ifdef __cplusplus
 } /* extern "C" */

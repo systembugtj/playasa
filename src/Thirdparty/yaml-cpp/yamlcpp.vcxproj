@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version='1.0' encoding='utf-8'?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="12.0">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug Unicode|Win32">
       <Configuration>Debug Unicode</Configuration>
@@ -70,14 +70,15 @@
       <AdditionalOptions>/D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4127;4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4127;4355;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Lib>
       <OutputFile>lib\$(ProjectName)d.lib</OutputFile>
@@ -89,13 +90,14 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader />
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4127;4355;4715;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4127;4355;4715;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
@@ -105,77 +107,115 @@
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <DisableSpecificWarnings>4127;4355;4715;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4127;4355;4715;4244;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\parser.cpp" />
-    <ClCompile Include="src\parserstate.cpp" />
-    <ClCompile Include="src\aliascontent.cpp" />
-    <ClCompile Include="src\conversion.cpp" />
-    <ClCompile Include="src\iterator.cpp" />
-    <ClCompile Include="src\map.cpp" />
-    <ClCompile Include="src\node.cpp" />
-    <ClCompile Include="src\null.cpp" />
-    <ClCompile Include="src\scalar.cpp" />
-    <ClCompile Include="src\sequence.cpp" />
-    <ClCompile Include="src\tag.cpp" />
+    <ClCompile Include="src\binary.cpp" />
+    <ClCompile Include="src\convert.cpp" />
+    <ClCompile Include="src\depthguard.cpp" />
+    <ClCompile Include="src\directives.cpp" />
+    <ClCompile Include="src\emit.cpp" />
+    <ClCompile Include="src\emitfromevents.cpp" />
+    <ClCompile Include="src\emitter.cpp" />
+    <ClCompile Include="src\emitterstate.cpp" />
+    <ClCompile Include="src\emitterutils.cpp" />
+    <ClCompile Include="src\exceptions.cpp" />
     <ClCompile Include="src\exp.cpp" />
-    <ClCompile Include="src\regex.cpp" />
+    <ClCompile Include="src\fptostring.cpp" />
+    <ClCompile Include="src\memory.cpp" />
+    <ClCompile Include="src\node.cpp" />
+    <ClCompile Include="src\node_data.cpp" />
+    <ClCompile Include="src\nodebuilder.cpp" />
+    <ClCompile Include="src\nodeevents.cpp" />
+    <ClCompile Include="src\null.cpp" />
+    <ClCompile Include="src\ostream_wrapper.cpp" />
+    <ClCompile Include="src\parse.cpp" />
+    <ClCompile Include="src\parser.cpp" />
+    <ClCompile Include="src\regex_yaml.cpp" />
     <ClCompile Include="src\scanner.cpp" />
     <ClCompile Include="src\scanscalar.cpp" />
     <ClCompile Include="src\scantag.cpp" />
     <ClCompile Include="src\scantoken.cpp" />
     <ClCompile Include="src\simplekey.cpp" />
+    <ClCompile Include="src\singledocparser.cpp" />
     <ClCompile Include="src\stream.cpp" />
-    <ClCompile Include="src\emitter.cpp" />
-    <ClCompile Include="src\emitterstate.cpp" />
-    <ClCompile Include="src\emitterutils.cpp" />
-    <ClCompile Include="src\ostream.cpp" />
+    <ClCompile Include="src\tag.cpp" />
+    <ClCompile Include="src\contrib\graphbuilder.cpp" />
+    <ClCompile Include="src\contrib\graphbuilderadapter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\crt.h" />
-    <ClInclude Include="include\exceptions.h" />
-    <ClInclude Include="src\indentation.h" />
-    <ClInclude Include="include\noncopyable.h" />
+    <ClInclude Include="include\yaml-cpp\anchor.h" />
+    <ClInclude Include="include\yaml-cpp\binary.h" />
+    <ClInclude Include="include\yaml-cpp\contrib\anchordict.h" />
+    <ClInclude Include="include\yaml-cpp\contrib\graphbuilder.h" />
+    <ClInclude Include="include\yaml-cpp\depthguard.h" />
+    <ClInclude Include="include\yaml-cpp\dll.h" />
+    <ClInclude Include="include\yaml-cpp\emitfromevents.h" />
+    <ClInclude Include="include\yaml-cpp\emitter.h" />
+    <ClInclude Include="include\yaml-cpp\emitterdef.h" />
+    <ClInclude Include="include\yaml-cpp\emittermanip.h" />
+    <ClInclude Include="include\yaml-cpp\emitterstyle.h" />
+    <ClInclude Include="include\yaml-cpp\eventhandler.h" />
+    <ClInclude Include="include\yaml-cpp\exceptions.h" />
+    <ClInclude Include="include\yaml-cpp\fptostring.h" />
+    <ClInclude Include="include\yaml-cpp\mark.h" />
+    <ClInclude Include="include\yaml-cpp\node\convert.h" />
+    <ClInclude Include="include\yaml-cpp\node\detail\impl.h" />
+    <ClInclude Include="include\yaml-cpp\node\detail\iterator.h" />
+    <ClInclude Include="include\yaml-cpp\node\detail\iterator_fwd.h" />
+    <ClInclude Include="include\yaml-cpp\node\detail\memory.h" />
+    <ClInclude Include="include\yaml-cpp\node\detail\node.h" />
+    <ClInclude Include="include\yaml-cpp\node\detail\node_data.h" />
+    <ClInclude Include="include\yaml-cpp\node\detail\node_iterator.h" />
+    <ClInclude Include="include\yaml-cpp\node\detail\node_ref.h" />
+    <ClInclude Include="include\yaml-cpp\node\emit.h" />
+    <ClInclude Include="include\yaml-cpp\node\impl.h" />
+    <ClInclude Include="include\yaml-cpp\node\iterator.h" />
+    <ClInclude Include="include\yaml-cpp\node\node.h" />
+    <ClInclude Include="include\yaml-cpp\node\parse.h" />
+    <ClInclude Include="include\yaml-cpp\node\ptr.h" />
+    <ClInclude Include="include\yaml-cpp\node\type.h" />
+    <ClInclude Include="include\yaml-cpp\noexcept.h" />
+    <ClInclude Include="include\yaml-cpp\null.h" />
+    <ClInclude Include="include\yaml-cpp\ostream_wrapper.h" />
+    <ClInclude Include="include\yaml-cpp\parser.h" />
+    <ClInclude Include="include\yaml-cpp\stlemitter.h" />
+    <ClInclude Include="include\yaml-cpp\traits.h" />
+    <ClInclude Include="include\yaml-cpp\yaml.h" />
     <ClInclude Include="include\yaml.h" />
-    <ClInclude Include="include\parser.h" />
-    <ClInclude Include="include\parserstate.h" />
-    <ClInclude Include="src\aliascontent.h" />
-    <ClInclude Include="src\content.h" />
-    <ClInclude Include="include\conversion.h" />
-    <ClInclude Include="include\iterator.h" />
-    <ClInclude Include="src\iterpriv.h" />
-    <ClInclude Include="src\ltnode.h" />
-    <ClInclude Include="src\map.h" />
-    <ClInclude Include="include\node.h" />
-    <ClInclude Include="src\scalar.h" />
-    <ClInclude Include="src\sequence.h" />
-    <ClInclude Include="src\tag.h" />
+    <ClInclude Include="src\collectionstack.h" />
+    <ClInclude Include="src\contrib\dragonbox.h" />
+    <ClInclude Include="src\contrib\graphbuilderadapter.h" />
+    <ClInclude Include="src\directives.h" />
+    <ClInclude Include="src\emitterstate.h" />
+    <ClInclude Include="src\emitterutils.h" />
     <ClInclude Include="src\exp.h" />
-    <ClInclude Include="src\regex.h" />
+    <ClInclude Include="src\indentation.h" />
+    <ClInclude Include="src\nodebuilder.h" />
+    <ClInclude Include="src\nodeevents.h" />
+    <ClInclude Include="src\ptr_vector.h" />
+    <ClInclude Include="src\regex_yaml.h" />
     <ClInclude Include="src\regeximpl.h" />
     <ClInclude Include="src\scanner.h" />
     <ClInclude Include="src\scanscalar.h" />
     <ClInclude Include="src\scantag.h" />
+    <ClInclude Include="src\setting.h" />
+    <ClInclude Include="src\singledocparser.h" />
     <ClInclude Include="src\stream.h" />
     <ClInclude Include="src\streamcharsource.h" />
     <ClInclude Include="src\stringsource.h" />
+    <ClInclude Include="src\tag.h" />
     <ClInclude Include="src\token.h" />
-    <ClInclude Include="include\emitter.h" />
-    <ClInclude Include="include\emittermanip.h" />
-    <ClInclude Include="src\emitterstate.h" />
-    <ClInclude Include="src\emitterutils.h" />
-    <ClInclude Include="include\ostream.h" />
-    <ClInclude Include="include\stlemitter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

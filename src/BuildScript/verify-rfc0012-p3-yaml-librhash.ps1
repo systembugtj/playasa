@@ -5,15 +5,20 @@
 
 .DESCRIPTION
   yaml-cpp 首行 legacy-yaml-h-62b23520：校验 include/yaml.h 的 include guard（当前内嵌树）。
+  yaml-cpp 首行 yaml-cpp-0.9.0：校验上游 CMake 版本、公共头路径、MSBuild 源清单与调用方新 API 迁移。
   librhash 首行 legacy-hash-count-22：校验 librhash/rhash.h 中 RHASH_HASH_COUNT 取值。
   P3 升级上游后请改写期望首行并扩展本脚本中对应分支（与 jsoncpp 脚本同一模式）。
+  librhash：`rhash-upstream-1.4.6` 分支校验 `RHASH_HASH_COUNT = 32`。
 #>
 $ErrorActionPreference = 'Stop'
 
 $REPO_ROOT = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $YAML_EXPECT_FILE = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/rfc0012-expected.txt'
 $YAML_H = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/include/yaml.h'
+$YAML_PUBLIC_H = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/include/yaml-cpp/yaml.h'
+$YAML_CMAKE = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/CMakeLists.txt'
 $YAML_PROJ = Join-Path $REPO_ROOT 'src/Thirdparty/yaml-cpp/yamlcpp.vcxproj'
+$YAML_RSC_FORMAT = Join-Path $REPO_ROOT 'src/Prototype/SPlayerNewGui/splayer/Model/rsc_format.cc'
 
 $RH_EXPECT_FILE = Join-Path $REPO_ROOT 'src/Thirdparty/librhash/rfc0012-expected.txt'
 $RHASH_H = Join-Path $REPO_ROOT 'src/Thirdparty/librhash/librhash/rhash.h'
@@ -35,12 +40,45 @@ function Test-RequiredFile {
 # --- yaml-cpp ---
 Test-RequiredFile $YAML_EXPECT_FILE
 Test-RequiredFile $YAML_H
+Test-RequiredFile $YAML_PUBLIC_H
+Test-RequiredFile $YAML_CMAKE
 Test-RequiredFile $YAML_PROJ
+Test-RequiredFile $YAML_RSC_FORMAT
 $yamlTag = Read-FirstNonEmptyLine $YAML_EXPECT_FILE
 if ($yamlTag -eq 'legacy-yaml-h-62b23520') {
     $raw = Get-Content -LiteralPath $YAML_H -Raw -Encoding UTF8
     if ($raw -notmatch 'YAML_H_62B23520_7C8E_11DE_8A39_0800200C9A66') {
         throw 'yaml.h include guard changed; update rfc0012-expected.txt or upstream tree'
+    }
+}
+elseif ($yamlTag -eq 'yaml-cpp-0.9.0') {
+    $cmake = Get-Content -LiteralPath $YAML_CMAKE -Raw -Encoding UTF8
+    if ($cmake -notmatch 'project\(YAML_CPP VERSION 0\.9\.0 LANGUAGES CXX\)') {
+        throw 'yaml-cpp CMakeLists.txt does not declare upstream 0.9.0'
+    }
+
+    $compatHeader = Get-Content -LiteralPath $YAML_H -Raw -Encoding UTF8
+    if ($compatHeader -notmatch '#include <yaml-cpp/yaml\.h>') {
+        throw 'yaml-cpp compatibility yaml.h wrapper is missing'
+    }
+
+    $project = Get-Content -LiteralPath $YAML_PROJ -Raw -Encoding UTF8
+    foreach ($required in @(
+        'src\parse.cpp',
+        'src\singledocparser.cpp',
+        'src\contrib\graphbuilder.cpp',
+        'include\yaml-cpp\node\parse.h',
+        'YAML_CPP_STATIC_DEFINE',
+        'stdcpp14'
+    )) {
+        if ($project -notlike "*$required*") {
+            throw "yamlcpp.vcxproj missing expected 0.9.0 entry: $required"
+        }
+    }
+
+    $rscFormat = Get-Content -LiteralPath $YAML_RSC_FORMAT -Raw -Encoding UTF8
+    if ($rscFormat -match 'YAML::Parser|YAML::Iterator|#include <yaml\.h>') {
+        throw 'rsc_format.cc still contains legacy yaml-cpp API usage'
     }
 }
 else {
@@ -56,6 +94,12 @@ if ($rhTag -eq 'legacy-hash-count-22') {
     $raw = Get-Content -LiteralPath $RHASH_H -Raw -Encoding UTF8
     if ($raw -notmatch 'RHASH_HASH_COUNT\s*=\s*22') {
         throw 'rhash.h RHASH_HASH_COUNT no longer 22; update rfc0012-expected.txt after P3 upgrade'
+    }
+}
+elseif ($rhTag -eq 'rhash-upstream-1.4.6') {
+    $raw = Get-Content -LiteralPath $RHASH_H -Raw -Encoding UTF8
+    if ($raw -notmatch 'RHASH_HASH_COUNT\s*=\s*32') {
+        throw 'rhash.h RHASH_HASH_COUNT expected 32 for rhash-upstream-1.4.6 pin'
     }
 }
 else {

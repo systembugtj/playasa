@@ -5,10 +5,44 @@
 #include "../Utils/base64_utils.h"
 
 #include <fstream>
-#include <yaml.h>
+#include <string>
+#include <yaml-cpp/yaml.h>
 
 namespace rsc_format
 {
+
+const char kStringNodeName[] = "string";
+const char kBinaryNodeName[] = "bin";
+
+bool CopyStringMap(const YAML::Node& node, std::map<std::wstring, std::wstring>& output)
+{
+  if (!node || !node.IsMap())
+    return false;
+
+  for (YAML::const_iterator it = node.begin(); it != node.end(); ++it)
+  {
+    const std::string key = it->first.as<std::string>();
+    const std::string value = it->second.as<std::string>();
+    output[string_util::Utf8StringToWString(key)] = string_util::Utf8StringToWString(value);
+  }
+
+  return true;
+}
+
+bool CopyBinaryMap(const YAML::Node& node, std::map<std::wstring, std::vector<unsigned char> >& output)
+{
+  if (!node || !node.IsMap())
+    return false;
+
+  for (YAML::const_iterator it = node.begin(); it != node.end(); ++it)
+  {
+    const std::string key = it->first.as<std::string>();
+    const std::string value = it->second.as<std::string>();
+    output[string_util::Utf8StringToWString(key)] = base64_utils::Decode(value);
+  }
+
+  return true;
+}
 
 bool Parse(const wchar_t* filename, std::map<std::wstring, std::wstring>& str_output,
            std::map<std::wstring, std::vector<unsigned char> >& buf_output)
@@ -36,32 +70,21 @@ bool Parse(const wchar_t* filename, std::map<std::wstring, std::wstring>& str_ou
   if (yaml_utf8s.empty())
     return false;
 
-  std::stringstream yaml_istm;
   yaml_utf8s.push_back(0);
-  yaml_istm << (char*)&yaml_utf8s[0];
 
   try
   {
-    YAML::Parser parser(yaml_istm);
-    YAML::Node doc;
-    if (!parser.GetNextDocument(doc))
+    const YAML::Node doc = YAML::Load(reinterpret_cast<const char*>(&yaml_utf8s[0]));
+    if (!doc || !doc.IsMap())
       return false;
 
-    const YAML::Node& str_node = doc["string"];
-    for (YAML::Iterator it = str_node.begin(); it != str_node.end(); it++)
-      str_output[string_util::Utf8StringToWString(it.first())] =
-        string_util::Utf8StringToWString(it.second());
+    if (!CopyStringMap(doc[kStringNodeName], str_output))
+      return false;
 
-    const YAML::Node& bin_node = doc["bin"];
-    for (YAML::Iterator it = bin_node.begin(); it != bin_node.end(); it++)
-    {
-      std::string temp_b64;
-      it.second() >> temp_b64;
-      std::vector<unsigned char> buf = base64_utils::Decode(temp_b64);
-      buf_output[string_util::Utf8StringToWString(it.first())] = buf;
-    }
+    if (!CopyBinaryMap(doc[kBinaryNodeName], buf_output))
+      return false;
   }
-  catch (YAML::ParserException& e)
+  catch (const YAML::Exception& e)
   {
     UNREFERENCED_LOCAL_VARIABLE(e);
     return false;

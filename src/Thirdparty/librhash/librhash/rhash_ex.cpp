@@ -1,10 +1,11 @@
 #include "rhash_ex.h"
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace {
 
-// ???��?????????????????? boost::filesystem::path(...).filename()?????????????????? Boost ?????
+// 不依赖 Boost：从完整路径取文件名（与历史行为一致）
 std::string path_filename_string(const std::string& file)
 {
   const size_t pos = file.find_last_of("/\\");
@@ -17,35 +18,36 @@ std::string path_filename_string(const std::string& file)
 
 } // namespace
 
-// Func : create_link
-// the msg_id can be the combination of RHASH_ED2K, RHASH_SHA1, RHASH_BTIH
+// hash_id 可为 RHASH_ED2K，或 RHASH_ED2K|RHASH_SHA1|RHASH_BTIH 等按位组合（由 rhash_init 解析）
 void RHash::create_link(unsigned hash_id, const std::string &file, std::vector<std::string> &result)
 {
-  // initialization
   rhash ctx = rhash_init(hash_id);
   if (ctx == 0) return;
 
   FILE *fd = fopen(file.c_str(), "rb");
-  if (fd == 0) return;
+  if (fd == 0)
+  {
+    rhash_free(ctx);
+    return;
+  }
 
   fseek(fd, 0, SEEK_END);
   long size = ftell(fd);
-  rewind(fd);  // rewind the pointer
+  rewind(fd);
   std::stringstream ssSize;
   ssSize << size;
 
-  // update the file hash
   rhash_file_update(ctx, fd);
+  fclose(fd);
+  fd = 0;
 
   bool b = true;
   std::string value;
   std::string to_save;
 
-  // deal with ed2k link
   b = _get_link_internal(RHASH_ED2K, ctx, value);
   if (b)
   {
-    // ed2k://|file|[WMV??3GP???????].4Media.WMV.3GP.Converter.v6.0.2.0415.Incl.Keygen-Lz0.zip|34494025|DEDC307D2C7D6CC67D44D87957F94908|/
     to_save = "";
     to_save += "ed2k://|file|" + path_filename_string(file);
     to_save += "|" + ssSize.str();
@@ -53,29 +55,21 @@ void RHash::create_link(unsigned hash_id, const std::string &file, std::vector<s
     result.push_back(to_save);
   }
 
-  // deal with sha-1 magnet link
   b = _get_link_internal(RHASH_SHA1, ctx, value);
   if (b)
   {
-    // magnet:?xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C
     to_save = "";
     to_save += "magnet:?xt=urn:sha1:" + value;
     result.push_back(to_save);
   }
 
-  // deal with btih magnet link
   b = _get_link_internal(RHASH_BTIH, ctx, value);
   if (b)
   {
-    // magnet:?xt=urn:btih:XAKVF3ZS3LRJJUITOAQSNZCJOIM64NRI
     to_save = "";
     to_save += "magnet:?xt=urn:btih:" + value;
     result.push_back(to_save);
   }
-
-  // clean
-  fclose(fd);
-  fd = 0;
 
   rhash_free(ctx);
   ctx = 0;
@@ -83,26 +77,30 @@ void RHash::create_link(unsigned hash_id, const std::string &file, std::vector<s
 
 bool RHash::_get_link_internal(unsigned hash_id, rhash ctx, std::string &result)
 {
-  if (ctx->hash_id & hash_id)
-  {
-    // init
-    unsigned char *final = new unsigned char[rhash_get_digest_size(hash_id)];
-    char *result_temp = new char[rhash_get_hash_length(hash_id) + 1];
-    result_temp[rhash_get_hash_length(hash_id)] = '\0';  // set the last char to '\0'
-
-    // calc
-    rhash_final(ctx, hash_id, final);
-    rhash_print_bytes(result_temp, final, rhash_get_digest_size(hash_id), RHPR_HEX | RHPR_UPPERCASE);
-    result = result_temp;
-
-    // clean
-    delete [] final;
-    delete [] result_temp;
-
-    return true;
-  }
-  else
+  const unsigned long long mask = ctx->hash_mask;
+  if ((mask & hash_id) == 0)
   {
     return false;
-  }  
+  }
+
+  const int hexLen = rhash_get_hash_length(hash_id);
+  if (hexLen <= 0)
+  {
+    return false;
+  }
+
+  std::vector<char> buf(static_cast<size_t>(hexLen) + 8u, '\0');
+  const size_t n = rhash_print(buf.data(), ctx, hash_id, RHPR_HEX | RHPR_UPPERCASE);
+  if (n == 0)
+  {
+    return false;
+  }
+
+  size_t len = n;
+  while (len > 0 && buf[len - 1] == '\0')
+  {
+    --len;
+  }
+  result.assign(buf.data(), len);
+  return true;
 }

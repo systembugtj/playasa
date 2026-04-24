@@ -10,16 +10,16 @@ extern "C" {
 /* algorithm context */
 typedef struct ed2k_ctx
 {
-  md4_ctx md4_context;       /* context to hash block hashes */
-  md4_ctx md4_context_inner; /* context to hash file blocks */
-  int not_emule;
+	md4_ctx md4_context_inner; /* md4 context to hash file blocks */
+	md4_ctx md4_context;       /* md4 context to hash block hashes */
+	int not_emule;             /* flag: 0 for emule ed2k algorithm */
 } ed2k_ctx;
 
 /* hash functions */
 
-void ed2k_init(ed2k_ctx *ctx);
-void ed2k_update(ed2k_ctx *ctx, const unsigned char* msg, size_t size);
-void ed2k_final(ed2k_ctx *ctx, unsigned char result[16]);
+void rhash_ed2k_init(ed2k_ctx* ctx);
+void rhash_ed2k_update(ed2k_ctx* ctx, const unsigned char* msg, size_t size);
+void rhash_ed2k_final(ed2k_ctx* ctx, unsigned char result[16]);
 
 #ifdef __cplusplus
 } /* extern "C" */
