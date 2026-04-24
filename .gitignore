@@ -94,7 +94,13 @@ src/lib/
 # Project Specific
 # ============================================================================
 
-# Language resources
+# 勿在仓库根落生成物；若本地曾构建过原型资源，忽略根目录遗留
+/splayer.rsc
+
+# 根目录历史语言 DLL 散落目录（RFC-0011：语言工程输出进 out\bin\...）
+/lang/
+
+# Language resources (any path named lang/)
 lang/
 /src/ipch
 /src/UpgradeLog.htm

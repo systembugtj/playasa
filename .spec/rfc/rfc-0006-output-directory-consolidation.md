@@ -1,5 +1,7 @@
 # RFC-0006: 输出目录统一化
 
+> **现行契约** 以 **[RFC-0011](../../.spec/rfc/rfc-0011-windows-repository-layout.md)**（仓库根 **`out\`**、`$(SolutionDir)..\out\...`）为准；本文档保留为 2025-01 迁移记录。
+
 **状态**: 已完成 (Completed)  
 **作者**: 开发团队  
 **创建日期**: 2025-01-16  
@@ -125,7 +127,7 @@ IntDir: $(SolutionDir)src\out\obj\$(ProjectName)
 
 ### 7.2 创建的脚本
 
-- `src/BuildScript/fix-output-directories.ps1` - 自动修复输出目录的脚本
+- `src/BuildScript/fix-output-directories-rfc0011.ps1` - 现行：将漂移的 OutDir/IntDir 及松散 `..\out\bin` 库路径对齐到 `$(SolutionDir)..\out\...`（与 RFC-0011 / `common.props` 一致；历史同名脚本已删除）
 
 ### 7.3 修复的路径模式
 

@@ -24,7 +24,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="$(SolutionDir)tools\python_bin\python $(InputDir)compile_rsc.py -i $(InputDir)splayer_rsc.yaml&#x0D;&#x0A;copy /y $(InputDir)splayer_rsc.yaml_bz $(SolutionDir)..\splayer.rsc&#x0D;&#x0A;copy /y $(InputDir)splayer_rsc.yaml_bz $(OutDir)\splayer.rsc"
+				CommandLine="$(SolutionDir)tools\python_bin\python $(InputDir)compile_rsc.py -i $(InputDir)splayer_rsc.yaml&#x0D;&#x0A;copy /y $(InputDir)splayer_rsc.yaml_bz $(OutDir)\splayer.rsc"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -46,7 +46,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="$(SolutionDir)tools\python_bin\python $(InputDir)compile_rsc.py -i $(InputDir)splayer_rsc.yaml&#x0D;&#x0A;copy /y $(InputDir)splayer_rsc.yaml_bz $(SolutionDir)..\splayer.rsc&#x0D;&#x0A;copy /y $(InputDir)splayer_rsc.yaml_bz $(OutDir)\splayer.rsc"
+				CommandLine="$(SolutionDir)tools\python_bin\python $(InputDir)compile_rsc.py -i $(InputDir)splayer_rsc.yaml&#x0D;&#x0A;copy /y $(InputDir)splayer_rsc.yaml_bz $(OutDir)\splayer.rsc"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"

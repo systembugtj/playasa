@@ -67,21 +67,18 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
       <Command>$(SolutionDir)tools\python_bin\python $(ProjectDir)compile_rsc.py -i $(ProjectDir)splayer_rsc.yaml
-copy /y $(ProjectDir)splayer_rsc.yaml_bz $(SolutionDir)..\splayer.rsc
 copy /y $(ProjectDir)splayer_rsc.yaml_bz $(OutDir)splayer.rsc</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
       <Command>$(SolutionDir)tools\python_bin\python $(ProjectDir)compile_rsc.py -i $(ProjectDir)splayer_rsc.yaml
-copy /y $(ProjectDir)splayer_rsc.yaml_bz $(SolutionDir)..\splayer.rsc
 copy /y $(ProjectDir)splayer_rsc.yaml_bz $(OutDir)splayer.rsc</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <PreBuildEvent>
       <Command>$(SolutionDir)tools\python_bin\python $(ProjectDir)compile_rsc.py -i $(ProjectDir)splayer_rsc.yaml
-copy /y $(ProjectDir)splayer_rsc.yaml_bz $(SolutionDir)..\splayer.rsc
 copy /y $(ProjectDir)splayer_rsc.yaml_bz $(OutDir)splayer.rsc</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>

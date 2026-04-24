@@ -141,7 +141,7 @@
     </ClCompile>
     <Lib />
     <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin;$(SolutionDir)\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\;$(SolutionDir)\lib\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

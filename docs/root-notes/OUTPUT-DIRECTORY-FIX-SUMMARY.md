@@ -1,5 +1,7 @@
 # 输出目录修复总结
 
+> **历史记录**：下文描述的是早期「`src\out`」阶段的统计与脚本名。当前仓库以 **仓库根 `out\`** 与 **`$(SolutionDir)..\out\...`** 为契约；请参阅 **[RFC-0011](../../.spec/rfc/rfc-0011-windows-repository-layout.md)** 与 **`src/BuildScript/fix-output-directories-rfc0011.ps1`**（旧名 `fix-output-directories*.ps1` 已从仓库移除）。
+
 ## 问题
 
 项目输出文件分散在多个位置：
@@ -43,8 +45,8 @@
 
 ## 相关文档
 
-- [RFC-0006: 输出目录统一化](../rfc/rfc-0006-output-directory-consolidation.md)
-- `src/BuildScript/fix-output-directories.ps1` - 修复脚本
+- [RFC-0006: 输出目录统一化](../../.spec/rfc/rfc-0006-output-directory-consolidation.md)
+- `src/BuildScript/fix-output-directories-rfc0011.ps1` - 现行输出路径迁移脚本（可加 `-SelfTest` 自检）
 
 ---
 

@@ -9,5 +9,5 @@
 
 ## 相关文档
 
-- [RFC 文档](../rfc/) - 正式的技术提案和决策记录
+- [RFC 文档索引](../rfc/README.md)（正文在 `.spec/rfc/`）
 - [项目主 README](../../README.md) - 项目概览
