@@ -209,5 +209,5 @@ void UsrBehaviorData::SetEnvironmentData()
 
 	SPlayerGUID::GenerateGUID(var);
 	AppendEnvEntry(L"UUID", var);
-	AppendEnvEntry(L"SPlayerù?", SVP_REV_STR);
+	AppendEnvEntry(L"SPlayerÔøΩ?", SVP_REV_STR);
 }

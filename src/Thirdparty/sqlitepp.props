@@ -13,7 +13,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>sqlitepp-utf16.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Thirdparty\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\$(Platform)\release-utf16\;$(SolutionDir)Thirdparty\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-// mfchostDoc.cpp : CmfchostDoc ÀàµÄÊµÏÖ
+// mfchostDoc.cpp : CmfchostDoc ï¿½ï¿½ï¿½Êµï¿½ï¿½
 //
 #include "MovieComment_Win.h"
 #include <exdispid.h>

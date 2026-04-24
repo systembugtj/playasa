@@ -87,10 +87,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug-utf16|Win32'">
     <OutDir>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)d-utf16</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release-utf16|Win32'">
     <OutDir>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)-utf16</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <OutDir>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\</OutDir>

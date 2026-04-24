@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <malloc.h>
+#include <stdlib.h>
 #include "libpng.h"
 #include "..\..\libpng\png.h"
 
@@ -40,6 +41,9 @@ unsigned char* DecompressPNG(struct png_t* png, int* w, int* h)
 	unsigned char* pic;
 	unsigned char* row;
 	unsigned int x, y, c;
+	png_uint_32 width = 0, height = 0;
+	int bit_depth = 0, color_type = 0, interlace_type = 0, compression_type = 0, filter_method = 0;
+	png_bytepp row_pointers = NULL;
 
 	if(png_sig_cmp(png->data, 0, 8) != 0) 
 		return NULL;
@@ -90,20 +94,39 @@ unsigned char* DecompressPNG(struct png_t* png, int* w, int* h)
 		return NULL;
 	}
 
-	pic = calloc(info_ptr->width * info_ptr->height, 4);
-
-	*w = info_ptr->width;
-	*h = info_ptr->height;
-
-	for(y = 0; y < info_ptr->height; y++)
+	if (!png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
+		&interlace_type, &compression_type, &filter_method))
 	{
-		row = &pic[y * info_ptr->width * 4];
+		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+		return NULL;
+	}
 
-		for(x = 0; x < info_ptr->width*3; row += 4)
+	row_pointers = png_get_rows(png_ptr, info_ptr);
+	if (row_pointers == NULL)
+	{
+		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+		return NULL;
+	}
+
+	pic = (unsigned char*)calloc((size_t)width * (size_t)height, 4);
+	if (pic == NULL)
+	{
+		png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+		return NULL;
+	}
+
+	*w = (int)width;
+	*h = (int)height;
+
+	for(y = 0; y < height; y++)
+	{
+		row = &pic[y * width * 4];
+
+		for(x = 0; x < width * 3; row += 4)
 		{
 			for(c = 0; c < 3; c++)
 			{
-				row[c] = info_ptr->row_pointers[y][x++];
+				row[c] = row_pointers[y][x++];
 			}
 		}
 	}

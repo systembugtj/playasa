@@ -2,7 +2,7 @@
 
 | 字段 | 内容 |
 |------|------|
-| **状态** | 草案 (Draft) |
+| **状态** | 草案 (Draft)；**P1 已合入**后可改为 **已接受 (Accepted)**（见 §8 与 §11 前言） |
 | **适用范围** | 本仓库 `playasa`（MSBuild / Win32 为主） |
 | **相关 RFC** | [RFC-0011](./rfc-0011-windows-repository-layout.md)（路径与 `out\` 契约）、[RFC-0002](./rfc-0002-build-environment-analysis.md)（历史环境分析） |
 
@@ -23,7 +23,7 @@
 | `src/Source/zlib` | zlib 静态库工程 | **已升级 1.3.1**（`gzio.c` 已移除） | `SVPToolBox.cpp` 仍用 `gzopen`/`gzread`（API 保持）；回归压缩路径 |
 | `src/Source/libpng` | libpng | **已升级 1.6.47**；`pnglibconf.h` 来自 `scripts/pnglibconf.h.prebuilt`，`PNG_ZLIB_VERNUM` 对齐 `0x1310` | 与 zlib 同阶段；静态库不含 `pngtest.c` |
 | `src/Thirdparty/openssl-0.9.8x` | OpenSSL | **0.9.8x**；协议与 API 与 3.x 不兼容 | 主工程若未直接链接 SSL，可先审计引用再决定是否移除或替换 |
-| `src/Thirdparty/jsoncpp` | jsoncpp 老目录布局 | 无 `JSONCPP_VERSION` 宏的早期形态 | 与上游 1.9.x 差异大；需 API 与 `lib_json.vcxproj` 双迁移 |
+| `src/Thirdparty/jsoncpp` | jsoncpp | **已升级 1.9.5**（`JSONCPP_VERSION_STRING`）；`lib_json.vcxproj` 源清单已对齐 | 应用侧仍用 `Json::Reader`/`StyledWriter`（1.9.5 仍提供，已弃用）；全量 MSBuild 须在本地再跑 |
 | `src/Thirdparty/yaml-cpp` | yaml-cpp | 中等 | 工程体量小于 OpenSSL；适合 jsoncpp 之后单独阶段 |
 | `src/Thirdparty/zeromq` | libzmq | 依赖网络栈与编译选项 | 与业务消息路径相关，需运行时验证 |
 | `src/Source/filters/transform/mpcvideodec/ffmpeg` | FFmpeg/libav 衍生 | 体量大、许可证与符号导出敏感 | **单独 RFC 或子阶段**；不在 RFC-0012 首波范围 |
@@ -77,6 +77,9 @@
 | 2026-04-19 | 采用分阶段升级，拒绝单 PR「全库最新」 | 降低链接/运行时回归风险；与内嵌源码现实一致 |
 | 2026-04-19 | 默认路线 A（内嵌升级），vcpkg 为后续可选 | 与当前 MSBuild 仓结构一致，可交付增量 PR |
 | 2026-04-24 | 完成 P1：zlib **1.3.1** + libpng **1.6.47** 内嵌升级 | 工程与 `pnglibconf.h` 对齐；`verify-rfc0012-zlib-libpng.ps1` 供 CI 轻检 |
+| 2026-04-23 | P2 门闩：`verify-rfc0012-jsoncpp.ps1` + `rfc0012-expected.txt` | 无 MSBuild 时可钉扎 legacy 或 SemVer；P2 PR 须更新期望首行 |
+| 2026-04-23 | P3 门闩：`verify-rfc0012-p3-yaml-librhash.ps1` + `verify-rfc0012-all.ps1` | yaml-cpp / librhash 期望文件与脚本分支；P3 PR 须同步更新 |
+| 2026-04-23 | **P2 执行**：内嵌 jsoncpp 换为上游 **1.9.5** | `include/json` + `src/lib_json` + 测试目录同步；`rfc0012-expected.txt` = `1.9.5` |
 
 ## 9. 可执行计划：P1（zlib + libpng）检查清单
 
@@ -126,16 +129,114 @@ MSBuild ..\Source\libpng\libpng_vs2005.vcxproj /m /p:Configuration="Release Unic
 无 MSBuild 时的**最小自检**（仅校验头文件版本号）：
 
 ```powershell
-.\src\BuildScript\verify-rfc0012-zlib-libpng.ps1
+.\src\BuildScript\verify-rfc0012-all.ps1
 ```
 
-## 11. P2 及之后（纲要，执行前展开为检查清单）
+或分项执行：
 
-- **P2 jsoncpp**：先 `rg "json/json.h"` / `Json::` 统计模块；选定上游 tag；优先静态链进现有 `lib_json.vcxproj` 或改为 amalgamation；全解 + 配置读写冒烟测试。
-- **P3 yaml-cpp / librhash**：单库 MSBuild → 全解；覆盖读 yaml / 校验路径。
-- **P4 zeromq / sqlitepp**：全解 + 与网络/持久化相关的手测脚本（若有 `test-*.ps1` 则接入）。
-- **P5 OpenSSL**：`rg -i openssl` 全仓；若仅头文件残留则删树；若链接则走 3.x 迁移或替换为 **Schannel / BCrypt** 等 Windows 原生方案，另附安全评审结论。
+```powershell
+.\src\BuildScript\verify-rfc0012-zlib-libpng.ps1
+.\src\BuildScript\verify-rfc0012-jsoncpp.ps1
+.\src\BuildScript\verify-rfc0012-p3-yaml-librhash.ps1
+```
+
+**钉扎文件（首行非空即期望标记）**
+
+| 组件 | 期望文件 | 当前首行含义 |
+|------|-----------|--------------|
+| jsoncpp | `src/Thirdparty/jsoncpp/rfc0012-expected.txt` | 当前 **`1.9.5`**，与 `include/json/version.h` 中 **`JSONCPP_VERSION_STRING`** 一致；以后再升上游时只改此首行 |
+| yaml-cpp | `src/Thirdparty/yaml-cpp/rfc0012-expected.txt` | **`legacy-yaml-h-62b23520`**（`yaml.h` include guard）；P3 升级后改脚本分支或新标记 |
+| librhash | `src/Thirdparty/librhash/rfc0012-expected.txt` | **`legacy-hash-count-22`**（`rhash.h` 中 `RHASH_HASH_COUNT`）；P3 升级后同步更新 |
+
+## 11. P2–P5 可执行纲要（按阶段开分支；每阶段一份 PR）
+
+**前言**：§9 的 P1 清单为模板；以下各阶段在开工前将对应小节**复制到 PR 描述**并打勾。分支命名建议 `upgrade/rfc0012-p{N}-{topic}`；合并前更新 **`TASK_TRACKING.md`** 与本文 **§8 决策记录**（一行：日期、决策、理由）。
+
+### 11.1 P2：jsoncpp 现代化
+
+**本仓锚点**：`src/Thirdparty/jsoncpp.props`（`AdditionalIncludeDirectories` → `Thirdparty\jsoncpp\include`）；工程 `src/Thirdparty/jsoncpp/makefiles/vs71/lib_json.vcxproj`；主程序引用见 `src/Source/apps/mplayerc/mplayerc_vs2005.vcxproj`（`ProjectReference` + `Import`）。
+
+**两条正交路线**（与 §5.1 同一思路，落实到组件级）：
+
+| 路线 | 技术原理 | 风险 |
+|------|-----------|------|
+| **2A：内嵌升级到上游维护 tag** | 替换 `include/json`、`src/lib_json` 与 `lib_json.vcxproj` 的 `ClCompile` 列表；保留 MSBuild 静态库 | `Json::Reader`/`FastWriter` 等弃用 API 需改调用方；`char`/`Unicode` 与 `std::string` 边界 |
+| **2B：Amalgamation 单编译单元** | 减少工程文件漂移；仍须适配 API | 大 TU 编译时间上升；与 2A 二选一为主，不要混用两套树 |
+
+**推荐**：优先 **2A**，与当前 `lib_json.vcxproj` 结构一致。
+
+**实施检查清单**
+
+1. 基线：`git checkout -b upgrade/rfc0012-p2-jsoncpp`；可选 tag `pre-rfc0012-p2-jsoncpp`。
+2. 摸底（结果贴 PR）：`rg "json/json\.h" src --glob "*.{h,hpp,cc,cpp}"`；`rg "\bJson::" src --glob "*.{h,hpp,cc,cpp}"`；单独统计 `mplayerc` 与 `shared` 命中数。
+3. 选定上游 **精确 tag**（如 1.9.x），在 PR 正文写死；阅读该 tag 的 **RELEASE_NOTES** 中 breaking changes。
+4. 对照上游 `CMakeLists.txt` 或 `src/lib_json` 目录，更新内嵌 **`src/Thirdparty/jsoncpp/src/lib_json/*.cpp`** 与 **`include/json/*.h`**；**不要**在未审计的情况下删掉本仓对 `json_internal*.inl` 的引用——以新树是否存在为准。
+5. 更新 **`lib_json.vcxproj`**：所有 `ClCompile`/`ClInclude` 路径与磁盘一致（注意 `vs71` 子目录下相对路径 `..\..\src\lib_json\`）；同步 **`.filters`**（若有）。
+6. 在 PR 中记录 **`JSONCPP_VERSION_STRING`**（或说明仍为 legacy 树）；更新 **`src/Thirdparty/jsoncpp/rfc0012-expected.txt`** 首行为新 SemVer；**`verify-rfc0012-jsoncpp.ps1`**（§10）须在 CI 或本地通过。
+7. **单项目**：`MSBuild src\Thirdparty\jsoncpp\makefiles\vs71\lib_json.vcxproj /m /p:Configuration=Release /p:Platform=Win32 /v:minimal`（及团队使用的 Unicode 配置名，以工程内 `ProjectConfiguration` 为准）。
+8. **全量**：`src\BuildScript\build-with-msbuild.cmd`；至少 **`Release Unicode|Win32`**。
+9. **冒烟**：启动播放器，覆盖 **读/写 JSON 配置**、网络返回 JSON 的对话框或解析路径（以步骤 2 命中文件为准列在 PR）。
+10. 合并后：`TASK_TRACKING.md` 将 P2 标完成；§8 追加决策行。
+
+### 11.2 P3：yaml-cpp 与 librhash
+
+**yaml-cpp 锚点**：`src/Thirdparty/yaml-cpp/yamlcpp.vcxproj`；**Prototype** 侧 `src/Prototype/SPlayerNewGui/splayer/splayer.vcxproj` 含 `ProjectReference`；消费方以 `rg "yaml\.h"` / `YAML::` 摸底。
+
+**librhash 锚点**：`src/Thirdparty/librhash/librhash/librhash.vcxproj` 与 **`src/Thirdparty/librhash.props`**（`mplayerc_vs2005.vcxproj` 已 `Import`）；消费方以 `rhash` / `librhash` 符号全仓 `rg` 为准。
+
+**门闩（无 MSBuild）**：`verify-rfc0012-p3-yaml-librhash.ps1` + 上表 **yaml-cpp / librhash** 的 `rfc0012-expected.txt`；升级后须在脚本内增加新期望分支或改写指纹行。
+
+**实施检查清单**（每库可拆独立 PR，仍属 P3）
+
+1. 基线：`upgrade/rfc0012-p3-yaml` 与 `upgrade/rfc0012-p3-librhash` 分支二选一或顺序执行；各自可选 tag `pre-rfc0012-p3-yaml` / `pre-rfc0012-p3-librhash`。
+2. **yaml-cpp**：`rg "\bYAML::" src --glob "*.{h,hpp,cc,cpp}"` 与 `rg "yaml-cpp|yaml\.h" src --glob "*.vcxproj"`，输出贴 PR。
+3. 选定上游 tag；用上游 **`src/*.cpp`** / **`include/*.h`** 覆盖本仓对应子树；**不要**默认把上游 `test/`、`util/` 主程序并进 `yamlcpp.vcxproj`，除非确需链接。
+4. 对照磁盘更新 **`yamlcpp.vcxproj`** 的 `ClCompile`/`ClInclude`；同步 `.filters`（若有）。
+5. **单项目**：`MSBuild src\Thirdparty\yaml-cpp\yamlcpp.vcxproj /m /p:Configuration=Release /p:Platform=Win32 /v:minimal`（及工程内其它必测配置）。
+6. **librhash**：`rg "\brhash_" src --glob "*.{h,hpp,cc,cpp}"` 贴 PR；替换 **`librhash/`** 下 C 源与头；更新 **`librhash.vcxproj`** 源清单（注意 `rhash_ex.cpp` 等本仓扩展文件是否保留）。
+7. **单项目**：`MSBuild src\Thirdparty\librhash\librhash\librhash.vcxproj /m /p:Configuration=Release /p:Platform=Win32 /v:minimal`。
+8. **全量**：`src\BuildScript\build-with-msbuild.cmd`；至少 **`Release Unicode|Win32`**（主程序链 librhash；Prototype 链 yaml-cpp 时另测 `splayer` 配置若适用）。
+9. 手测：存在 **YAML 配置路径** 则覆盖读/写；覆盖 **校验和 / ED2K** 等依赖 rhash 的 UI 或后台任务。
+10. 更新 **`rfc0012-expected.txt`**（两库）与 **`verify-rfc0012-p3-yaml-librhash.ps1`** 内分支；运行 **`verify-rfc0012-all.ps1`**；合并后 §8 与 **`TASK_TRACKING.md`** 标 P3 完成。
+
+### 11.3 P4：zeromq 与 sqlitepp
+
+**zeromq 锚点**：`src/Thirdparty/zeromq/libzmq.vcxproj`；与 **网络消息、进程间通信** 相关代码强耦合。
+
+**sqlitepp 锚点**：测试工程如 `src/Test/sqliteppTest/sqliteppTest.vcxproj`；应用内 SQLite 封装以 `rg sqlitepp` / `MediaSQLite` 等为线索。
+
+**实施检查清单**
+
+1. **libzmq**：升级前记录当前 **ABI 选项**（`ZMQ_BUILD_DRAFT_API`、静态/动态 CRT 与主程序一致）；单项目构建 → 全解 → **运行时**发一条消息或走现有网络功能（PR 写明手测步骤）。
+2. **sqlitepp**：库与测试项目同升；跑 `sqliteppTest`（若 CI 未编测试，本地必跑）及主程序 **媒体库/历史记录** 路径。
+3. 将 `src/BuildScript` 下已有 **`test-*.ps1`** 能覆盖到的条目在 PR 中引用文件名。
+
+### 11.4 P5：OpenSSL 0.9.8x 审计与处置
+
+**原则**：**先审计链接与包含**，再决定删树、换 3.x、或改为 **Schannel** 等；禁止「只升版本号不改调用方」。
+
+**实施检查清单**
+
+1. `rg -i "openssl|ssleay|libeay|SSL_CTX" src src/Thirdparty --glob "*.{h,hpp,c,cc,cpp,vcxproj,props}"`；区分 **真实链接** 与 **死代码/文档**。
+2. 若主程序与各 filter **均未** `AdditionalDependencies` 指向 `libeay32`/`ssleay32`：将结论写入 §8；**可考虑**移除 `src/Thirdparty/openssl-0.9.8x` 或标为「未使用，保留仅历史对比」——须法务/安全确认。
+3. 若存在链接：单独立项 **OpenSSL 3.x** 或 **平台 TLS** 迁移 RFC，本文 §8 引用该子 RFC；本 RFC P5 行标为「已委派」。
+
+## 12. CI 与无 VS 环境的门闩
+
+| 门闩 | 目的 | 命令 / 位置 |
+|------|------|-------------|
+| P1 头版本 | 防止 zlib/libpng 被误回退 | `src/BuildScript/verify-rfc0012-zlib-libpng.ps1` |
+| P2 钉扎 | 防止 jsoncpp 被误替换或 include 路径漂移 | `verify-rfc0012-jsoncpp.ps1` + `Thirdparty/jsoncpp/rfc0012-expected.txt` |
+| P3 钉扎 | 防止 yaml-cpp / librhash 静默漂移 | `verify-rfc0012-p3-yaml-librhash.ps1` + 两库各自 `rfc0012-expected.txt` |
+| 一键门闩 | 本地 / 无 VS CI 串行跑 P1–P3 钉扎 | `verify-rfc0012-all.ps1` |
+| 全量真相源 | 发布与回归仍以 MSBuild 为准 | `build-with-msbuild.cmd`；CI 若无法装 VS，**不得**将「仅头文件 grep」冒充为全量通过 |
+
+## 13. 旁系事项（不阻塞 P2，但勿遗忘）
+
+- **FFmpeg / mpcvideodec**：许可证、导出符号、性能与体积；**单独 RFC** 引用本文 P1–P2 的「单阶段单合并」节奏。
+- **Boost 头文件树**：通常不整树替换；随 **编译器告警** 与 **标准库替代**（`std::`）渐进消化。
+- **CRT / MFC 静态链接**：任何新第三方 `.lib` 须与主程序 **同一 `/MT` 或 `/MD` 家族**；升级 PR 中若出现 LNK4098 等，先查依赖再合。
 
 ---
 
-**变更流程**：执行 **P1** 前将本文 **状态** 升为 **已接受 (Accepted)**；每完成一个阶段，在 **`TASK_TRACKING.md`** 勾选对应行并附上合并提交哈希。
+**变更流程**：若 P1 在本文仍为 **草案** 时已合入，可将表头 **状态** 更新为 **已接受** 以反映「准则已冻结、后续阶段照 §11 执行」。每完成一个阶段，在 **`TASK_TRACKING.md`** 勾选对应行并附上合并提交哈希。

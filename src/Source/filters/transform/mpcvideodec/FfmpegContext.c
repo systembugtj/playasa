@@ -377,7 +377,7 @@ int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAV
 						return 2;	// Too much ref frames
 				}
 			} else {
-				if (cur_sps->ref_frame_count > 11)//14 »¨ÆÁÎÊÌâ
+				if (cur_sps->ref_frame_count > 11)//14 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 					return 2;	// Too much ref frames
 			}
 		} else {
@@ -838,7 +838,7 @@ struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* nNextCodecIndex, int
 
     pPicParams->bBidirectionalAveragingMode		= 0;	// The value ??indicates MPEG-1 and MPEG-2 rounded averaging (//2), 
     // pPicParams->bMVprecisionAndChromaRelation = 0;	// Indicates that luminance motion vectors have half-sample precision and that chrominance motion vectors are derived from luminance motion vectors according to the rules in MPEG-2
-    pPicParams->bChromaFormat					= 0x01;	// For MPEG-1, MPEG-2 “Main Profile,?H.261 and H.263 bitstreams, this value shall always be set to ?1? indicating "4:2:0" format
+    pPicParams->bChromaFormat					= 0x01;	// For MPEG-1, MPEG-2 ï¿½Main Profile,?H.261 and H.263 bitstreams, this value shall always be set to ?1? indicating "4:2:0" format
 
     // pPicParams->bPicScanFixed				= 1;	// set in UpdatePicParams
     // pPicParams->bPicScanMethod				= 1;	// set in UpdatePicParams

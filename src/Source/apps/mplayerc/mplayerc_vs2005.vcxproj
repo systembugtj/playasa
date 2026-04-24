@@ -154,7 +154,7 @@
     <Link>
       <AdditionalOptions>/MACHINE:I386  /LTCG /FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>legacy_stdio_definitions.lib;subpic.lib;Rpcrt4.lib;Winmm.lib;Wbemuuid.lib;Dsound.lib;Imm32.lib;Dbghelp.lib;Psapi.lib;libssf.lib;detours.lib;delayimp.lib;unrar.lib;qtmlClient.lib;dxguid.lib;libsamplerate.a;libzmq.lib;libphashaudio.a;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\;$(SolutionDir)Thirdparty\unrar;../../../Thirdparty/sqlitepp/lib;../../../lib;../../../lib/wm7;../../../lib/qt6;../../../lib/detours;../../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\;$(SolutionDir)..\out\bin\$(Platform)\release-utf16\;$(SolutionDir)Thirdparty\unrar;../../../Thirdparty/sqlitepp/lib;../../../lib;../../../lib/wm7;../../../lib/qt6;../../../lib/detours;../../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <IgnoreSpecificDefaultLibraries>MSVCRT;nafxcw.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <DelayLoadDLLs>unrar.dll;d3d9.dll;gdiplus.dll;psapi.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
