@@ -1,0 +1,9 @@
+[package]
+name = "playasa-playlist-parser"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "playasa_playlist_parser"
+crate-type = ["cdylib"]

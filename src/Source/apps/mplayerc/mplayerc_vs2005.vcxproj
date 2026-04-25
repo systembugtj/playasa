@@ -62,6 +62,7 @@
     <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
     <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
     <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)Thirdparty\playlist_parser_rust.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -72,6 +73,7 @@
     <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
     <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
     <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)Thirdparty\playlist_parser_rust.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -82,6 +84,7 @@
     <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
     <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
     <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)Thirdparty\playlist_parser_rust.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -92,6 +95,7 @@
     <Import Project="$(SolutionDir)Thirdparty\sinet.props" />
     <Import Project="..\..\..\Thirdparty\sqlitepp.props" />
     <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
+    <Import Project="$(SolutionDir)Thirdparty\playlist_parser_rust.props" />
     <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
     <Import Project="..\..\..\Thirdparty\tcl.props" />
     <Import Project="..\..\..\Thirdparty\jsoncpp.props" />
@@ -434,6 +438,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile Include="Model\MediaTreeModel.cc" />
     <ClCompile Include="Model\PlaylistItem.cc" />
     <ClCompile Include="Model\PlaylistParser.cc" />
+    <ClCompile Include="Model\PlaylistParserRust.cpp" />
     <ClCompile Include="Model\SubTransFormat.cc" />
     <ClCompile Include="Model\ThemePkg.cc" />
     <ClCompile Include="Model\UsrBehaviorData.cc" />
@@ -620,6 +625,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClInclude Include="Model\PHashComm.h" />
     <ClInclude Include="Model\PlaylistItem.h" />
     <ClInclude Include="Model\PlaylistParser.h" />
+    <ClInclude Include="Model\PlaylistParserRust.h" />
     <ClInclude Include="Model\SourceModel.h" />
     <ClInclude Include="Model\SubTransFormat.h" />
     <ClInclude Include="Model\ThemePkg.h" />

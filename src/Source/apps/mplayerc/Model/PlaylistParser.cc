@@ -11,6 +11,7 @@
 #include "..\Utils\ContentType.h"
 #include "..\Controller\PlayerPreference.h"
 #include "..\Controller\SPlayerDefs.h"
+#include "PlaylistParserRust.h"
 
 
 void PlaylistParser::MergeList(std::vector<CPlaylistItem>& list,
@@ -261,6 +262,25 @@ std::vector<CPlaylistItem> PlaylistParser::Parse(std::vector<std::wstring>& fns,
 }
 
 std::vector<CPlaylistItem> PlaylistParser::ParseCUEPlayList(std::wstring fn)
+{
+	std::vector<std::wstring> rustFiles;
+	if (ParseCuePlaylistWithRust(fn, &rustFiles))
+	{
+		std::vector<CPlaylistItem> playlist;
+		for (std::vector<std::wstring>::const_iterator iter = rustFiles.begin();
+			iter != rustFiles.end(); ++iter)
+		{
+			CPlaylistItem pli;
+			pli.m_fns.AddTail(iter->c_str());
+			playlist.push_back(pli);
+		}
+		return playlist;
+	}
+
+	return ParseCUEPlayListLegacy(fn);
+}
+
+std::vector<CPlaylistItem> PlaylistParser::ParseCUEPlayListLegacy(std::wstring fn)
 {
 	std::vector<CPlaylistItem> playlist;
 	CString str;//Use CString to match the param type of CWebTextFile::ReadString

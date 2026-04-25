@@ -3,5 +3,9 @@
 version = 4
 
 [[package]]
+name = "playasa-playlist-parser"
+version = "0.1.0"
+
+[[package]]
 name = "playasa-sphash"
 version = "0.1.0"

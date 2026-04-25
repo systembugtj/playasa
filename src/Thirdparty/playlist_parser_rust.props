@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+    <PlayasaUseRustPlaylistParser Condition="'$(PlayasaUseRustPlaylistParser)'==''">true</PlayasaUseRustPlaylistParser>
+    <PlayasaCargoExe Condition="'$(PlayasaCargoExe)'=='' And Exists('$(USERPROFILE)\.cargo\bin\cargo.exe')">$(USERPROFILE)\.cargo\bin\cargo.exe</PlayasaCargoExe>
+    <PlayasaCargoExe Condition="'$(PlayasaCargoExe)'==''">cargo</PlayasaCargoExe>
+    <PlayasaRustPlaylistParserTarget Condition="'$(Platform)'=='Win32'">i686-pc-windows-msvc</PlayasaRustPlaylistParserTarget>
+    <PlayasaRustPlaylistParserProfile Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Debug Unicode'">debug</PlayasaRustPlaylistParserProfile>
+    <PlayasaRustPlaylistParserProfile Condition="'$(PlayasaRustPlaylistParserProfile)'==''">release</PlayasaRustPlaylistParserProfile>
+    <PlayasaRustPlaylistParserCargoArgs Condition="'$(PlayasaRustPlaylistParserProfile)'=='release'">--release</PlayasaRustPlaylistParserCargoArgs>
+    <PlayasaRustPlaylistParserCargoTargetDir>$(SolutionDir)..\out\obj\rust</PlayasaRustPlaylistParserCargoTargetDir>
+    <PlayasaRustPlaylistParserOutputDir>$(PlayasaRustPlaylistParserCargoTargetDir)\$(PlayasaRustPlaylistParserTarget)\$(PlayasaRustPlaylistParserProfile)\</PlayasaRustPlaylistParserOutputDir>
+    <PlayasaRustPlaylistParserDll>$(PlayasaRustPlaylistParserOutputDir)playasa_playlist_parser.dll</PlayasaRustPlaylistParserDll>
+    <PlayasaRustPlaylistParserImportLib>$(PlayasaRustPlaylistParserOutputDir)playasa_playlist_parser.dll.lib</PlayasaRustPlaylistParserImportLib>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Thirdparty\pkg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies Condition="'$(PlayasaUseRustPlaylistParser)'=='true'">playasa_playlist_parser.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories Condition="'$(PlayasaUseRustPlaylistParser)'=='true'">$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <Target Name="BuildPlayasaRustPlaylistParser" BeforeTargets="Link" Condition="'$(PlayasaUseRustPlaylistParser)'=='true' And '$(PlayasaRustPlaylistParserTarget)'!=''">
+    <Message Importance="High" Text="Building Rust playlist parser DLL for $(Platform)|$(Configuration)..." />
+    <MakeDir Directories="$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\;$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\;$(PlayasaRustPlaylistParserCargoTargetDir)" />
+    <Exec Command="set &quot;CARGO_TARGET_DIR=$(PlayasaRustPlaylistParserCargoTargetDir)&quot; &amp;&amp; &quot;$(PlayasaCargoExe)&quot; build --manifest-path &quot;$(SolutionDir)..\Cargo.toml&quot; -p playasa-playlist-parser --target $(PlayasaRustPlaylistParserTarget) $(PlayasaRustPlaylistParserCargoArgs)" />
+    <Copy SourceFiles="$(PlayasaRustPlaylistParserDll)" DestinationFolder="$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\" />
+    <Copy SourceFiles="$(PlayasaRustPlaylistParserImportLib)" DestinationFiles="$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\playasa_playlist_parser.lib" />
+  </Target>
+  <ItemGroup />
+</Project>
