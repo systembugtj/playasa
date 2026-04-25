@@ -1,0 +1,34 @@
+---
+description: Rust crate modularity rule: no monolithic lib.rs files
+globs: crates/**/*.rs
+alwaysApply: false
+---
+
+# Rust Modularity
+
+Do not grow Rust crates as a monolithic `lib.rs`.
+
+When editing any Rust crate in this repo:
+
+- Keep `src/lib.rs` as a thin module/export entry point.
+- Put real logic in focused modules, for example `ffi.rs`, `text.rs`, `paths.rs`, `cue.rs`, `mpc.rs`, `m3u.rs`, `pls.rs`, or similarly scoped files.
+- Put C ABI boundary code in `ffi.rs` or a clearly named FFI module.
+- Put parser/algorithm logic in format-specific or domain-specific modules.
+- Add tests close to the module they validate.
+- Before adding new functionality to an existing Rust crate, split the crate first if `lib.rs` contains substantial implementation logic.
+
+Bad:
+
+```rust
+// lib.rs
+// hundreds of lines of FFI, parsing, memory management, and tests together
+```
+
+Good:
+
+```rust
+// lib.rs
+mod ffi;
+mod parser;
+mod text;
+```

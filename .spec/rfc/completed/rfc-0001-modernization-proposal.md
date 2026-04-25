@@ -405,8 +405,7 @@ std::unique_ptr<CGraphCore> m_pGraphCore;
 
 ## 9. 参考文献
 
-- [编译与现代化分析.md](../../编译与现代化分析.md)
-- [现代化实施计划.md](../../现代化实施计划.md)
+- [现代化路线](../../../docs/MODERNIZATION.md)
 - [Visual Studio 工具集版本](https://docs.microsoft.com/en-us/cpp/build/reference/toolset-version)
 - [Qt 文档](https://doc.qt.io/)
 - [FFmpeg 文档](https://ffmpeg.org/documentation.html)

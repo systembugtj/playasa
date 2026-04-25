@@ -19,6 +19,18 @@ void EnsureTwoFilenames(RustMpcPlaylistItem* item)
 	}
 }
 
+bool ConvertPathList(PlayasaPlaylistPathList list, std::vector<std::wstring>* files)
+{
+	for (size_t i = 0; i < list.len; ++i) {
+		const PlayasaPlaylistPath& item = list.items[i];
+		if (item.ptr && item.len > 0) {
+			files->push_back(std::wstring(item.ptr, item.len));
+		}
+	}
+	playasa_playlist_free_path_list(list);
+	return !files->empty();
+}
+
 }  // namespace
 
 bool ParseCuePlaylistWithRust(const std::wstring& path, std::vector<std::wstring>* files)
@@ -27,16 +39,25 @@ bool ParseCuePlaylistWithRust(const std::wstring& path, std::vector<std::wstring
 		return false;
 	}
 
-	PlayasaPlaylistPathList list = playasa_playlist_parse_cue(path.c_str());
-	for (size_t i = 0; i < list.len; ++i) {
-		const PlayasaPlaylistPath& item = list.items[i];
-		if (item.ptr && item.len > 0) {
-			files->push_back(std::wstring(item.ptr, item.len));
-		}
-	}
-	playasa_playlist_free_path_list(list);
+	return ConvertPathList(playasa_playlist_parse_cue(path.c_str()), files);
+}
 
-	return !files->empty();
+bool ParseM3uPlaylistWithRust(const std::wstring& path, std::vector<std::wstring>* files)
+{
+	if (!files) {
+		return false;
+	}
+
+	return ConvertPathList(playasa_playlist_parse_m3u(path.c_str()), files);
+}
+
+bool ParsePlsPlaylistWithRust(const std::wstring& path, std::vector<std::wstring>* files)
+{
+	if (!files) {
+		return false;
+	}
+
+	return ConvertPathList(playasa_playlist_parse_pls(path.c_str()), files);
 }
 
 bool ParseMpcPlaylistWithRust(const std::wstring& path, std::vector<RustMpcPlaylistItem>* items)

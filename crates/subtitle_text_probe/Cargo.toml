@@ -1,0 +1,9 @@
+[package]
+name = "playasa-subtitle-text-probe"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "playasa_subtitle_text_probe"
+crate-type = ["cdylib"]

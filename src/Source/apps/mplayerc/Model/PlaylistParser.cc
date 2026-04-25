@@ -228,6 +228,23 @@ std::vector<CPlaylistItem> PlaylistParser::Parse(std::vector<std::wstring>& fns,
 		return playlists;
 	}
 
+	std::wstring ext = CPath(fns.at(0).c_str()).GetExtension();
+	std::transform(ext.begin(), ext.end(), ext.begin(), tolower);
+	if (ext == L".m3u" || ext == L".m3u8" || ext == L".pls")
+	{
+		std::vector<std::wstring> rustRedir;
+		const bool parsedByRust = ext == L".pls"
+			? ParsePlsPlaylistWithRust(fns.at(0), &rustRedir)
+			: ParseM3uPlaylistWithRust(fns.at(0), &rustRedir);
+		if (parsedByRust)
+		{
+			for (std::vector<std::wstring>::iterator iter = rustRedir.begin();
+				iter != rustRedir.end(); ++iter)
+				MergeList(playlists, Parse(*iter, subs));
+			return playlists;
+		}
+	}
+
 	//Use CAtlList<CString> to match the second param of GetContentType witch declared in mplayerc.h
 	std::vector<std::wstring> redir;
 	std::wstring ct = ContentType::Get(fns.at(0).c_str(), &redir);

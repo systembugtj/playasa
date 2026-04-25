@@ -166,7 +166,7 @@ $(SolutionDir)src\Source\filters\BaseClasses
 ## 7. 相关文档
 
 - `BUILD-ERRORS-FIXED.md` - 构建错误修复总结
-- `docs/root-notes/BUILD-FIXES-SUMMARY.md` - 构建修复总结（自 BuildScript 迁入）
+- `docs/BUILD.md` - 构建修复与排障总结（旧碎片文档已归并）
 - `src/BuildScript/fix-baseclasses-paths.ps1` - 修复脚本
 
 ## 8. 变更历史

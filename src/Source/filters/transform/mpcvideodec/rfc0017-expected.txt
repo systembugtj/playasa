@@ -1,0 +1,37 @@
+RFC-0017 FFmpeg / mpcvideodec audit pin
+
+Status: audited-and-pinned
+Last updated: 2026-04-25
+
+FFmpeg/libav snapshot:
+- libavcodec version: 52.32.0
+- libavutil version: 50.2.0
+- Source form: vendored FFmpeg/libav-derived source under ffmpeg/
+- License headers observed: FFmpeg LGPL 2.1-or-later headers in libavcodec/libavutil
+- Project license headers observed: mplayerc GPL 3-or-later headers in MPCVideoDec sources
+- Local top-level FFmpeg COPYING/LICENSE file: absent in mpcvideodec tree
+
+Configuration pins:
+- CONFIG_GPL=1
+- CONFIG_LIBAMR_NB=1
+- ENABLE_LIBAMR_NB=1
+- CONFIG_DECODERS=1
+- CONFIG_ENCODERS=0
+- CONFIG_ZLIB=1
+
+MPCVideoDec Win32 Release Unicode project pins:
+- ConfigurationType=StaticLibrary
+- PlatformToolset=v145
+- UseOfMfc=Static
+- CharacterSet=Unicode
+- Additional libraries include libavcodec_gcc.lib, libgcc.a, libmingwex.a
+- Include directories include ffmpeg, ffmpeg/libavcodec, ffmpeg/libavutil
+- Stale libflac ProjectReference removed; standalone MPCVideoDec project build must not depend on libflac project configuration
+
+Runtime/export pins:
+- MPCVideoDec.def exports DllCanUnloadNow, DllGetClassObject, DllRegisterServer, DllUnregisterServer
+- Main runtime dependency path still includes MPCVideoDec.lib through splayer solution build
+
+Upgrade decision:
+- Do not replace the FFmpeg tree in this RFC.
+- Any future upgrade must first add an API compatibility plan for AVCodecContext, AVFrame, CodecID, packet/frame lifetime, DXVA paths, and licensing/configure options.

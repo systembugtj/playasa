@@ -15,4 +15,6 @@ struct RustMpcPlaylistItem {
 };
 
 bool ParseCuePlaylistWithRust(const std::wstring& path, std::vector<std::wstring>* files);
+bool ParseM3uPlaylistWithRust(const std::wstring& path, std::vector<std::wstring>* files);
+bool ParsePlsPlaylistWithRust(const std::wstring& path, std::vector<std::wstring>* files);
 bool ParseMpcPlaylistWithRust(const std::wstring& path, std::vector<RustMpcPlaylistItem>* items);

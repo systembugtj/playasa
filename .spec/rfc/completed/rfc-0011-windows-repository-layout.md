@@ -37,7 +37,7 @@
 
 ### 2.2 非目标
 
-- 不规定 Visual Studio 具体版本号（由 `docs/root-notes` 与工具链 RFC 跟进）。
+- 不规定 Visual Studio 具体版本号（由 `docs/INSTALL.md`、`docs/BUILD.md` 与工具链 RFC 跟进）。
 - 不替代 `docs/rfc` 中已有历史 RFC 的正文；冲突时以 **§7** 优先级为准。
 
 ## 3. 规范：目录布局
@@ -124,7 +124,7 @@
 2. **物理子目录**（如 `BuildScript\run\`、`BuildScript\maint\`）能减轻认知负担，但会**破坏**现有 **`$(SolutionDir)BuildScript\pre-build.cmd`** 等硬编码；若要做，须同步改 `.vcxproj` 并开独立迁移任务。
 3. **维护类脚本的工作目录**：部分脚本使用 `Get-ChildItem -Path "src"` 等写法，隐含 **当前目录为仓库根**；应在各脚本文件头用注释写清「从何处执行」，或统一改为基于 **`$PSScriptRoot`** 推导 `srcPath`，避免在 `cd src\BuildScript` 下误跑。
 4. **输出目录维护脚本**：唯一入口为 **`src\BuildScript\fix-output-directories-rfc0011.ps1`**（与 **`src\Source\common.props`** 及本节 §4.3 逐字对齐）；自检：**`powershell -File src\BuildScript\fix-output-directories-rfc0011.ps1 -SelfTest`**（从仓库根执行）。历史上曾存在的 `fix-output-directories.ps1` / `fix-output-directories-root.ps1` / `fix-output-directories-vs-best-practice.ps1` 已**删除**（勿从旧文档或笔记中恢复运行）。
-5. **`BUILD-FIXES-SUMMARY.md`**：已迁至 **`docs/root-notes/BUILD-FIXES-SUMMARY.md`**（与 BuildScript 解耦）。
+5. **构建修复笔记**：历史碎片已归并到 **`docs/BUILD.md`**（与 BuildScript 解耦）。
 
 ## 4. 规范：MSBuild 路径契约
 

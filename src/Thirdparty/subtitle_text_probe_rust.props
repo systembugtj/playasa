@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+    <PlayasaCargoExe Condition="'$(PlayasaCargoExe)'=='' And Exists('$(USERPROFILE)\.cargo\bin\cargo.exe')">$(USERPROFILE)\.cargo\bin\cargo.exe</PlayasaCargoExe>
+    <PlayasaCargoExe Condition="'$(PlayasaCargoExe)'==''">cargo</PlayasaCargoExe>
+    <PlayasaRustSubtitleTextProbeTarget Condition="'$(Platform)'=='Win32'">i686-pc-windows-msvc</PlayasaRustSubtitleTextProbeTarget>
+    <PlayasaRustSubtitleTextProbeProfile Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Debug Unicode'">debug</PlayasaRustSubtitleTextProbeProfile>
+    <PlayasaRustSubtitleTextProbeProfile Condition="'$(PlayasaRustSubtitleTextProbeProfile)'==''">release</PlayasaRustSubtitleTextProbeProfile>
+    <PlayasaRustSubtitleTextProbeCargoArgs Condition="'$(PlayasaRustSubtitleTextProbeProfile)'=='release'">--release</PlayasaRustSubtitleTextProbeCargoArgs>
+    <PlayasaRustSubtitleTextProbeCargoTargetDir>$(SolutionDir)..\out\obj\rust</PlayasaRustSubtitleTextProbeCargoTargetDir>
+    <PlayasaRustSubtitleTextProbeOutputDir>$(PlayasaRustSubtitleTextProbeCargoTargetDir)\$(PlayasaRustSubtitleTextProbeTarget)\$(PlayasaRustSubtitleTextProbeProfile)\</PlayasaRustSubtitleTextProbeOutputDir>
+    <PlayasaRustSubtitleTextProbeDll>$(PlayasaRustSubtitleTextProbeOutputDir)playasa_subtitle_text_probe.dll</PlayasaRustSubtitleTextProbeDll>
+    <PlayasaRustSubtitleTextProbeImportLib>$(PlayasaRustSubtitleTextProbeOutputDir)playasa_subtitle_text_probe.dll.lib</PlayasaRustSubtitleTextProbeImportLib>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Thirdparty\pkg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>playasa_subtitle_text_probe.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <Target Name="BuildPlayasaRustSubtitleTextProbe" BeforeTargets="Link" Condition="'$(PlayasaRustSubtitleTextProbeTarget)'!=''">
+    <Message Importance="High" Text="Building Rust subtitle text probe DLL for $(Platform)|$(Configuration)..." />
+    <MakeDir Directories="$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\;$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\;$(PlayasaRustSubtitleTextProbeCargoTargetDir)" />
+    <Exec Command="set &quot;CARGO_TARGET_DIR=$(PlayasaRustSubtitleTextProbeCargoTargetDir)&quot; &amp;&amp; &quot;$(PlayasaCargoExe)&quot; build --manifest-path &quot;$(SolutionDir)..\Cargo.toml&quot; -p playasa-subtitle-text-probe --target $(PlayasaRustSubtitleTextProbeTarget) $(PlayasaRustSubtitleTextProbeCargoArgs)" />
+    <Copy SourceFiles="$(PlayasaRustSubtitleTextProbeDll)" DestinationFolder="$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\" />
+    <Copy SourceFiles="$(PlayasaRustSubtitleTextProbeImportLib)" DestinationFiles="$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\playasa_subtitle_text_probe.lib" />
+  </Target>
+  <ItemGroup />
+</Project>

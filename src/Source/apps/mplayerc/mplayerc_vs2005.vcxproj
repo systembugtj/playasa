@@ -63,6 +63,8 @@
     <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
     <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
     <Import Project="$(SolutionDir)Thirdparty\playlist_parser_rust.props" />
+    <Import Project="$(SolutionDir)Thirdparty\subtitle_text_probe_rust.props" />
+    <Import Project="$(SolutionDir)Thirdparty\archive_helper_rust.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -74,6 +76,8 @@
     <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
     <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
     <Import Project="$(SolutionDir)Thirdparty\playlist_parser_rust.props" />
+    <Import Project="$(SolutionDir)Thirdparty\subtitle_text_probe_rust.props" />
+    <Import Project="$(SolutionDir)Thirdparty\archive_helper_rust.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -85,6 +89,8 @@
     <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
     <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
     <Import Project="$(SolutionDir)Thirdparty\playlist_parser_rust.props" />
+    <Import Project="$(SolutionDir)Thirdparty\subtitle_text_probe_rust.props" />
+    <Import Project="$(SolutionDir)Thirdparty\archive_helper_rust.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -96,6 +102,8 @@
     <Import Project="..\..\..\Thirdparty\sqlitepp.props" />
     <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
     <Import Project="$(SolutionDir)Thirdparty\playlist_parser_rust.props" />
+    <Import Project="$(SolutionDir)Thirdparty\subtitle_text_probe_rust.props" />
+    <Import Project="$(SolutionDir)Thirdparty\archive_helper_rust.props" />
     <Import Project="$(SolutionDir)Thirdparty\unrar_dll.props" />
     <Import Project="..\..\..\Thirdparty\tcl.props" />
     <Import Project="..\..\..\Thirdparty\jsoncpp.props" />
@@ -408,9 +416,6 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile Include="Controller\AdController.cc" />
     <ClCompile Include="Controller\Ed2kController.cpp" />
     <ClCompile Include="Controller\HashController.cc" />
-    <ClCompile Include="$(SolutionDir)Thirdparty\pkg\sphash_stub.cpp" Condition="'$(PlayasaUseSphashStub)'=='true'">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Controller\Hotkey_Controller.cc" />
     <ClCompile Include="Controller\MediaCenterController.cc" />
     <ClCompile Include="Controller\MediaCheckDB.cc" />

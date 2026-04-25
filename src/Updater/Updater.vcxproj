@@ -272,9 +272,6 @@
     <ClCompile Include="Updater.cpp" />
     <ClCompile Include="UpdaterDlg.cpp" />
     <ClCompile Include="..\Source\apps\mplayerc\Controller\HashController.cc" />
-    <ClCompile Include="$(SolutionDir)Thirdparty\pkg\sphash_stub.cpp" Condition="'$(PlayasaUseSphashStub)'=='true'">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cupdatenetlib.h" />

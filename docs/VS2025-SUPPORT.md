@@ -141,6 +141,6 @@ cd src\BuildScript
 
 ## 相关文档
 
-- [快速开始](root-notes/快速开始.md)
-- [构建修复指南](BUILD-FIXES.md)
-- [安装指南](INSTALL-GUIDE.md)
+- [文档入口](README.md)
+- [构建与排障](BUILD.md)
+- [安装指南](INSTALL.md)

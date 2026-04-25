@@ -7,14 +7,14 @@
 | **平台** | Windows；Win32 优先，x64 后续沿用同一目录与 ABI 规则 |
 | **作者** | 维护团队 |
 | **创建日期** | 2026-04-24 |
-| **最后更新** | 2026-04-24 |
+| **最后更新** | 2026-04-25 |
 | **相关 RFC** | [RFC-0011](./rfc-0011-windows-repository-layout.md)、[RFC-0012](./rfc-0012-thirdparty-library-upgrades.md) |
 
 ## 摘要
 
 本 RFC 定义 Playasa 在现有 Visual Studio / MSBuild / C++ 架构中引入 Rust 的边界、目录、构建、链接、C ABI 与验证规则。Rust 只作为**小型原生模块试点**接入，不替换 MFC UI、DirectShow filter COM 外壳、主播放器框架或现有成熟 C/C++ 引擎。
 
-首个推荐试点为 `sphash` 兼容层：仓库已有 `src/Thirdparty/pkg/sphash.h` 声明和 `sphash_stub.cpp` 占位实现，当前实现不读盘、不计算摘要，调用方通过 `len == 0` 判断失败。该边界天然适合由 Rust 实现，并通过原有 C ABI 被 C++ 消费。
+首个推荐试点为 `sphash` 兼容层：仓库已有 `src/Thirdparty/pkg/sphash.h` 声明和 C ABI 消费点。该边界天然适合由 Rust 实现，并通过原有 C ABI 被 C++ 消费。当前实现要求始终构建并链接 Rust `playasa_sphash.dll`，不再保留空实现占位路径。
 
 ## 1. 背景与动机
 
@@ -45,7 +45,7 @@ Rust 可用于提升内存安全、简化二进制解析和封装纯算法，但
 - 不重写 MFC UI、DirectShow filter COM 外壳或播放器主框架。
 - 不用 Rust 替换 SQLite、zlib、libpng、librhash、FFmpeg 等成熟库本体。
 - 不引入跨平台主构建系统替代 `src/splayer.sln`。
-- 不要求所有开发者立即安装 Rust；进入 Accepted 前应允许没有 Rust 的 C++ 构建保持可诊断失败或保留 stub fallback。
+- Rust 接入模块必须由 Rust 工具链构建；没有 Rust 工具链时应构建失败并给出明确诊断，不提供空实现替代。
 
 ## 3. 候选方案
 
@@ -67,11 +67,11 @@ Rust 可用于提升内存安全、简化二进制解析和封装纯算法，但
 
 **风险分析**：部署多一个 DLL；加载失败路径需要处理；导出符号和运行时依赖需要额外检查。
 
-**推荐理由**：与本仓现有 DLL/filter 产物模型更接近，Rust 运行时边界更清晰，升级或回滚单个 Rust 模块更容易；首期可通过 import lib 静态绑定，后续如需 fallback 再改为运行时加载。
+**推荐理由**：与本仓现有 DLL/filter 产物模型更接近，Rust 运行时边界更清晰，升级或回滚单个 Rust 模块更容易；首期通过 import lib 静态绑定，缺少 Rust 产物时直接构建失败。
 
 ### 3.3 方案 C：保持纯 C++，不接入 Rust
 
-**技术原理**：继续用 C/C++ 实现缺失模块，例如把 `sphash_stub.cpp` 替换为 C++ MD5 实现或调用现有 librhash。
+**技术原理**：继续用 C/C++ 实现缺失模块，例如调用现有 librhash 或新增 C++ MD5 实现。
 
 **实施步骤**：在 C++ 工程内新增实现；复用现有 `.vcxproj`；补测试。
 
@@ -103,8 +103,7 @@ Rust 源码应放在仓库根 Cargo workspace 下的 `crates/<module>/`。根目
 └── src/
     └── Thirdparty/
         └── pkg/
-            ├── sphash.h
-            └── sphash_stub.cpp
+            └── sphash.h
 ```
 
 `crates/` 属于本仓维护源码，不等同于 Cargo 的下载缓存。Cargo registry、target 目录、临时下载物不得提交。所有 Rust crate 必须纳入根 `Cargo.toml` 的 `[workspace].members`，避免每个模块各自形成孤立 Cargo 项目。
@@ -213,17 +212,12 @@ void hash_data(const char* mod, int algo, char* buff, int* len);
 `hash_data`：
 
 1. 沿用既有签名限制，`buff` 同时代表输入数据指针。
-2. 由于当前 ABI 没有独立输出 buffer 和输入长度，首期可以保持 stub 行为并记录为待修正 API。
+2. 旧 ABI 没有独立输出 buffer 和输入长度，后续通过 `hash_data_v2` 修正该限制。
 3. 若要实现 `hash_data`，必须先新增不破坏旧 ABI 的 v2 函数，例如 `hash_data_v2(const char* mod, int algo, const uint8_t* input, int input_len, char* out, int* out_len)`。
 
 ### 8.3 兼容策略
 
-首期保留 `sphash_stub.cpp` 作为无 Rust 工具链时的明确 fallback，但默认构建路径应优先链接 Rust 实现。若同时存在 Rust 实现和 stub，必须避免重复定义 `hash_file` / `hash_data` 符号。
-
-可选做法：
-
-1. 将 stub 编译项从消费项目中移除，改为链接 Rust DLL 的 import `.lib`，并确保 DLL 复制到运行目录。
-2. 给 stub 加条件宏，例如 `PLAYASA_USE_SPHASH_STUB`，默认不定义。
+Rust 接入后，消费项目必须链接 Rust DLL 的 import `.lib`，并确保 DLL 复制到运行目录。不保留空实现占位路径；缺少 Rust 工具链或 Rust 产物时构建必须失败。
 
 ## 9. 测试与验证
 
@@ -291,25 +285,26 @@ build-with-msbuild.cmd
 
 | 风险 | 等级 | 缓解 |
 |------|------|------|
-| 开发机未安装 Rust | 中 | 构建脚本输出明确错误；草案期允许 stub fallback |
+| 开发机未安装 Rust | 中 | 构建脚本输出明确错误并失败 |
 | Win32 Rust target 缺失 | 中 | bootstrap 脚本检查 `i686-pc-windows-msvc` |
 | FFI 内存所有权错误 | 高 | 首期只用调用方 buffer；禁止 Rust 分配返回 |
 | panic 穿过 C ABI | 高 | 核心逻辑返回 `Result`；FFI 层捕获并转换为失败码 |
 | 生成物污染 `src` 或仓库根 | 中 | 强制 `CARGO_TARGET_DIR` 指向 `out\obj\rust` |
-| 重复定义 stub 与 Rust 符号 | 中 | 使用项目清单或宏二选一，PR 中检查链接日志 |
+| 重复定义旧实现与 Rust 符号 | 中 | Rust 接入模块只保留 Rust import `.lib` 链接路径，PR 中检查链接日志 |
 
 ## 13. 决策记录
 
 | 日期 | 决策 | 理由 |
 |------|------|------|
 | 2026-04-24 | Rust 不替换 UI、DirectShow COM 外壳、主播放器框架 | 降低迁移风险，保持现有 C++ 架构稳定 |
-| 2026-04-24 | 首个试点选择 `sphash` 兼容层 | 现有实现是 stub，C ABI 已存在，边界最小 |
+| 2026-04-24 | 首个试点选择 `sphash` 兼容层 | C ABI 已存在，边界最小 |
 | 2026-04-24 | 默认采用 Rust `cdylib`，C++ 链接 import `.lib` 并部署 DLL | 模块边界更清晰，便于独立升级、回滚和诊断 |
+| 2026-04-25 | Rust 接入模块不再保留空实现占位路径 | 避免产出可链接但运行时功能静默失败的程序 |
 
 ## 14. 下一步行动
 
 1. 评审本 RFC 的目录、ABI 与 MSBuild 输出契约。
 2. 新增 `crates/sphash/` crate，先实现 Rust 单测。
 3. 增加最小 MSBuild 接入脚本或 props，使 `sphash` Rust DLL 输出到 `out\bin\Win32\Release Unicode\`，import `.lib` 输出到 `out\lib\Win32\Release Unicode\`。
-4. 切换消费项目，避免 `sphash_stub.cpp` 与 Rust 实现重复定义。
+4. 切换消费项目，确保只链接 Rust 实现。
 5. 增加 C++ smoke test 并跑主配置构建。

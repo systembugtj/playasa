@@ -1,3 +1,8 @@
 [workspace]
-members = ["crates/sphash", "crates/playlist_parser"]
+members = [
+    "crates/sphash",
+    "crates/playlist_parser",
+    "crates/subtitle_text_probe",
+    "crates/archive_helper",
+]
 resolver = "2"

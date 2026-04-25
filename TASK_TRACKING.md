@@ -4,7 +4,7 @@
 
 | 状态 | 项 | 备注 |
 |------|-----|------|
-| 完成 | RFC-0011：输出目录脚本收敛 + BUILD-FIXES 文档归位 | `fix-output-directories-rfc0011.ps1`、旧 `fix-output-directories*.ps1` 已删、`docs/root-notes/BUILD-FIXES-SUMMARY.md` |
+| 完成 | RFC-0011：输出目录脚本收敛 + 构建文档归并 | `fix-output-directories-rfc0011.ps1`、旧 `fix-output-directories*.ps1` 已删；碎片构建笔记归并到 `docs/BUILD.md` |
 | 完成 | 仓库根散落物清理 | 已删本地 `lang/`、`lib/`、`Release/`、`tools/`（空）、`nul`；README 链接修正；`.gitignore` 增加 `/lang/` |
 | 完成 | **RFC-0012 P1**：zlib **1.3.1** + libpng **1.6.47** | `zlib_vs2005`/`libpng_vs2005` 源清单与 `.filters` 已更新；`verify-rfc0012-zlib-libpng.ps1`；全量 MSBuild 需在本地 VS 上再跑 |
 | 完成 | **RFC-0012 P2**：jsoncpp **1.9.5** | 上游 `include/json`、`src/lib_json` 已替换；`lib_json.vcxproj` 已更新；`rfc0012-expected.txt`=`1.9.5`；**请在本地跑** `MSBuild ...\lib_json.vcxproj` 与全量 `build-with-msbuild.cmd` + 字幕字体 JSON 路径手测 |
@@ -18,5 +18,8 @@
 | 待办 | **RFC-0017**：FFmpeg / mpcvideodec 升级与隔离策略 | 新增 **[.spec/rfc/rfc-0017-ffmpeg-mpcvideodec-upgrade.md](.spec/rfc/rfc-0017-ffmpeg-mpcvideodec-upgrade.md)**；先审计和钉扎 `mpcvideodec` / FFmpeg 调用面、许可证、符号导出、体积与 smoke test，再决定是否升级 |
 | 待办 | **RFC-0018**：Boost 头文件树渐进消化 | 新增 **[.spec/rfc/rfc-0018-boost-header-tree-digestion.md](.spec/rfc/rfc-0018-boost-header-tree-digestion.md)**；先建立 Boost 使用清单，再按组件迁移到 `std::` 或保留钉扎 |
 | 待办 | **RFC-0019**：第三方库 CRT / MFC 静态链接准入契约 | 新增 **[.spec/rfc/rfc-0019-thirdparty-crt-mfc-linkage-contract.md](.spec/rfc/rfc-0019-thirdparty-crt-mfc-linkage-contract.md)**；所有新增/升级三方 `.lib` 必须记录 CRT、MFC、架构、配置、系统库和验证命令 |
-| 进行中 | **RFC-0020**：Rust playlist parser 试点（M3U/PLS） | 新增 **[.spec/rfc/rfc-0020-rust-m3u-pls-playlist-parser.md](.spec/rfc/rfc-0020-rust-m3u-pls-playlist-parser.md)**；目标是在现有 `ContentType` redirection 流程前优先使用 Rust 解析本地 `.m3u` / `.m3u8` / `.pls`，并保留旧 C++ fallback |
+| 完成 | **RFC-0020**：Rust playlist parser 试点（M3U/PLS） | 已归档到 **[.spec/rfc/completed/rfc-0020-rust-m3u-pls-playlist-parser.md](.spec/rfc/completed/rfc-0020-rust-m3u-pls-playlist-parser.md)**；`crates/playlist_parser` 已拆分为 `cue` / `mpc` / `m3u` / `pls` / `ffi` / `paths` / `text` 模块；已导出 `playasa_playlist_parse_m3u` 与 `playasa_playlist_parse_pls`；`PlaylistParser::Parse` 对本地 `.m3u` / `.m3u8` / `.pls` 优先 Rust，保留旧 `ContentType` fallback；Rust 单测 8/8 通过；`PlaylistParser_UnitTest` Debug Unicode 构建并运行通过（CUE + MPC + M3U + PLS adapter fixture）；全量 `splayer.sln` Release Unicode\|Win32 构建通过；`splayer.exe` 启动 smoke test 通过 |
+| 完成 | **RFC-0021**：Rust `sphash` v2 API | 已归档到 **[.spec/rfc/completed/rfc-0021-rust-sphash-v2-api.md](.spec/rfc/completed/rfc-0021-rust-sphash-v2-api.md)**；`crates/sphash` 已拆分为 `ffi` / `file` / `md5` / `path` 模块；新增 `hash_data_v2`，`HashController::GetMD5Hash` 已改用独立输入/输出 buffer；Rust 单测 8/8 通过；全量 `splayer.sln` Release Unicode\|Win32 构建通过；`splayer.exe` 启动 smoke test 通过 |
+| 完成 | **RFC-0022**：Rust subtitle text probe | 已归档到 **[.spec/rfc/completed/rfc-0022-rust-subtitle-text-probe.md](.spec/rfc/completed/rfc-0022-rust-subtitle-text-probe.md)**；新增 `crates/subtitle_text_probe`，拆分为 `encoding` / `format` / `path` / `probe` / `ffi` 模块；导出 `playasa_subtitle_probe_text`；Rust 单测 8/8 通过；`PlaylistParser_UnitTest` Debug Unicode 构建并运行通过（含 subtitle probe C ABI smoke）；全量 `splayer.sln` Release Unicode\|Win32 构建通过；`splayer.exe` 启动 smoke test 通过 |
+| 完成 | **RFC-0023**：Rust ZIP / archive helper | 已归档到 **[.spec/rfc/completed/rfc-0023-rust-zip-archive-helper.md](.spec/rfc/completed/rfc-0023-rust-zip-archive-helper.md)**；新增 `crates/archive_helper`，拆分为 `ffi` / `path` / `wide` / `zip` 模块；基于 `zip` crate 且关闭默认解压特性，只做 ZIP entry listing；导出 `playasa_archive_list_zip` / `playasa_archive_free_entry_list`；Rust 单测 5/5 通过；`PlaylistParser_UnitTest` Debug Unicode 构建并运行通过（含 ZIP listing C ABI smoke）；全量 `splayer.sln` Release Unicode\|Win32 构建通过；`splayer.exe` 启动 smoke test 通过 |
 |  |  |  |

@@ -1,0 +1,18 @@
+---
+description: Rust integrations must not keep stub or disable paths
+globs: crates/**/*.rs,src/**/*.props,src/**/*.vcxproj,src/Thirdparty/pkg/*.h
+alwaysApply: false
+---
+
+# Rust Always, No Stubs
+
+Once a project feature is integrated through Rust, Rust is the required implementation path.
+
+- Do not add stub, fake, empty, or no-op implementations for Rust-backed features.
+- Do not add MSBuild switches that disable an accepted Rust module.
+- Do not keep fallback code that silently returns failure instead of calling Rust.
+- Missing Rust toolchain, missing target, failed Cargo build, or missing Rust DLL/import lib must fail the build.
+- C++ callers should link the Rust import library and call the exported C ABI directly.
+- Historical C++ implementations may exist only as real compatibility code when explicitly required, not as an empty substitute.
+
+This rule applies to existing Rust modules such as `playasa_sphash.dll` and `playasa_playlist_parser.dll`, and to future Rust modules.

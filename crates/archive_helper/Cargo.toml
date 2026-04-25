@@ -1,0 +1,12 @@
+[package]
+name = "playasa-archive-helper"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "playasa_archive_helper"
+crate-type = ["cdylib"]
+
+[dependencies]
+zip = { version = "8.5.1", default-features = false }

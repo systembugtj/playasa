@@ -331,12 +331,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">true</ExcludedFromBuild>
     </ResourceCompile>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\mpadecfilter\libflac\src\libFLAC\libflac.vcxproj">
-      <Project>{4cefbc84-c215-11db-8314-0800200c9a66}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+    <PlayasaCargoExe Condition="'$(PlayasaCargoExe)'=='' And Exists('$(USERPROFILE)\.cargo\bin\cargo.exe')">$(USERPROFILE)\.cargo\bin\cargo.exe</PlayasaCargoExe>
+    <PlayasaCargoExe Condition="'$(PlayasaCargoExe)'==''">cargo</PlayasaCargoExe>
+    <PlayasaRustArchiveHelperTarget Condition="'$(Platform)'=='Win32'">i686-pc-windows-msvc</PlayasaRustArchiveHelperTarget>
+    <PlayasaRustArchiveHelperProfile Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Debug Unicode'">debug</PlayasaRustArchiveHelperProfile>
+    <PlayasaRustArchiveHelperProfile Condition="'$(PlayasaRustArchiveHelperProfile)'==''">release</PlayasaRustArchiveHelperProfile>
+    <PlayasaRustArchiveHelperCargoArgs Condition="'$(PlayasaRustArchiveHelperProfile)'=='release'">--release</PlayasaRustArchiveHelperCargoArgs>
+    <PlayasaRustArchiveHelperCargoTargetDir>$(SolutionDir)..\out\obj\rust</PlayasaRustArchiveHelperCargoTargetDir>
+    <PlayasaRustArchiveHelperOutputDir>$(PlayasaRustArchiveHelperCargoTargetDir)\$(PlayasaRustArchiveHelperTarget)\$(PlayasaRustArchiveHelperProfile)\</PlayasaRustArchiveHelperOutputDir>
+    <PlayasaRustArchiveHelperDll>$(PlayasaRustArchiveHelperOutputDir)playasa_archive_helper.dll</PlayasaRustArchiveHelperDll>
+    <PlayasaRustArchiveHelperImportLib>$(PlayasaRustArchiveHelperOutputDir)playasa_archive_helper.dll.lib</PlayasaRustArchiveHelperImportLib>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)Thirdparty\pkg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>playasa_archive_helper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <Target Name="BuildPlayasaRustArchiveHelper" BeforeTargets="Link" Condition="'$(PlayasaRustArchiveHelperTarget)'!=''">
+    <Message Importance="High" Text="Building Rust archive helper DLL for $(Platform)|$(Configuration)..." />
+    <MakeDir Directories="$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\;$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\;$(PlayasaRustArchiveHelperCargoTargetDir)" />
+    <Exec Command="set &quot;CARGO_TARGET_DIR=$(PlayasaRustArchiveHelperCargoTargetDir)&quot; &amp;&amp; &quot;$(PlayasaCargoExe)&quot; build --manifest-path &quot;$(SolutionDir)..\Cargo.toml&quot; -p playasa-archive-helper --target $(PlayasaRustArchiveHelperTarget) $(PlayasaRustArchiveHelperCargoArgs)" />
+    <Copy SourceFiles="$(PlayasaRustArchiveHelperDll)" DestinationFolder="$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\" />
+    <Copy SourceFiles="$(PlayasaRustArchiveHelperImportLib)" DestinationFiles="$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\playasa_archive_helper.lib" />
+  </Target>
+  <ItemGroup />
+</Project>
