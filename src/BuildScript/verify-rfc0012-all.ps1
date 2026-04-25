@@ -9,4 +9,5 @@ $here = $PSScriptRoot
 & (Join-Path $here 'verify-rfc0012-jsoncpp.ps1')
 & (Join-Path $here 'verify-rfc0012-p3-yaml-librhash.ps1')
 & (Join-Path $here 'verify-rfc0012-p4-sqlitepp.ps1')
+& (Join-Path $here 'verify-rfc0012-p4-zeromq.ps1')
 Write-Host 'verify-rfc0012-all: OK (P1 + P2 + P3 + P4 pins)' -ForegroundColor Green
