@@ -17,7 +17,7 @@
 | 第三方库安全升级 | [RFC-0012](./rfc-0012-thirdparty-library-upgrades.md) |
 | Rust 小型 native island | [RFC-0013](./rfc-0013-rust-native-module-integration.md) |
 | Rust playlist parser | [RFC-0014](./rfc-0014-rust-playlist-parser.md)、[RFC-0016](./rfc-0016-rust-mpc-playlist-parser.md) |
-| 后续三方与构建治理 | [RFC-0015](../rfc-0015-curl-schannel-updater-download.md)、[RFC-0017](../rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0018](../rfc-0018-boost-header-tree-digestion.md)、[RFC-0019](../rfc-0019-thirdparty-crt-mfc-linkage-contract.md) |
+| 后续三方与构建治理 | [RFC-0015](../rfc-0015-curl-schannel-updater-download.md)、[RFC-0017](./rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0018](../rfc-0018-boost-header-tree-digestion.md)、[RFC-0019](../rfc-0019-thirdparty-crt-mfc-linkage-contract.md) |
 
 因此，本文适合回答“为什么要现代化”，不适合回答“今天改哪个文件、跑哪个命令”。
 

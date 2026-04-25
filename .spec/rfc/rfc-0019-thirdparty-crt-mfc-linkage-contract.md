@@ -4,7 +4,7 @@
 |------|------|
 | **状态** | 提案 (Proposed) |
 | **适用范围** | 所有新增或升级的第三方 `.lib`、`.dll`、MSBuild `.vcxproj`、预编译二进制 |
-| **相关 RFC** | [RFC-0011](./completed/rfc-0011-windows-repository-layout.md)、[RFC-0012](./completed/rfc-0012-thirdparty-library-upgrades.md)、[RFC-0015](./rfc-0015-curl-schannel-updater-download.md)、[RFC-0017](./rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0018](./rfc-0018-boost-header-tree-digestion.md) |
+| **相关 RFC** | [RFC-0011](./completed/rfc-0011-windows-repository-layout.md)、[RFC-0012](./completed/rfc-0012-thirdparty-library-upgrades.md)、[RFC-0015](./rfc-0015-curl-schannel-updater-download.md)、[RFC-0017](./completed/rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0018](./rfc-0018-boost-header-tree-digestion.md) |
 | **创建日期** | 2026-04-25 |
 | **最后更新** | 2026-04-25 |
 
