@@ -12,4 +12,5 @@ $here = $PSScriptRoot
 & (Join-Path $here 'verify-rfc0012-p4-zeromq.ps1')
 & (Join-Path $here 'verify-rfc0012-p5-openssl-audit.ps1')
 & (Join-Path $here 'verify-rfc0017-ffmpeg-mpcvideodec.ps1')
-Write-Host 'verify-rfc0012-all: OK (RFC-0012 P1-P5 + RFC-0017 pins)' -ForegroundColor Green
+& (Join-Path $here 'verify-rfc0024-ffmpeg-modern.ps1')
+Write-Host 'verify-rfc0012-all: OK (RFC-0012 P1-P5 + RFC-0017 + RFC-0024 pins)' -ForegroundColor Green

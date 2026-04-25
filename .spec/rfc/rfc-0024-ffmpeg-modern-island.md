@@ -54,14 +54,31 @@ RFC-0017 已确认当前 `mpcvideodec` 内嵌 FFmpeg/libav 是 `libavcodec 52.32
 --disable-network
 --disable-hwaccels
 --disable-encoders
+--disable-decoders
+--disable-demuxers
+--disable-parsers
 --disable-muxers
 --enable-avcodec
 --enable-avutil
+--enable-avformat
 --enable-swscale
---enable-decoders
+--enable-decoder=mpeg4
+--enable-decoder=flv
+--enable-decoder=vp6
+--enable-decoder=vp6a
+--enable-decoder=vp6f
+--enable-decoder=wmv1
+--enable-decoder=wmv2
+--enable-demuxer=avi
+--enable-demuxer=flv
+--enable-demuxer=matroska
+--enable-demuxer=mov
+--enable-parser=mpeg4video
+--enable-parser=h263
+--enable-parser=vp3
 ```
 
-后续如果软件路径需要 demux 或 sample smoke，可单独启用 `libavformat`，但不允许无记录扩大 configure 面。
+`libavformat` 用于样本级 smoke test 打开容器并喂给 adapter；仍禁用 network / muxers / device / filter / hwaccel，并且默认禁用所有 decoder/demuxer/parser 后只打开第一批迁移需要的最小集合。
 
 ## 6. Adapter 边界
 

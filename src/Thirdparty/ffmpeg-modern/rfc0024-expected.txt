@@ -1,0 +1,75 @@
+RFC-0024 FFmpeg modern island pin
+
+Status: vendored-source-pinned
+Last updated: 2026-04-25
+
+Source:
+- Product: FFmpeg
+- Version: 8.1
+- Release name: Hoare
+- Release date: 2026-03-16
+- Source URL: https://ffmpeg.org/releases/ffmpeg-8.1.tar.xz
+- Source archive SHA-256: b072aed6871998cce9b36e7774033105ca29e33632be5b6347f3206898e0756a
+- Vendored source directory: src/Thirdparty/ffmpeg-modern/src
+
+Version pins:
+- libavcodec: 62.28.100
+- libavutil: 60.26.100
+
+License files required:
+- LICENSE.md
+- COPYING.LGPLv2.1
+- COPYING.LGPLv3
+- COPYING.GPLv2
+- COPYING.GPLv3
+
+Configure pins:
+- --disable-programs
+- --disable-doc
+- --disable-debug
+- --disable-avdevice
+- --disable-avfilter
+- --disable-network
+- --disable-hwaccels
+- --disable-encoders
+- --disable-decoders
+- --disable-demuxers
+- --disable-parsers
+- --disable-muxers
+- --enable-avcodec
+- --enable-avutil
+- --enable-avformat
+- --enable-swscale
+- --enable-decoder=mpeg4
+- --enable-decoder=flv
+- --enable-decoder=vp6
+- --enable-decoder=vp6a
+- --enable-decoder=vp6f
+- --enable-decoder=wmv1
+- --enable-decoder=wmv2
+- --enable-demuxer=avi
+- --enable-demuxer=flv
+- --enable-demuxer=matroska
+- --enable-demuxer=mov
+- --enable-parser=mpeg4video
+- --enable-parser=h263
+- --enable-parser=vp3
+
+Boundaries:
+- Keep legacy src/Source/filters/transform/mpcvideodec/ffmpeg unchanged.
+- Keep DXVA/H.264/MPEG-2/VC-1 legacy FfmpegContext.c paths unchanged in the first phase.
+- Do not expose FFmpeg private headers outside src/Source/filters/transform/mpcvideodec/modern_ffmpeg.
+- Do not link this island into MPCVideoDec until adapter smoke tests exist.
+
+First-wave software codecs:
+- MPEG-4 ASP / DivX / Xvid
+- FLV1
+- VP6
+- WMV1
+- WMV2
+
+Adapter pins:
+- src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegDecodeAdapter.h
+- src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegDecodeAdapter.cpp
+- Adapter must use avcodec_send_packet / avcodec_receive_frame.
+- Adapter must keep FFmpeg public headers out of MPCVideoDecFilter.cpp.
