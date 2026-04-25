@@ -235,4 +235,4 @@ cd src\BuildScript
 
 - [编译与现代化分析](../analysis/编译与现代化分析.md)
 - [现代化实施计划](../analysis/现代化实施计划.md)
-- [RFC-0002: 编译环境与技术栈分析](../.spec/rfc/rfc-0002-build-environment-analysis.md)
+- [RFC-0002: 编译环境与技术栈分析](../.spec/rfc/completed/rfc-0002-build-environment-analysis.md)

@@ -1,13 +1,13 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  RFC-0012 P5：审计 OpenSSL 0.9.8x 的真实链接面，并钉住迁移委派结论。
+  RFC-0012 P5：确认活跃工程已从 OpenSSL 0.9.8x 迁出，缺失的旧 curl 库不再阻塞构建。
 #>
 $ErrorActionPreference = 'Stop'
 
 $REPO_ROOT = Resolve-Path (Join-Path $PSScriptRoot '..\..')
-$EXPECT_FILE = Join-Path $REPO_ROOT 'src/Thirdparty/openssl-0.9.8x/rfc0012-expected.txt'
-$OPENSSL_README = Join-Path $REPO_ROOT 'src/Thirdparty/openssl-0.9.8x/README'
+$EXPECT_FILE = Join-Path $REPO_ROOT 'src/Thirdparty/openssl-rfc0012-expected.txt'
+$OPENSSL_TREE = Join-Path $REPO_ROOT 'src/Thirdparty/openssl-0.9.8x'
 $MPLAYERC_PROJ = Join-Path $REPO_ROOT 'src/Source/apps/mplayerc/mplayerc_vs2005.vcxproj'
 $UPDATER_PROJ = Join-Path $REPO_ROOT 'src/Updater/Updater.vcxproj'
 $LIBRHASH_PROJ = Join-Path $REPO_ROOT 'src/Thirdparty/librhash/librhash/librhash.vcxproj'
@@ -39,6 +39,18 @@ function Get-ItemDefinitionGroup {
     return $node
 }
 
+function Get-OptionalChildText {
+    param(
+        $Node,
+        [string]$ChildName
+    )
+    $child = $Node.ChildNodes | Where-Object { $_.LocalName -eq $ChildName } | Select-Object -First 1
+    if (-not $child) {
+        return ''
+    }
+    return [string]$child.InnerText
+}
+
 function Test-NoOpenSslLink {
     param(
         [xml]$Project,
@@ -47,17 +59,17 @@ function Test-NoOpenSslLink {
         [string]$Platform
     )
     $group = Get-ItemDefinitionGroup -Project $Project -Configuration $Configuration -Platform $Platform
-    $deps = [string]$group.Link.AdditionalDependencies
-    $delay = [string]$group.Link.DelayLoadDLLs
+    $deps = Get-OptionalChildText -Node $group.Link -ChildName 'AdditionalDependencies'
+    $delay = Get-OptionalChildText -Node $group.Link -ChildName 'DelayLoadDLLs'
     if ($deps -match '(?i)(libeay32|ssleay32|openssl)') {
-        throw "$ProjectName $Configuration|$Platform unexpectedly links OpenSSL: $deps"
+        throw ($ProjectName + ' ' + $Configuration + '|' + $Platform + ' unexpectedly links OpenSSL: ' + $deps)
     }
     if ($delay -match '(?i)(libeay32|ssleay32|openssl)') {
-        throw "$ProjectName $Configuration|$Platform unexpectedly delay-loads OpenSSL: $delay"
+        throw ($ProjectName + ' ' + $Configuration + '|' + $Platform + ' unexpectedly delay-loads OpenSSL: ' + $delay)
     }
 }
 
-function Test-HasLegacyOpenSslLink {
+function Test-HasSchannelSystemLink {
     param(
         [xml]$Project,
         [string]$ProjectName,
@@ -65,9 +77,16 @@ function Test-HasLegacyOpenSslLink {
         [string]$Platform
     )
     $group = Get-ItemDefinitionGroup -Project $Project -Configuration $Configuration -Platform $Platform
-    $deps = [string]$group.Link.AdditionalDependencies
-    if ($deps -notmatch '(?i)libeay32\.lib' -or $deps -notmatch '(?i)ssleay32\.lib') {
-        throw "$ProjectName $Configuration|$Platform no longer has the expected legacy OpenSSL debug link. Update P5 audit."
+    $deps = Get-OptionalChildText -Node $group.Link -ChildName 'AdditionalDependencies'
+    $schannelCurlLibs = @('Crypt32.lib', 'Secur32.lib', 'Wldap32.lib', 'Normaliz.lib', 'Ws2_32.lib')
+    foreach ($lib in $schannelCurlLibs) {
+        $escapedLib = [regex]::Escape($lib)
+        if ($deps -notmatch $escapedLib) {
+            throw ($ProjectName + ' ' + $Configuration + '|' + $Platform + ' is missing Schannel system dependency: ' + $lib)
+        }
+    }
+    if ($deps -match '(?i)curllibd?\.lib') {
+        throw ($ProjectName + ' ' + $Configuration + '|' + $Platform + ' still links a missing legacy curl library: ' + $deps)
     }
 }
 
@@ -84,18 +103,17 @@ function Test-NoDirectOpenSslIncludes {
     }
 }
 
-foreach ($path in @($EXPECT_FILE, $OPENSSL_README, $MPLAYERC_PROJ, $UPDATER_PROJ, $LIBRHASH_PROJ)) {
+foreach ($path in @($EXPECT_FILE, $MPLAYERC_PROJ, $UPDATER_PROJ, $LIBRHASH_PROJ)) {
     Test-RequiredFile $path
 }
 
 $tag = Read-FirstNonEmptyLine $EXPECT_FILE
-if ($tag -ne 'openssl-0.9.8x-audit-delegated') {
+if ($tag -ne 'openssl-0.9.8x-dropped') {
     throw "Unknown OpenSSL P5 expectation tag: '$tag'. Update verify-rfc0012-p5-openssl-audit.ps1."
 }
 
-$readme = Get-Content -LiteralPath $OPENSSL_README -Raw -Encoding UTF8
-if ($readme -notmatch 'OpenSSL 0\.9\.8x') {
-    throw 'OpenSSL tree is no longer 0.9.8x; update P5 audit and migration plan.'
+if (Test-Path -LiteralPath $OPENSSL_TREE) {
+    throw "OpenSSL 0.9.8x tree still exists: $OPENSSL_TREE"
 }
 
 [xml]$mplayerc = Get-Content -LiteralPath $MPLAYERC_PROJ -Raw -Encoding UTF8
@@ -103,11 +121,12 @@ if ($readme -notmatch 'OpenSSL 0\.9\.8x') {
 
 Test-NoOpenSslLink -Project $mplayerc -ProjectName 'mplayerc' -Configuration 'Release Unicode' -Platform 'Win32'
 Test-NoOpenSslLink -Project $mplayerc -ProjectName 'mplayerc' -Configuration 'Release' -Platform 'Win32'
-Test-HasLegacyOpenSslLink -Project $mplayerc -ProjectName 'mplayerc' -Configuration 'Debug Unicode' -Platform 'Win32'
+Test-NoOpenSslLink -Project $mplayerc -ProjectName 'mplayerc' -Configuration 'Debug Unicode' -Platform 'Win32'
 
 Test-NoOpenSslLink -Project $updater -ProjectName 'Updater' -Configuration 'Release' -Platform 'Win32'
 Test-NoOpenSslLink -Project $updater -ProjectName 'Updater' -Configuration 'Debug Unicode' -Platform 'Win32'
-Test-HasLegacyOpenSslLink -Project $updater -ProjectName 'Updater' -Configuration 'Debug' -Platform 'Win32'
+Test-NoOpenSslLink -Project $updater -ProjectName 'Updater' -Configuration 'Debug' -Platform 'Win32'
+Test-HasSchannelSystemLink -Project $updater -ProjectName 'Updater' -Configuration 'Debug' -Platform 'Win32'
 
 $librhashProject = Get-Content -LiteralPath $LIBRHASH_PROJ -Raw -Encoding UTF8
 if ($librhashProject -match '(?i)USE_OPENSSL|OPENSSL_RUNTIME|libeay32|ssleay32') {
@@ -121,4 +140,4 @@ Test-NoDirectOpenSslIncludes -Roots @(
     (Join-Path $REPO_ROOT 'src/Test')
 )
 
-Write-Host 'verify-rfc0012-p5-openssl-audit: OK (Release mainline clean, legacy debug links delegated)' -ForegroundColor Green
+Write-Host 'verify-rfc0012-p5-openssl-audit: OK (OpenSSL dropped from active links, missing legacy curl lib removed)' -ForegroundColor Green

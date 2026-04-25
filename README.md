@@ -2,9 +2,9 @@
 
 这是一个基于 Media Player Classic 的 Windows 媒体播放器项目。
 
-**仓库布局与 MSBuild 路径契约**（目录、`src\splayer.sln`、`out\` 等）以 [.spec/rfc/rfc-0011-windows-repository-layout.md](.spec/rfc/rfc-0011-windows-repository-layout.md) 为准。
+**仓库布局与 MSBuild 路径契约**（目录、`src\splayer.sln`、`out\` 等）以 [.spec/rfc/completed/rfc-0011-windows-repository-layout.md](.spec/rfc/completed/rfc-0011-windows-repository-layout.md) 为准。
 
-**原根目录下的安装/构建类 Markdown 与构建日志** 已迁入 [`docs/root-notes/`](docs/root-notes/README.md)，便于与 RFC、安装指南等统一查阅。
+**安装、构建、PowerShell、项目结构和现代化说明** 已收敛到 [`docs/`](docs/README.md)，避免根目录和历史笔记继续碎片化。
 
 **仓库根**仅保留元数据、文档与入口脚本（如 `script\`）；**勿**在根目录堆积 `lang\`、`lib\`、`Release\` 等生成物或随机构建目录（应落在 **`out\`** 或 **`src\lib\`**，见 RFC-0011 §3.5–3.6）。若本地曾误生成，可直接删除；对应路径已在 `.gitignore` 中忽略。
 
@@ -14,7 +14,7 @@
 - **平台**: Windows (Win32)
 - **架构**: DirectShow + MFC
 - **许可证**: GNU General Public License v2
-- **依赖升级**: 见 [.spec/rfc/rfc-0012-thirdparty-library-upgrades.md](.spec/rfc/rfc-0012-thirdparty-library-upgrades.md)（分阶段；非单次「全库换最新」）
+- **依赖升级**: 见 [.spec/rfc/completed/rfc-0012-thirdparty-library-upgrades.md](.spec/rfc/completed/rfc-0012-thirdparty-library-upgrades.md)（分阶段；非单次「全库换最新」）
 
 ## 快速开始
 
@@ -31,7 +31,7 @@
    ```powershell
    .\script\install-visual-studio.ps1
    ```
-   或查看 [VS2026 升级说明](docs/root-notes/VS2026-UPDATE.md)
+   或查看 [安装指南](docs/INSTALL.md)
 
 3. **验证安装**:
    ```powershell
@@ -46,17 +46,16 @@
    build-fixed.cmd           # 使用 Visual Studio
    ```
 
-**项目已准备好构建！** 查看 [BUILD-READY.md](docs/root-notes/BUILD-READY.md) 了解当前状态。
+**项目已准备好构建！** 查看 [构建指南](docs/BUILD.md) 了解当前状态和排障顺序。
 
 ### 使用其他 Visual Studio 版本
 
 项目也支持 VS2013-2025，但推荐使用 VS2026。
 
 **详细指南**:
-- [VS2026 升级与构建](docs/root-notes/VS2026-UPDATE.md)（推荐）
-- [VS2025 快速开始](docs/root-notes/VS2025-快速开始.md)
-- [快速开始](docs/root-notes/快速开始.md)
-- [安装指南](docs/INSTALL-GUIDE.md)
+- [安装指南](docs/INSTALL.md)
+- [构建与排障](docs/BUILD.md)
+- [VS2025 支持说明](docs/VS2025-SUPPORT.md)
 
 ### 编译要求
 
@@ -65,7 +64,7 @@
 - DirectShow SDK
 - MFC 库（包含在 Visual Studio 中）
 
-**遇到构建问题？** 查看 [快速修复构建问题](docs/root-notes/快速修复构建问题.md) 或 [详细构建修复指南](docs/BUILD-FIXES.md)
+**遇到构建问题？** 查看 [构建与排障](docs/BUILD.md)。
 
 ### 依赖项
 
@@ -76,7 +75,7 @@
 - **`src/Thirdparty/unrar`**、**`sqlitepp`**、**`jsoncpp`**、**`zeromq`**、**`yaml-cpp`** 等：见各子目录与对应 `.vcxproj`
 - **`src/Source/zlib`**、**`src/Source/libpng`**：随主解决方案编译的静态库（当前为 **zlib 1.3.1**、**libpng 1.6.47**，见各目录下 `zlib.h` / `png.h`）
 
-具体升级顺序与风险见 **[RFC-0012](.spec/rfc/rfc-0012-thirdparty-library-upgrades.md)**。
+具体升级顺序与风险见 **[RFC-0012](.spec/rfc/completed/rfc-0012-thirdparty-library-upgrades.md)**。
 
 ## 项目结构
 
@@ -102,9 +101,8 @@ src/
 ## 现代化计划
 
 项目正在进行现代化改进，详见:
-- [编译与现代化分析.md](docs/analysis/编译与现代化分析.md) - 详细的技术分析
-- [现代化实施计划.md](docs/analysis/现代化实施计划.md) - 具体的实施计划
-- [RFC-0001: 现代化提案](.spec/rfc/rfc-0001-modernization-proposal.md) - 正式的技术提案
+- [现代化路线](docs/MODERNIZATION.md)
+- [RFC-0001: 现代化提案](.spec/rfc/completed/rfc-0001-modernization-proposal.md) - 历史技术提案
 
 ### 主要改进方向
 
@@ -123,4 +121,4 @@ src/
 - **修复构建问题**: `src\BuildScript\fix-build-issues.ps1`
 - **输出目录对齐契约**: `src\BuildScript\fix-output-directories-rfc0011.ps1`（可加 `-SelfTest`）
 - **改进的构建脚本**: `src\BuildScript\build-fixed.cmd`、`build-with-msbuild.cmd`
-- **PowerShell 中文环境**: 见 [docs/root-notes/POWERSHELL-CHINESE-SETUP-COMPLETE.md](docs/root-notes/POWERSHELL-CHINESE-SETUP-COMPLETE.md)
+- **PowerShell 中文环境**: 见 [docs/POWERSHELL.md](docs/POWERSHELL.md)

@@ -1,0 +1,4 @@
+openssl-0.9.8x-dropped
+ActiveVcxproj=no-libeay32-or-ssleay32
+UpdaterDebugTlsSystemLibs=Schannel
+Decision=Remove OpenSSL 0.9.8x and stale missing curllibd.lib from active MSBuild links

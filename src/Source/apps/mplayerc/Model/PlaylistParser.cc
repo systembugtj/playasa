@@ -342,6 +342,36 @@ std::vector<CPlaylistItem> PlaylistParser::ParseCUEPlayListLegacy(std::wstring f
 std::vector<CPlaylistItem> PlaylistParser::ParseMPCPlayList(std::wstring fn)
 {
 	std::vector<CPlaylistItem> playlist;
+	std::vector<RustMpcPlaylistItem> rustItems;
+	if (ParseMpcPlaylistWithRust(fn, &rustItems))
+	{
+		for (std::vector<RustMpcPlaylistItem>::const_iterator it = rustItems.begin();
+			it != rustItems.end(); ++it)
+		{
+			CPlaylistItem pli;
+			pli.m_type = (CPlaylistItem::type_t)it->type;
+			pli.m_label = it->label.c_str();
+			for (std::vector<std::wstring>::const_iterator fnIt = it->filenames.begin();
+				fnIt != it->filenames.end(); ++fnIt)
+				pli.m_fns.AddTail(fnIt->c_str());
+			for (std::vector<std::wstring>::const_iterator subIt = it->subtitles.begin();
+				subIt != it->subtitles.end(); ++subIt)
+				pli.m_subs.AddTail(subIt->c_str());
+			pli.m_vinput = it->vinput;
+			pli.m_vchannel = it->vchannel;
+			pli.m_ainput = it->ainput;
+			pli.m_country = it->country;
+			playlist.push_back(pli);
+		}
+		return playlist;
+	}
+
+	return ParseMPCPlayListLegacy(fn);
+}
+
+std::vector<CPlaylistItem> PlaylistParser::ParseMPCPlayListLegacy(std::wstring fn)
+{
+	std::vector<CPlaylistItem> playlist;
 	CString str;
 	std::map<int, CPlaylistItem> pli;
 	std::vector<int> idx;
@@ -411,6 +441,9 @@ std::vector<CPlaylistItem> PlaylistParser::ParseMPCPlayList(std::wstring fn)
 				pli[i].m_country = _ttol(value.c_str());
 		}
 	}
+
+	if (idx.empty())
+		return playlist;
 
 	qsort(&idx[0], idx.size(), sizeof(int), s_int_comp);
 	for (size_t i = 0; i < idx.size(); i++)

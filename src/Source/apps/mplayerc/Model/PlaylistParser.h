@@ -21,6 +21,7 @@ public:
                                    std::vector<std::wstring>* subs);
   std::vector<CPlaylistItem> ParseBDMVPlayList(std::wstring fn);
   std::vector<CPlaylistItem> ParseMPCPlayList(std::wstring fn);
+  std::vector<CPlaylistItem> ParseMPCPlayListLegacy(std::wstring fn);
   std::vector<CPlaylistItem> ParseCUEPlayList(std::wstring fn);
   std::vector<CPlaylistItem> ParseCUEPlayListLegacy(std::wstring fn);
   void MergeList(std::vector<CPlaylistItem>& list, std::vector<CPlaylistItem>& listToAdd);

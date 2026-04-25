@@ -1,7 +1,7 @@
 # 构建修复总结
 
 > 本文档自 **`src/BuildScript/BUILD-FIXES-SUMMARY.md`** 迁入此处（2026-04），与脚本目录解耦。  
-> **输出目录（OutDir/IntDir）现行契约** 以 **[.spec/rfc/rfc-0011-windows-repository-layout.md](../../.spec/rfc/rfc-0011-windows-repository-layout.md)** 与 **`src/Source/common.props`** 为准；维护脚本为 **`src/BuildScript/fix-output-directories-rfc0011.ps1`**。
+> **输出目录（OutDir/IntDir）现行契约** 以 **[.spec/rfc/completed/rfc-0011-windows-repository-layout.md](../../.spec/rfc/completed/rfc-0011-windows-repository-layout.md)** 与 **`src/Source/common.props`** 为准；维护脚本为 **`src/BuildScript/fix-output-directories-rfc0011.ps1`**。
 
 ## 已修复的问题
 

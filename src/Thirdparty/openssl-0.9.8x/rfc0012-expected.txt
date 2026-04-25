@@ -1,4 +1,0 @@
-openssl-0.9.8x-audit-delegated
-ReleaseUnicodeMain=no-libeay32-or-ssleay32
-LegacyDebugLinks=mplayerc:Debug Unicode;Updater:Debug
-Decision=Do not upgrade in place; delegate OpenSSL 3.x or Schannel/curl TLS migration to a follow-up RFC

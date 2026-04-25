@@ -90,7 +90,7 @@
     <ClCompile>
       <AdditionalOptions>/D "CURL_STATICLIB" /D "WINVER=0x0600" /D "_WIN32_WINNT=0x0600" /D "NTDDI_VERSION=NTDDI_VISTA" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../src/svplib/;..\Thirdparty\;$(SolutionDir)Thirdparty\pkg;..\Thirdparty\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/svplib/;..\Source\apps\mplayerc;..\Thirdparty\;$(SolutionDir)Thirdparty\pkg;..\Thirdparty\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -106,7 +106,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>uafxcwd.lib;libcpmtd.lib;libeay32.lib;ssleay32.lib;curllibd.lib;svplibDU.lib;zlibD.lib;Version.lib;libunrarD.lib;D3D9.lib;Wbemuuid.lib;base.lib;courgette_lib.lib;lzma_sdk.lib;modp_b64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>uafxcwd.lib;libcpmtd.lib;Crypt32.lib;Secur32.lib;Wldap32.lib;Normaliz.lib;Ws2_32.lib;svplibDU.lib;zlibD.lib;Version.lib;D3D9.lib;Wbemuuid.lib;base.lib;courgette_lib.lib;lzma_sdk.lib;modp_b64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>../lib;..\Thirdparty\courgette\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>nafxcwd.lib;MSVCRT;uafxcwd.lib;libcpmtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -130,7 +130,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../src/svplib/;..\Thirdparty\;./;..\Thirdparty\pkg;$(SolutionDir)Thirdparty\pkg;..\Thirdparty\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/svplib/;..\Source\apps\mplayerc;..\Thirdparty\;./;..\Thirdparty\pkg;$(SolutionDir)Thirdparty\pkg;..\Thirdparty\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
@@ -188,7 +188,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../src/svplib/;..\Thirdparty\;./;..\Thirdparty\pkg;$(SolutionDir)Thirdparty\pkg;..\Thirdparty\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../src/svplib/;..\Source\apps\mplayerc;..\Thirdparty\;./;..\Thirdparty\pkg;$(SolutionDir)Thirdparty\pkg;..\Thirdparty\wtl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>

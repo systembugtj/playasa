@@ -1,6 +1,6 @@
 # 输出目录修复总结
 
-> **历史记录**：下文描述的是早期「`src\out`」阶段的统计与脚本名。当前仓库以 **仓库根 `out\`** 与 **`$(SolutionDir)..\out\...`** 为契约；请参阅 **[RFC-0011](../../.spec/rfc/rfc-0011-windows-repository-layout.md)** 与 **`src/BuildScript/fix-output-directories-rfc0011.ps1`**（旧名 `fix-output-directories*.ps1` 已从仓库移除）。
+> **历史记录**：下文描述的是早期「`src\out`」阶段的统计与脚本名。当前仓库以 **仓库根 `out\`** 与 **`$(SolutionDir)..\out\...`** 为契约；请参阅 **[RFC-0011](../../.spec/rfc/completed/rfc-0011-windows-repository-layout.md)** 与 **`src/BuildScript/fix-output-directories-rfc0011.ps1`**（旧名 `fix-output-directories*.ps1` 已从仓库移除）。
 
 ## 问题
 
