@@ -4,10 +4,6 @@
  */
 #include "sphash.h"
 
-const char HASH_MOD_VIDEO_STR[] = "video";
-const char HASH_MOD_FILE_STR[]   = "file";
-const char HASH_MOD_BINARY_STR[] = "binary";
-
 void hash_file(const char* mod, int algo, const wchar_t* path, char* out, int* len) {
   (void)mod;
   (void)algo;

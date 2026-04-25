@@ -8,9 +8,9 @@
 extern "C" {
 #endif
 
-extern const char HASH_MOD_VIDEO_STR[];
-extern const char HASH_MOD_FILE_STR[];
-extern const char HASH_MOD_BINARY_STR[];
+#define HASH_MOD_VIDEO_STR "video"
+#define HASH_MOD_FILE_STR "file"
+#define HASH_MOD_BINARY_STR "binary"
 
 #define HASH_ALGO_MD5 0
 

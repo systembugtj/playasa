@@ -26,6 +26,7 @@ release-utf16/
 [Oo]ut/
 [Oo]bj/
 [Bb]inaries/
+/target/
 
 # Third-party and library source code (should be managed separately or as submodules)
 src/lib/
