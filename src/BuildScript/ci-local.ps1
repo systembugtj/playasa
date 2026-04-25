@@ -1,14 +1,14 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  本地/CI 统一入口：RFC-0012 门闩、预构建、修订信息、MSBuild 全量构建，可选 sqlitepp 测试工程。
+  本地/CI 统一入口：RFC 门闩、预构建、修订信息、MSBuild 全量构建，可选 sqlitepp 测试工程。
 
 .DESCRIPTION
   设计为在 PowerShell 中直接运行（含 GitHub Actions），避免依赖交互式 cmd。
   在 Git Bash 中调用 MSBuild 时请勿使用本脚本外的裸 /m 参数；本脚本使用 PowerShell 调用无此问题。
 
 .PARAMETER SkipVerify
-  跳过 verify-rfc0012-all.ps1（CI 中可由前置 job 已跑过时使用）。
+  跳过 verify-rfc0012-all.ps1 汇总门闩（CI 中可由前置 job 已跑过时使用）。
 
 .PARAMETER SkipPreBuild
   跳过预构建（密钥占位与 out 目录）；一般不建议。

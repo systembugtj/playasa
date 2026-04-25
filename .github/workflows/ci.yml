@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   rfc0012-gates:
-    name: RFC-0012 pins (no MSBuild)
+    name: RFC pins (no MSBuild)
     runs-on: windows-latest
     steps:
       - name: Checkout

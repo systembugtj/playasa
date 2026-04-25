@@ -61,7 +61,7 @@ function dev_SplayerReleaseExePath {
 function Write-PlayasaDevHelp {
     Write-Host @'
 用法（在仓库根）:
-  ./dev.ps1 verify      仅 RFC-0012 门闩（无 MSBuild）
+  ./dev.ps1 verify      仅 RFC 汇总门闩（无 MSBuild）
   ./dev.ps1 build       门闩 + 预构建 + revision + 全量 MSBuild
   ./dev.ps1 buildFast   同 build，但跳过门闩（迭代编译）
   ./dev.ps1 run         启动 Release Unicode 构建的 splayer（工作目录为 exe 目录）
