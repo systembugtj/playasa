@@ -5,15 +5,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+    <SqliteppLibraryName>sqlitepp-utf16.lib</SqliteppLibraryName>
+    <SqliteppLibraryName Condition="'$(Configuration)'=='Debug Unicode'">libsqliteD.lib</SqliteppLibraryName>
+    <SqliteppLibraryConfiguration>release-utf16</SqliteppLibraryConfiguration>
+    <SqliteppLibraryConfiguration Condition="'$(Configuration)'=='Debug Unicode'">Debug Unicode</SqliteppLibraryConfiguration>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Thirdparty\sqlitepp\sqlitepp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;SQLITEPP_UTF16;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)sqlitepp\sqlitepp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_LIB;SQLITEPP_UTF16;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>sqlitepp-utf16.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\$(Platform)\release-utf16\;$(SolutionDir)Thirdparty\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SqliteppLibraryName);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\out\bin\$(Platform)\$(SqliteppLibraryConfiguration)\;$(MSBuildThisFileDirectory)bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

@@ -102,9 +102,9 @@ void statement::prepare()
 		}
 
 		// bind into binders
-		std::accumulate(q_.intos().begin(), q_.intos().end(), 0, bind(*this));
+		static_cast<void>(std::accumulate(q_.intos().begin(), q_.intos().end(), 0, bind(*this)));
 		// bind use binders
-		std::accumulate(q_.uses().begin(), q_.uses().end(), 1, bind(*this));
+		static_cast<void>(std::accumulate(q_.uses().begin(), q_.uses().end(), 1, bind(*this)));
 	}
 	catch(std::exception const&)
 	{
@@ -155,7 +155,7 @@ void statement::reset(bool rebind)
 		s_.check_error( ::sqlite3_reset(impl_) );
 		if ( rebind )
 		{
-			std::accumulate(q_.uses().begin(), q_.uses().end(), 1, bind(*this));
+			static_cast<void>(std::accumulate(q_.uses().begin(), q_.uses().end(), 1, bind(*this)));
 		}
 	}
 }

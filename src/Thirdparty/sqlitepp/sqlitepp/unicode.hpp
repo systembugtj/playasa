@@ -128,17 +128,17 @@ const utf16_char	utf16_low_surrogate_back_k(0xdfff);
 /*************************************************************************************************/
 
 template <std::size_t NumBytes> struct utf8_header_t	{ };
-template <>						struct utf8_header_t<0>	{ enum { value = char(0x80) }; }; // nonheader
-//template <>					struct utf8_header_t<1>	{ enum { value = char(0x00) }; }; // illegal
-template <>						struct utf8_header_t<2>	{ enum { value = char(0xC0) }; };
-template <>						struct utf8_header_t<3>	{ enum { value = char(0xE0) }; };
-template <>						struct utf8_header_t<4>	{ enum { value = char(0xF0) }; };
-template <>						struct utf8_header_t<5>	{ enum { value = char(0xF8) }; };
-template <>						struct utf8_header_t<6>	{ enum { value = char(0xFC) }; };
+template <>						struct utf8_header_t<0>	{ enum { value = 0x80 }; }; // nonheader
+//template <>					struct utf8_header_t<1>	{ enum { value = 0x00 }; }; // illegal
+template <>						struct utf8_header_t<2>	{ enum { value = 0xC0 }; };
+template <>						struct utf8_header_t<3>	{ enum { value = 0xE0 }; };
+template <>						struct utf8_header_t<4>	{ enum { value = 0xF0 }; };
+template <>						struct utf8_header_t<5>	{ enum { value = 0xF8 }; };
+template <>						struct utf8_header_t<6>	{ enum { value = 0xFC }; };
 
 /*************************************************************************************************/
 
-template <char Mask, typename BinaryInteger>
+template <int Mask, typename BinaryInteger>
 inline char add_mask(BinaryInteger code)
 { return char(code | Mask); }
 
@@ -148,7 +148,7 @@ inline char utf8_add_mask(BinaryInteger code)
 
 /*************************************************************************************************/
 
-template<char Mask, typename BinaryInteger>
+template<int Mask, typename BinaryInteger>
 inline char strip_mask(BinaryInteger code)
 { return char(code & ~Mask); }
 

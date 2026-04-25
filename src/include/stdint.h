@@ -163,13 +163,20 @@ typedef uint64_t  uintmax_t;
 
 // 7.18.3 Limits of other integer types
 
-#ifdef _WIN64 // [
-#  define PTRDIFF_MIN  _I64_MIN
-#  define PTRDIFF_MAX  _I64_MAX
-#else  // _WIN64 ][
-#  define PTRDIFF_MIN  _I32_MIN
-#  define PTRDIFF_MAX  _I32_MAX
-#endif  // _WIN64 ]
+#ifndef PTRDIFF_MIN // [
+#  ifdef _WIN64 // [
+#    define PTRDIFF_MIN  _I64_MIN
+#  else  // _WIN64 ][
+#    define PTRDIFF_MIN  _I32_MIN
+#  endif  // _WIN64 ]
+#endif // PTRDIFF_MIN ]
+#ifndef PTRDIFF_MAX // [
+#  ifdef _WIN64 // [
+#    define PTRDIFF_MAX  _I64_MAX
+#  else  // _WIN64 ][
+#    define PTRDIFF_MAX  _I32_MAX
+#  endif  // _WIN64 ]
+#endif // PTRDIFF_MAX ]
 
 #define SIG_ATOMIC_MIN  INT_MIN
 #define SIG_ATOMIC_MAX  INT_MAX

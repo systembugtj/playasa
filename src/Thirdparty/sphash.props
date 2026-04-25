@@ -5,15 +5,31 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+    <PlayasaUseRustSphash Condition="'$(PlayasaUseRustSphash)'==''">true</PlayasaUseRustSphash>
+    <PlayasaRustSphashTarget Condition="'$(Platform)'=='Win32'">i686-pc-windows-msvc</PlayasaRustSphashTarget>
+    <PlayasaRustSphashProfile Condition="'$(Configuration)'=='Debug' Or '$(Configuration)'=='Debug Unicode'">debug</PlayasaRustSphashProfile>
+    <PlayasaRustSphashProfile Condition="'$(PlayasaRustSphashProfile)'==''">release</PlayasaRustSphashProfile>
+    <PlayasaRustSphashCargoArgs Condition="'$(PlayasaRustSphashProfile)'=='release'">--release</PlayasaRustSphashCargoArgs>
+    <PlayasaRustSphashCargoTargetDir>$(SolutionDir)..\out\obj\rust</PlayasaRustSphashCargoTargetDir>
+    <PlayasaRustSphashOutputDir>$(PlayasaRustSphashCargoTargetDir)\$(PlayasaRustSphashTarget)\$(PlayasaRustSphashProfile)\</PlayasaRustSphashOutputDir>
+    <PlayasaRustSphashDll>$(PlayasaRustSphashOutputDir)playasa_sphash.dll</PlayasaRustSphashDll>
+    <PlayasaRustSphashImportLib>$(PlayasaRustSphashOutputDir)playasa_sphash.dll.lib</PlayasaRustSphashImportLib>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)Thirdparty\pkg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies Condition="'$(PlayasaUseRustSphash)'=='true'">playasa_sphash.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories Condition="'$(PlayasaUseRustSphash)'=='true'">$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
+  <Target Name="BuildPlayasaRustSphash" BeforeTargets="Link" Condition="'$(PlayasaUseRustSphash)'=='true' And '$(PlayasaRustSphashTarget)'!=''">
+    <Message Importance="High" Text="Building Rust sphash DLL for $(Platform)|$(Configuration)..." />
+    <MakeDir Directories="$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\;$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\;$(PlayasaRustSphashCargoTargetDir)" />
+    <Exec Command="set &quot;CARGO_TARGET_DIR=$(PlayasaRustSphashCargoTargetDir)&quot; &amp;&amp; cargo build --manifest-path &quot;$(SolutionDir)..\Cargo.toml&quot; -p playasa-sphash --target $(PlayasaRustSphashTarget) $(PlayasaRustSphashCargoArgs)" />
+    <Copy SourceFiles="$(PlayasaRustSphashDll)" DestinationFolder="$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\" />
+    <Copy SourceFiles="$(PlayasaRustSphashImportLib)" DestinationFiles="$(SolutionDir)..\out\lib\$(Platform)\$(Configuration)\playasa_sphash.lib" />
+  </Target>
   <ItemGroup />
 </Project>

@@ -27,6 +27,7 @@
 | `src/Thirdparty/yaml-cpp` | yaml-cpp | **已升级 0.9.0** | Prototype `rsc_format.cc` 已迁移到新版 `YAML::Load` / `YAML::Node::as<T>()` API；静态库工程显式 `YAML_CPP_STATIC_DEFINE` + C++14 |
 | `src/Thirdparty/librhash` | RHash / librhash | **已对齐上游 v1.4.6**（`RHASH_HASH_COUNT = 32`）；本仓 `rhash_ex.cpp` 封装 ED2K/磁力 | `plug_openssl.c` 仍参与编译；与 `src/include/stdint.h` 并存时有 C4005 告警，后续可收紧包含路径 |
 | `src/Thirdparty/zeromq` | libzmq | 依赖网络栈与编译选项 | 与业务消息路径相关，需运行时验证 |
+| `src/Thirdparty/sqlitepp` | sqlitepp + SQLite amalgamation | **SQLite 已升级 3.53.0**；sqlitepp wrapper 保持本仓 API | `sqliteppTest` 已改为非交互、失败返回非 0；`appSQLlite.cc` 字符串写入路径已由测试覆盖 |
 | `src/Source/filters/transform/mpcvideodec/ffmpeg` | FFmpeg/libav 衍生 | 体量大、许可证与符号导出敏感 | **单独 RFC 或子阶段**；不在 RFC-0012 首波范围 |
 | `src/Thirdparty/boost` | 头文件树 | 体量大 | 通常随编译器升级渐进替换用法，而非整树替换 |
 | `src/Thirdparty/pkg`、`src/Thirdparty/sinet` | 头文件 / stub | 非旧文档中的 `trunk` 大目录 | README 已改为指向本路径 |
@@ -208,10 +209,12 @@ MSBuild ..\Source\libpng\libpng_vs2005.vcxproj /m /p:Configuration="Release Unic
 
 **sqlitepp 锚点**：测试工程如 `src/Test/sqliteppTest/sqliteppTest.vcxproj`；应用内 SQLite 封装以 `rg sqlitepp` / `MediaSQLite` 等为线索。
 
+**sqlitepp 当前钉扎**：`src/Thirdparty/sqlitepp/rfc0012-expected.txt` = `sqlite-amalgamation-3.53.0`；仅替换 SQLite amalgamation（`sqlite3.c` / `sqlite3.h` / `sqlite3ext.h`），sqlitepp wrapper API 保持不变。`sqlitepp.props` 已改为基于 `$(MSBuildThisFileDirectory)`，Debug Unicode 使用 `libsqliteD.lib`，release-utf16 使用 `sqlitepp-utf16.lib`。
+
 **实施检查清单**
 
 1. **libzmq**：升级前记录当前 **ABI 选项**（`ZMQ_BUILD_DRAFT_API`、静态/动态 CRT 与主程序一致）；单项目构建 → 全解 → **运行时**发一条消息或走现有网络功能（PR 写明手测步骤）。
-2. **sqlitepp**：库与测试项目同升；跑 `sqliteppTest`（若 CI 未编测试，本地必跑）及主程序 **媒体库/历史记录** 路径。
+2. **sqlitepp**：库与测试项目同升；跑 `sqliteppTest`（若 CI 未编测试，本地必跑）及主程序 **媒体库/历史记录** 路径。当前已完成 SQLite 3.53.0 与 `sqliteppTest` Debug Unicode 自动化运行；主程序媒体库/历史记录手测仍需人工确认。
 3. 将 `src/BuildScript` 下已有 **`test-*.ps1`** 能覆盖到的条目在 PR 中引用文件名。
 
 ### 11.4 P5：OpenSSL 0.9.8x 审计与处置
@@ -231,7 +234,8 @@ MSBuild ..\Source\libpng\libpng_vs2005.vcxproj /m /p:Configuration="Release Unic
 | P1 头版本 | 防止 zlib/libpng 被误回退 | `src/BuildScript/verify-rfc0012-zlib-libpng.ps1` |
 | P2 钉扎 | 防止 jsoncpp 被误替换或 include 路径漂移 | `verify-rfc0012-jsoncpp.ps1` + `Thirdparty/jsoncpp/rfc0012-expected.txt` |
 | P3 钉扎 | 防止 yaml-cpp / librhash 静默漂移 | `verify-rfc0012-p3-yaml-librhash.ps1` + 两库各自 `rfc0012-expected.txt` |
-| 一键门闩 | 本地 / 无 VS CI 串行跑 P1–P3 钉扎 | `verify-rfc0012-all.ps1` |
+| P4 sqlitepp 钉扎 | 防止 SQLite amalgamation、sqlitepp props 与测试入口静默回退 | `verify-rfc0012-p4-sqlitepp.ps1` + `Thirdparty/sqlitepp/rfc0012-expected.txt` |
+| 一键门闩 | 本地 / 无 VS CI 串行跑 P1–P4 钉扎 | `verify-rfc0012-all.ps1` |
 | 本地/CI 统一入口（PowerShell） | 门闩 + 预构建 + revision + MSBuild；避免 Git Bash 下裸 `/m` 与 MSYS `find` 污染 `revision.cmd` | `src/BuildScript/ci-local.ps1`（参数见脚本注释）；GitHub：`/.github/workflows/ci.yml` |
 | 仓库根日常入口 | 子命令：`verify` / `build` / `buildFast` / `run` / `ship`（见 `./dev.ps1 help`） | 根目录 **`dev.ps1`** |
 | 全量真相源 | 发布与回归仍以 MSBuild 为准 | `build-with-msbuild.cmd` 或 `ci-local.ps1`；CI 若托管机缺少 v145/MFC 等工作负载，**不得**将「仅头文件门闩」冒充为全量通过 |

@@ -47,19 +47,19 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Source\common.props" />
-    <Import Project="$(SolutionDir)Source\release.props" />
-    <Import Project="$(SolutionDir)Source\apps\mplayerc\wtl_integration.props" />
-    <Import Project="$(SolutionDir)Source\apps\mplayerc\atlserver_integration.props" />
-    <Import Project="$(SolutionDir)Thirdparty\sqlitepp.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Source\common.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Source\release.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Source\apps\mplayerc\wtl_integration.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Source\apps\mplayerc\atlserver_integration.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Thirdparty\sqlitepp.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Source\common.props" />
-    <Import Project="$(SolutionDir)Source\release.props" />
-    <Import Project="$(SolutionDir)Source\apps\mplayerc\wtl_integration.props" />
-    <Import Project="$(SolutionDir)Source\apps\mplayerc\atlserver_integration.props" />
-    <Import Project="$(SolutionDir)Thirdparty\sqlitepp.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Source\common.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Source\release.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Source\apps\mplayerc\wtl_integration.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Source\apps\mplayerc\atlserver_integration.props" />
+    <Import Project="$(MSBuildThisFileDirectory)..\..\Thirdparty\sqlitepp.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -69,18 +69,18 @@
     <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(MSBuildThisFileDirectory)..\..\out\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(MSBuildThisFileDirectory)..\..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(MSBuildThisFileDirectory)..\..\out\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(MSBuildThisFileDirectory)..\..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
-    <OutDir>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(MSBuildThisFileDirectory)..\..\out\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(MSBuildThisFileDirectory)..\..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -96,7 +96,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)Thirdparty\bin;../../lib;../../lib/wm7;../../lib/qt6;../../lib/detours;../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\Thirdparty\bin;../../lib;../../lib/wm7;../../lib/qt6;../../lib/detours;../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -106,16 +106,17 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\ZenLib\Source;..\..\..\include;$(SolutionDir)Source\apps\mplayerc\Model;$(SolutionDir)Test\sqliteppTest;..\..\mediainfo\Source\;..\..\mediainfo\Source\MediaInfo\;..\..\filters\BaseClasses;..\..\filters\transform\webm\vp8_sdk\include;..\..\filters\transform\webm\IDL;..\..\filters\transform\webm\common;..\..\filters\transform\mpcvideodec;..\..\svplib;..\..\..\thirdparty;..\..\..\include\dx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\ZenLib\Source;..\..\..\include;$(MSBuildThisFileDirectory)..\..\Source\apps\mplayerc\Model;$(MSBuildThisFileDirectory);..\..\mediainfo\Source\;..\..\mediainfo\Source\MediaInfo\;..\..\filters\BaseClasses;..\..\filters\transform\webm\vp8_sdk\include;..\..\filters\transform\webm\IDL;..\..\filters\transform\webm\common;..\..\filters\transform\mpcvideodec;..\..\svplib;..\..\..\thirdparty;..\..\..\include\dx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader />
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4302;4838;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)Thirdparty\bin;../../lib;../../lib/wm7;../../lib/qt6;../../lib/detours;../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\Thirdparty\bin;../../lib;../../lib/wm7;../../lib/qt6;../../lib/detours;../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
@@ -128,17 +129,19 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\ZenLib\Source;..\..\..\include;$(SolutionDir)Source\apps\mplayerc\Model;$(SolutionDir)Test\sqliteppTest;..\..\mediainfo\Source\;..\..\mediainfo\Source\MediaInfo\;..\..\filters\BaseClasses;..\..\filters\transform\webm\vp8_sdk\include;..\..\filters\transform\webm\IDL;..\..\filters\transform\webm\common;..\..\filters\transform\mpcvideodec;..\..\svplib;..\..\..\thirdparty;..\..\..\include\dx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\ZenLib\Source;..\..\..\include;$(MSBuildThisFileDirectory)..\..\Source\apps\mplayerc\Model;$(MSBuildThisFileDirectory);..\..\mediainfo\Source\;..\..\mediainfo\Source\MediaInfo\;..\..\filters\BaseClasses;..\..\filters\transform\webm\vp8_sdk\include;..\..\filters\transform\webm\IDL;..\..\filters\transform\webm\common;..\..\filters\transform\mpcvideodec;..\..\svplib;..\..\..\thirdparty;..\..\..\include\dx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4302;4838;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)Thirdparty\bin;../../lib;../../lib/wm7;../../lib/qt6;../../lib/detours;../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\Thirdparty\bin;../../lib;../../lib/wm7;../../lib/qt6;../../lib/detours;../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>

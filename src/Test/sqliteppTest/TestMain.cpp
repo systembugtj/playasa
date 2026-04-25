@@ -22,6 +22,7 @@ int t3 = 1;
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+  bool all_passed = true;
   /* step0 init-  *********************
   *first check del file mytest1.db
   *
@@ -71,19 +72,25 @@ int _tmain(int argc, _TCHAR* argv[])
     int geti1 = 1;
     int geti2 = 100;
 
-    geti1 = p.GetProfileInt(str2.c_str(), str1.c_str(), -10, false);
+    geti1 = SqliteGetProfileInt(&p, str2.c_str(), str1.c_str(), -10, false);
     if(geti1 == -10)
       printf("pass--1\n");   // ok
     else
+    {
+      all_passed = false;
       printf("fail--1\n");
+    }
 
 
-    p.WriteProfileInt(str1.c_str(), str2.c_str(), geti2, false);
-    geti1 = p.GetProfileInt(str1.c_str(), str2.c_str(), -1, false);
+    SqliteWriteProfileInt(&p, str1.c_str(), str2.c_str(), geti2, false);
+    geti1 = SqliteGetProfileInt(&p, str1.c_str(), str2.c_str(), -1, false);
     if(geti2 == geti1)
       printf("pass--2\n");   // ok
     else
+    {
+      all_passed = false;
       printf("fail--2\n");
+    }
 
   }
 
@@ -102,7 +109,10 @@ int _tmain(int argc, _TCHAR* argv[])
     if(str3s1 == L"xx")
       printf("pass--3\n");   // ok
     else
+    {
+      all_passed = false;
       printf("fail--3\n");
+    }
 
 
     p.WriteProfileString(str1.c_str(), str2.c_str(), str3s2.c_str());
@@ -110,7 +120,10 @@ int _tmain(int argc, _TCHAR* argv[])
     if(str3s1.compare(str3s2) == 0)
       printf("pass--4\n");   // ok
     else
+    {
+      all_passed = false;
       printf("fail--4\n");
+    }
 
   }
 
@@ -135,7 +148,10 @@ int _tmain(int argc, _TCHAR* argv[])
     if( i == 0 )
       printf("pass--5 bin\n");
     else
+    {
+      all_passed = false;
       printf("fail--5 bin\n");
+    }
 
     if(i>0 && pp)
     {
@@ -147,10 +163,13 @@ int _tmain(int argc, _TCHAR* argv[])
     p.WriteProfileBinary(str1.c_str(), str2.c_str(), (LPBYTE)buf, 30); //w 80 BYTE
     p.GetProfileBinary(str1.c_str(), str2.c_str(), (LPBYTE*)&pp, (UINT*)&i, false);
 
-    if(memcmp(pp,buf,30) == 0)
+    if(pp && i == 30 && memcmp(pp,buf,30) == 0)
       printf("pass--6 bin\n");
     else
+    {
+      all_passed = false;
       printf("fail--6 bin\n");
+    }
 
     if(i>0 && pp)
     {
@@ -161,7 +180,6 @@ int _tmain(int argc, _TCHAR* argv[])
   }
 
   printf("ALL tests done\n\n");
-  system("pause");
-  return 0;
+  return all_passed ? 0 : 1;
 }
 

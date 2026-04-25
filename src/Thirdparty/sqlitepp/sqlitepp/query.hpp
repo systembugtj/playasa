@@ -121,7 +121,7 @@ public:
 	prepare_query(prepare_query& src);
 
 	// Move query to statement on destroy.
-	~prepare_query();
+	~prepare_query() noexcept(false);
 private:
 	// Create preparing proxy for statement.
 	prepare_query(statement& st);
@@ -141,7 +141,7 @@ public:
 	once_query(once_query& src);
 
 	// Execute statement on destroy.
-	~once_query();
+	~once_query() noexcept(false);
 private:
 	// Create proxy for session.
 	once_query(session& s);

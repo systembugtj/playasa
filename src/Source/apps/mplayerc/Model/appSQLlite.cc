@@ -250,7 +250,7 @@ BOOL SQLliteapp::WriteProfileString(LPCTSTR lpszSection, LPCTSTR lpszEntry, LPCT
 		sqlitepp::string_t str3;
 		if (lpszValue)
 		{
-			str3 = str2 = ToSqliteString(std::wstring(lpszValue));
+			str3 = ToSqliteString(std::wstring(lpszValue));
 			st << "INSERT OR REPLACE INTO settingstring (hkey, sect, vstring) VALUES (:hkey, :sect, :vstring)",
 				sqlitepp::use(str), sqlitepp::use(str2), sqlitepp::use(str3);
 		}

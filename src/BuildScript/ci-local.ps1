@@ -117,6 +117,14 @@ function Invoke-RfcPreBuild {
         [Parameter(Mandatory)][string] $BuildScriptRoot,
         [Parameter(Mandatory)][string] $SrcRoot
     )
+    $unrarRoot = Join-Path $SrcRoot 'Thirdparty\unrar'
+    foreach ($unrarFile in @('unrar.dll', 'unrar.lib', 'license.txt')) {
+        $path = Join-Path $unrarRoot $unrarFile
+        if (-not (Test-Path -LiteralPath $path)) {
+            throw "Missing UnRAR runtime dependency: $path"
+        }
+    }
+
     $dummyClient = Join-Path $BuildScriptRoot 'shooterclient_dummy.key'
     $dummyApi = Join-Path $BuildScriptRoot 'shooterapi_dummy.key'
     if (-not (Test-Path -LiteralPath $dummyClient)) {

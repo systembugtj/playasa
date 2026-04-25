@@ -4,7 +4,8 @@
 #include <Windows.h>
 #include <fstream>
 
-std::unique_ptr<LogController> LogController::m_instance;
+template<>
+std::unique_ptr<LogController> LazyInstanceImpl<LogController>::m_instance;
 
 LogController::LogController(void) :
 m_PerfFrequency(0)

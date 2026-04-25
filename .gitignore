@@ -81,6 +81,7 @@ src/lib/
 *.a
 *.lib
 *.exp
+!src/Thirdparty/unrar/unrar.dll
 
 # ============================================================================
 # Resource Files (compiled)

@@ -47,16 +47,19 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)Source\common.props" />
     <Import Project="$(SolutionDir)Source\release.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)Source\common.props" />
     <Import Project="$(SolutionDir)Source\release.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)Source\common.props" />
     <Import Project="$(SolutionDir)Source\debug.props" />
+    <Import Project="$(SolutionDir)Thirdparty\sphash.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -269,7 +272,7 @@
     <ClCompile Include="Updater.cpp" />
     <ClCompile Include="UpdaterDlg.cpp" />
     <ClCompile Include="..\Source\apps\mplayerc\Controller\HashController.cc" />
-    <ClCompile Include="$(SolutionDir)Thirdparty\pkg\sphash_stub.cpp">
+    <ClCompile Include="$(SolutionDir)Thirdparty\pkg\sphash_stub.cpp" Condition="'$(PlayasaUseSphashStub)'=='true'">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>

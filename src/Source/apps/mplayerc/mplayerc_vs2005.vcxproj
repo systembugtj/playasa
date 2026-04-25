@@ -171,13 +171,9 @@
       <AdditionalManifestFiles>res\mplayerc.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
     <PostBuildEvent>
-      <Command>REM Copy unrar.dll next to splayer.exe (Win32 build needs 32-bit DLL from WinRAR x86 path).
-if exist "$(SolutionDir)Thirdparty\unrar\unrar.dll" (copy /Y "$(SolutionDir)Thirdparty\unrar\unrar.dll" "$(OutDir)unrar.dll" &amp; goto UnrarCopyDone)
-if exist "$(ProgramFiles(x86))\WinRAR\UnRAR.dll" (copy /Y "$(ProgramFiles(x86))\WinRAR\UnRAR.dll" "$(OutDir)unrar.dll" &amp; goto UnrarCopyDone)
-if exist "$(ProgramFiles)\WinRAR\UnRAR.dll" (copy /Y "$(ProgramFiles)\WinRAR\UnRAR.dll" "$(OutDir)unrar.dll" &amp; goto UnrarCopyDone)
-echo WARNING: unrar.dll not copied. Place unrar.dll in $(OutDir) or put it at $(SolutionDir)Thirdparty\unrar\unrar.dll then rebuild.
-:UnrarCopyDone
-exit /b 0
+      <Command>REM Copy the checked-in 32-bit UnRAR runtime next to splayer.exe.
+if not exist "$(SolutionDir)Thirdparty\unrar\unrar.dll" (echo ERROR: Missing $(SolutionDir)Thirdparty\unrar\unrar.dll &amp; exit /b 1)
+copy /Y "$(SolutionDir)Thirdparty\unrar\unrar.dll" "$(OutDir)unrar.dll"
       </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -378,6 +374,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile Include="SVPSubVoteControlBar.cpp" />
     <ClCompile Include="TimeBmpManage.cpp" />
     <ClCompile Include="TransparentControlBar.cpp" />
+    <ClCompile Include="UnrarChunkCompat.cpp" />
     <ClCompile Include="UnCompressAPI.cc" />
     <ClCompile Include="UnCompressZip.cpp" />
     <ClCompile Include="VolumeCtrl.cpp" />
@@ -407,7 +404,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile Include="Controller\AdController.cc" />
     <ClCompile Include="Controller\Ed2kController.cpp" />
     <ClCompile Include="Controller\HashController.cc" />
-    <ClCompile Include="$(SolutionDir)Thirdparty\pkg\sphash_stub.cpp">
+    <ClCompile Include="$(SolutionDir)Thirdparty\pkg\sphash_stub.cpp" Condition="'$(PlayasaUseSphashStub)'=='true'">
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Controller\Hotkey_Controller.cc" />

@@ -1,7 +1,8 @@
 #include "file_path.h"
 
 
-std::unique_ptr<FilePath> FilePath::m_instance;
+template<>
+std::unique_ptr<FilePath> LazyInstanceImpl<FilePath>::m_instance;
 
 
 // libgen's dirname and basename aren't guaranteed to be thread-safe and aren't
