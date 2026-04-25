@@ -84,6 +84,7 @@
 | 2026-04-23 | **P2 执行**：内嵌 jsoncpp 换为上游 **1.9.5** | `include/json` + `src/lib_json` + 测试目录同步；`rfc0012-expected.txt` = `1.9.5` |
 | 2026-04-24 | **P3 执行**：librhash 换为上游 **RHash v1.4.6** 树；`RHASH_HASH_COUNT`=**32**；保留 `rhash_ex.*` 并适配 API | `librhash/rfc0012-expected.txt` 钉扎 `rhash-upstream-1.4.6`；`rhash_ex.cpp` 已适配新 `rhash_final`/`rhash_print` |
 | 2026-04-24 | **P3 执行**：yaml-cpp 换为上游 **0.9.0** 树；Prototype YAML 资源解析迁移到新版 API | `yaml-cpp/rfc0012-expected.txt` 钉扎 `yaml-cpp-0.9.0`；`verify-rfc0012-p3-yaml-librhash.ps1` 校验公共头、MSBuild 清单和旧 API 残留 |
+| 2026-04-25 | **P5 审计**：OpenSSL 0.9.8x 不做原地版本号升级，迁移委派到后续 TLS/curl RFC | Release 主线未链接 `libeay32.lib`/`ssleay32.lib`；遗留链接仅在 `mplayerc` Debug Unicode 与 `Updater` Debug；`openssl-0.9.8x/rfc0012-expected.txt` 与 `verify-rfc0012-p5-openssl-audit.ps1` 钉住该结论 |
 
 ## 9. 可执行计划：P1（zlib + libpng）检查清单
 
@@ -229,6 +230,8 @@ MSBuild ..\Source\libpng\libpng_vs2005.vcxproj /m /p:Configuration="Release Unic
 2. 若主程序与各 filter **均未** `AdditionalDependencies` 指向 `libeay32`/`ssleay32`：将结论写入 §8；**可考虑**移除 `src/Thirdparty/openssl-0.9.8x` 或标为「未使用，保留仅历史对比」——须法务/安全确认。
 3. 若存在链接：单独立项 **OpenSSL 3.x** 或 **平台 TLS** 迁移 RFC，本文 §8 引用该子 RFC；本 RFC P5 行标为「已委派」。
 
+**当前审计结论**：`src/Thirdparty/openssl-0.9.8x/rfc0012-expected.txt` = `openssl-0.9.8x-audit-delegated`。Release 主线 `mplayerc`（`Release Unicode|Win32`、`Release|Win32`）和 `Updater`（`Release|Win32`）没有 `libeay32.lib` / `ssleay32.lib` / OpenSSL DLL 链接；遗留链接只保留在 `mplayerc` `Debug Unicode|Win32` 与 `Updater` `Debug|Win32`，且非 OpenSSL 源码树的主程序/Updater/Prototype/Test 源码没有直接 `#include <openssl/...>`。因此本阶段不删除 `src/Thirdparty/openssl-0.9.8x`，也不原地替换为 OpenSSL 3.x；后续若要消除 Debug 旧依赖，应单独做 **OpenSSL 3.x** 或 **Schannel/curl TLS** 迁移 RFC。
+
 ## 12. CI 与无 VS 环境的门闩
 
 | 门闩 | 目的 | 命令 / 位置 |
@@ -238,7 +241,8 @@ MSBuild ..\Source\libpng\libpng_vs2005.vcxproj /m /p:Configuration="Release Unic
 | P3 钉扎 | 防止 yaml-cpp / librhash 静默漂移 | `verify-rfc0012-p3-yaml-librhash.ps1` + 两库各自 `rfc0012-expected.txt` |
 | P4 sqlitepp 钉扎 | 防止 SQLite amalgamation、sqlitepp props 与测试入口静默回退 | `verify-rfc0012-p4-sqlitepp.ps1` + `Thirdparty/sqlitepp/rfc0012-expected.txt` |
 | P4 zeromq 钉扎 | 防止 0MQ 2.1 ABI、Release 静态库选项与 smoke test 入口静默漂移 | `verify-rfc0012-p4-zeromq.ps1` + `Thirdparty/zeromq/rfc0012-expected.txt` + `test-zeromq-smoke.ps1` |
-| 一键门闩 | 本地 / 无 VS CI 串行跑 P1–P4 钉扎 | `verify-rfc0012-all.ps1` |
+| P5 OpenSSL 审计 | 防止 OpenSSL 0.9.8x 链接面与迁移委派结论静默漂移 | `verify-rfc0012-p5-openssl-audit.ps1` + `Thirdparty/openssl-0.9.8x/rfc0012-expected.txt` |
+| 一键门闩 | 本地 / 无 VS CI 串行跑 P1–P5 钉扎 | `verify-rfc0012-all.ps1` |
 | 本地/CI 统一入口（PowerShell） | 门闩 + 预构建 + revision + MSBuild；避免 Git Bash 下裸 `/m` 与 MSYS `find` 污染 `revision.cmd` | `src/BuildScript/ci-local.ps1`（参数见脚本注释）；GitHub：`/.github/workflows/ci.yml` |
 | 仓库根日常入口 | 子命令：`verify` / `build` / `buildFast` / `run` / `ship`（见 `./dev.ps1 help`） | 根目录 **`dev.ps1`** |
 | 全量真相源 | 发布与回归仍以 MSBuild 为准 | `build-with-msbuild.cmd` 或 `ci-local.ps1`；CI 若托管机缺少 v145/MFC 等工作负载，**不得**将「仅头文件门闩」冒充为全量通过 |
