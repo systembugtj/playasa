@@ -45,6 +45,20 @@ const uint32_t kFourccWMV1 = 'W' | ('M' << 8) | ('V' << 16) | ('1' << 24);
 const uint32_t kFourccwmv1 = 'w' | ('m' << 8) | ('v' << 16) | ('1' << 24);
 const uint32_t kFourccWMV2 = 'W' | ('M' << 8) | ('V' << 16) | ('2' << 24);
 const uint32_t kFourccwmv2 = 'w' | ('m' << 8) | ('v' << 16) | ('2' << 24);
+const uint32_t kFourccH264 = 'H' | ('2' << 8) | ('6' << 16) | ('4' << 24);
+const uint32_t kFourcch264 = 'h' | ('2' << 8) | ('6' << 16) | ('4' << 24);
+const uint32_t kFourccX264 = 'X' | ('2' << 8) | ('6' << 16) | ('4' << 24);
+const uint32_t kFourccx264 = 'x' | ('2' << 8) | ('6' << 16) | ('4' << 24);
+const uint32_t kFourccAVC1 = 'A' | ('V' << 8) | ('C' << 16) | ('1' << 24);
+const uint32_t kFourccavc1 = 'a' | ('v' << 8) | ('c' << 16) | ('1' << 24);
+const uint32_t kFourccDAVC = 'D' | ('A' << 8) | ('V' << 16) | ('C' << 24);
+const uint32_t kFourccdavc = 'd' | ('a' << 8) | ('v' << 16) | ('c' << 24);
+const uint32_t kFourccPAVC = 'P' | ('A' << 8) | ('V' << 16) | ('C' << 24);
+const uint32_t kFourccpavc = 'p' | ('a' << 8) | ('v' << 16) | ('c' << 24);
+const uint32_t kFourccMPG2 = 'M' | ('P' << 8) | ('G' << 16) | ('2' << 24);
+const uint32_t kFourccmpg2 = 'm' | ('p' << 8) | ('g' << 16) | ('2' << 24);
+const uint32_t kFourccMMES = 'M' | ('M' << 8) | ('E' << 16) | ('S' << 24);
+const uint32_t kFourccmmes = 'm' | ('m' << 8) | ('e' << 16) | ('s' << 24);
 
 enum AVCodecID ToAvCodecId(DecodeCodec codec)
 {
@@ -63,6 +77,10 @@ enum AVCodecID ToAvCodecId(DecodeCodec codec)
         return AV_CODEC_ID_WMV1;
     case kDecodeCodecWmv2:
         return AV_CODEC_ID_WMV2;
+    case kDecodeCodecH264:
+        return AV_CODEC_ID_H264;
+    case kDecodeCodecMpeg2:
+        return AV_CODEC_ID_MPEG2VIDEO;
     default:
         return AV_CODEC_ID_NONE;
     }
@@ -191,6 +209,11 @@ bool DecodeSession::OpenWithExtradata(const uint8_t* extraData, size_t extraData
 
 DecodeStatus DecodeSession::Decode(const uint8_t* data, size_t dataSize, DecodedFrameInfo* frameInfo)
 {
+    return DecodeWithPts(data, dataSize, 0, frameInfo);
+}
+
+DecodeStatus DecodeSession::DecodeWithPts(const uint8_t* data, size_t dataSize, int64_t pts, DecodedFrameInfo* frameInfo)
+{
     AVCodecContext* context = AsContext(codecContext_);
     AVPacket* packet = AsPacket(packet_);
     if (!context || !packet) {
@@ -214,6 +237,8 @@ DecodeStatus DecodeSession::Decode(const uint8_t* data, size_t dataSize, Decoded
     }
 
     memcpy(packet->data, data, dataSize);
+    packet->pts = pts;
+    packet->dts = pts;
     const int sendResult = avcodec_send_packet(context, packet);
     av_packet_unref(packet);
     if (sendResult == AVERROR(EAGAIN)) {
@@ -347,6 +372,24 @@ bool DecodeCodecFromFourcc(uint32_t fourcc, DecodeCodec* codec)
     case kFourccwmv2:
         *codec = kDecodeCodecWmv2;
         return true;
+    case kFourccH264:
+    case kFourcch264:
+    case kFourccX264:
+    case kFourccx264:
+    case kFourccAVC1:
+    case kFourccavc1:
+    case kFourccDAVC:
+    case kFourccdavc:
+    case kFourccPAVC:
+    case kFourccpavc:
+        *codec = kDecodeCodecH264;
+        return true;
+    case kFourccMPG2:
+    case kFourccmpg2:
+    case kFourccMMES:
+    case kFourccmmes:
+        *codec = kDecodeCodecMpeg2;
+        return true;
     default:
         return false;
     }
@@ -380,6 +423,12 @@ bool DecodeCodecFromModernAvCodecId(int codecId, DecodeCodec* codec)
     case AV_CODEC_ID_WMV2:
         *codec = kDecodeCodecWmv2;
         return true;
+    case AV_CODEC_ID_H264:
+        *codec = kDecodeCodecH264;
+        return true;
+    case AV_CODEC_ID_MPEG2VIDEO:
+        *codec = kDecodeCodecMpeg2;
+        return true;
     default:
         return false;
     }
@@ -395,6 +444,8 @@ bool IsFirstWaveSoftwareCodec(DecodeCodec codec)
     case kDecodeCodecVp6a:
     case kDecodeCodecWmv1:
     case kDecodeCodecWmv2:
+    case kDecodeCodecH264:
+    case kDecodeCodecMpeg2:
         return true;
     default:
         return false;

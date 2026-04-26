@@ -12,7 +12,9 @@ enum DecodeCodec {
     kDecodeCodecVp6f,
     kDecodeCodecVp6a,
     kDecodeCodecWmv1,
-    kDecodeCodecWmv2
+    kDecodeCodecWmv2,
+    kDecodeCodecH264,
+    kDecodeCodecMpeg2
 };
 
 enum DecodeStatus {
@@ -39,6 +41,7 @@ public:
     bool Open();
     bool OpenWithExtradata(const uint8_t* extraData, size_t extraDataSize);
     DecodeStatus Decode(const uint8_t* data, size_t dataSize, DecodedFrameInfo* frameInfo);
+    DecodeStatus DecodeWithPts(const uint8_t* data, size_t dataSize, int64_t pts, DecodedFrameInfo* frameInfo);
     DecodeStatus Drain(DecodedFrameInfo* frameInfo);
     void Flush();
 

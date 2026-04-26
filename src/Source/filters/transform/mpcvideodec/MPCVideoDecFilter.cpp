@@ -569,6 +569,20 @@ bool IsModernFfmpegBridgeFourcc(int fourcc)
 	case MAKEFOURCC('w','m','v','1'):
 	case MAKEFOURCC('W','M','V','2'):
 	case MAKEFOURCC('w','m','v','2'):
+	case MAKEFOURCC('H','2','6','4'):
+	case MAKEFOURCC('h','2','6','4'):
+	case MAKEFOURCC('X','2','6','4'):
+	case MAKEFOURCC('x','2','6','4'):
+	case MAKEFOURCC('A','V','C','1'):
+	case MAKEFOURCC('a','v','c','1'):
+	case MAKEFOURCC('D','A','V','C'):
+	case MAKEFOURCC('d','a','v','c'):
+	case MAKEFOURCC('P','A','V','C'):
+	case MAKEFOURCC('p','a','v','c'):
+	case MAKEFOURCC('M','P','G','2'):
+	case MAKEFOURCC('m','p','g','2'):
+	case MAKEFOURCC('M','M','E','S'):
+	case MAKEFOURCC('m','m','e','s'):
 		return true;
 	default:
 		return false;
@@ -585,6 +599,8 @@ bool IsModernFfmpegBridgeCodec(enum CodecID codec, int fourcc)
 	case CODEC_ID_VP6A:
 	case CODEC_ID_WMV1:
 	case CODEC_ID_WMV2:
+	case CODEC_ID_H264:
+	case CODEC_ID_MPEG2VIDEO:
 		return IsModernFfmpegBridgeFourcc(fourcc);
 	default:
 		return false;
@@ -917,9 +933,13 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn)
 				#endif
 				break;
             case CODEC_ID_MPEG2VIDEO :
-                //Only DXVA MPEG2
-                m_bUseDXVA = true;
-                m_bUseFFmpeg = false;	// No Mpeg2 software support with ffmpeg!
+                if (IsModernFfmpegBridgeCodec(ffCodecs[i].nFFCodec, ffCodecs[i].fourcc)) {
+                    m_bUseDXVA = false;
+                    m_bUseFFmpeg = true;
+                } else {
+                    m_bUseDXVA = true;
+                    m_bUseFFmpeg = false;
+                }
                 break;
 			default :
 				m_bUseDXVA = false;
@@ -1271,6 +1291,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			m_pAVCtx->intra_matrix			= (uint16_t*)calloc(sizeof(uint16_t),64);
 			m_pAVCtx->inter_matrix			= (uint16_t*)calloc(sizeof(uint16_t),64);
 			m_pAVCtx->codec_tag				= ffCodecs[nNewCodec].fourcc;
+			m_pAVCtx->codec_id				= m_pAVCodec->id;
 			m_pAVCtx->workaround_bugs		= m_nWorkaroundBug;
 			m_pAVCtx->error_concealment		= m_nErrorConcealment;
 			m_pAVCtx->error_recognition		= m_nErrorRecognition;
@@ -1309,11 +1330,6 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			//SVP_LogMsg2(_T("AVCOPEN  m_pAVCodec %ul") , m_pAVCodec);
 			
 
-			int avcRet = avcodec_open(m_pAVCtx, m_pAVCodec);
-			if (avcRet<0){
-				SVP_LogMsg2(_T("AVCOPEN FAIL %d") , avcRet);
-				return VFW_E_INVALIDMEDIATYPE;
-			}
 			m_bUseModernFfmpegBridge = false;
 			if (IsModernFfmpegBridgeCodec(ffCodecs[m_nCodecNb].nFFCodec, ffCodecs[m_nCodecNb].fourcc)) {
 				if (!m_modernFfmpegBridge.Open(ffCodecs[m_nCodecNb].fourcc, m_pAVCtx->extradata, m_pAVCtx->extradata_size)) {
@@ -1321,9 +1337,19 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 					return VFW_E_INVALIDMEDIATYPE;
 				}
 				m_bUseModernFfmpegBridge = true;
+				if (ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_H264 || ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_MPEG2VIDEO) {
+					m_bUseDXVA = false;
+					m_bDXVACompatible = false;
+				}
+			} else {
+				int avcRet = avcodec_open(m_pAVCtx, m_pAVCodec);
+				if (avcRet<0){
+					SVP_LogMsg2(_T("AVCOPEN FAIL %d") , avcRet);
+					return VFW_E_INVALIDMEDIATYPE;
+				}
 			}
 			CString osd_msg;
-			if (ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_H264)
+			if (ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_H264 && !m_bUseModernFfmpegBridge)
 			{
 				int		nCompat, refFrames = 0;
 				nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, (BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, &refFrames);
@@ -1356,7 +1382,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 					if((nCompat == 2) && (m_ref_frame_count_check_skip)) m_bDXVACompatible = true;
 				#endif
 
-            }else if(ffCodecs[m_nCodecNb].nFFCodec ==  CODEC_ID_MPEG2VIDEO){
+            }else if(ffCodecs[m_nCodecNb].nFFCodec ==  CODEC_ID_MPEG2VIDEO && !m_bUseModernFfmpegBridge){
                 // DSP is disable for DXVA decoding (to keep default idct_permutation)
                 m_pAVCtx->dsp_mask ^= FF_MM_FORCE;
             }
@@ -1871,7 +1897,7 @@ HRESULT CMPCVideoDecFilter::ModernFfmpegBridgeDecode(IMediaSample* pIn, BYTE* pD
 	}
 
 	PlayasaFfmpegModernFrameInfo frameInfo = {};
-	const int status = m_modernFfmpegBridge.Decode(pDataIn, nSize, &frameInfo);
+	const int status = m_modernFfmpegBridge.Decode(pDataIn, nSize, rtStart, &frameInfo);
 	if (status == PLAYASA_FFMPEG_MODERN_STATUS_FAILURE) {
 		SVP_LogMsg5(L"Modern FFmpeg bridge decode failed: %S", m_modernFfmpegBridge.LastError());
 		return S_OK;
@@ -1897,9 +1923,10 @@ HRESULT CMPCVideoDecFilter::ModernFfmpegBridgeDecode(IMediaSample* pIn, BYTE* pD
 		return hr;
 	}
 
-	if (rtStop <= rtStart) {
-		rtStop = rtStart + m_rtAvrTimePerFrame;
+	if (frameInfo.pts != 0) {
+		rtStart = frameInfo.pts;
 	}
+	rtStop = rtStart + m_rtAvrTimePerFrame;
 	pOut->SetTime(&rtStart, &rtStop);
 	pOut->SetMediaTime(NULL, NULL);
 

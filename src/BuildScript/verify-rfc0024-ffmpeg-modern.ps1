@@ -111,16 +111,21 @@ Assert-Text $adapterSource 'AV_CODEC_ID_FLV1' 'adapter must cover FLV1 first-wav
 Assert-Text $adapterSource 'AV_CODEC_ID_VP6' 'adapter must cover VP6 first-wave codec'
 Assert-Text $adapterSource 'AV_CODEC_ID_WMV1' 'adapter must cover WMV1 first-wave codec'
 Assert-Text $adapterSource 'AV_CODEC_ID_WMV2' 'adapter must cover WMV2 first-wave codec'
+Assert-Text $adapterSource 'AV_CODEC_ID_H264' 'adapter must cover H264 modern software codec'
+Assert-Text $adapterSource 'AV_CODEC_ID_MPEG2VIDEO' 'adapter must cover MPEG-2 modern software codec'
 Assert-Text $adapterSource 'kFourccXVIX' 'adapter must cover XVIX MPEG-4 alias'
 Assert-Text $adapterSource 'kFourccVP61' 'adapter must cover VP61 alias'
 Assert-Text $adapterSource 'kFourccVP62' 'adapter must cover VP62 alias'
+Assert-Text $adapterSource 'kFourccMPG2' 'adapter must cover MPEG-2 alias'
 Assert-Text $bridgeHeader 'PLAYASA_FFMPEG_MODERN_API' 'bridge header must expose a C ABI import/export macro'
 Assert-Text $bridgeHeader 'PlayasaFfmpegModernSession' 'bridge header must expose opaque session handle'
+Assert-Text $bridgeHeader 'PLAYASA_FFMPEG_MODERN_CODEC_MPEG2' 'bridge header must expose MPEG-2 codec id'
 Assert-Text $bridgeHeader 'data\[4\]' 'bridge frame info must expose planes for MPCVideoDec output copy'
 Assert-Text $bridgeHeader 'linesize\[4\]' 'bridge frame info must expose strides for MPCVideoDec output copy'
 Assert-Text $bridgeSource 'extern "C"' 'bridge source must export a C ABI'
 Assert-Text $bridgeSource 'playasa_ffmpeg_modern_create' 'bridge source must export create'
 Assert-Text $bridgeSource 'playasa_ffmpeg_modern_decode' 'bridge source must export decode'
+Assert-Text $bridgeSource 'playasa_ffmpeg_modern_decode_with_pts' 'bridge source must export timestamp-aware decode'
 Assert-Text $bridgeSource 'ToBridgePixelFormat' 'bridge source must map pixel formats to stable C ABI values'
 Assert-Text $bridgeConsumerHeader 'class\s+Consumer' 'MSVC-side consumer must wrap dynamic bridge loading'
 Assert-Text $bridgeConsumerSource 'LoadLibraryA' 'MSVC-side consumer must dynamically load the bridge DLL'
@@ -133,6 +138,11 @@ Assert-Text $legacyFilterHeader 'ModernFfmpegBridgeConsumer\.h' 'MPCVideoDec mus
 Assert-Text $legacyFilterSource 'ModernFfmpegBridgeDecode' 'MPCVideoDec must route first-wave software decode through bridge'
 Assert-Text $legacyFilterSource 'IsModernFfmpegBridgeCodec' 'MPCVideoDec must restrict bridge use to first-wave codecs'
 Assert-Text $legacyFilterSource 'av_log_set_callback\(LogLibAVCodec\)' 'MPCVideoDec must not let legacy FFmpeg log through CRT stderr'
+Assert-Text $legacyFilterSource 'CODEC_ID_H264\)' 'MPCVideoDec must route H264 through bridge eligibility'
+Assert-Text $legacyFilterSource 'CODEC_ID_MPEG2VIDEO' 'MPCVideoDec must route MPEG-2 through bridge eligibility'
+Assert-Text $legacyFilterSource 'm_bUseDXVA = false' 'MPCVideoDec must disable old H264 DXVA path after bridge activation'
+Assert-Text $legacyFilterSource '!m_bUseModernFfmpegBridge' 'MPCVideoDec must not run legacy MPEG-2 DXVA setup for modern bridge'
+Assert-Text $legacyFilterSource 'else\s+\{\s+int avcRet = avcodec_open' 'MPCVideoDec must not open legacy decoders for modern bridge codecs'
 Assert-Text $legacyFilterSource "MAKEFOURCC\('X','V','I','X'\)" 'MPCVideoDec must route XVIX alias through bridge'
 Assert-Text $legacyFilterSource "MAKEFOURCC\('V','P','6','1'\)" 'MPCVideoDec must route VP61 alias through bridge'
 Assert-Text $legacyFilterSource "MAKEFOURCC\('V','P','6','2'\)" 'MPCVideoDec must route VP62 alias through bridge'
@@ -200,13 +210,17 @@ foreach ($option in @(
   '--enable-decoder=vp6f',
   '--enable-decoder=wmv1',
   '--enable-decoder=wmv2',
+  '--enable-decoder=h264',
+  '--enable-decoder=mpeg2video',
   '--enable-demuxer=avi',
   '--enable-demuxer=flv',
   '--enable-demuxer=matroska',
   '--enable-demuxer=mov',
   '--enable-parser=mpeg4video',
   '--enable-parser=h263',
-  '--enable-parser=vp3'
+  '--enable-parser=vp3',
+  '--enable-parser=h264',
+  '--enable-parser=mpegvideo'
 )) {
   Assert-Text $expectedFile ([regex]::Escape($option)) "missing configure option $option"
 }

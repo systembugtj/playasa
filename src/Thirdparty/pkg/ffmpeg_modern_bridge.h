@@ -22,7 +22,9 @@ enum {
     PLAYASA_FFMPEG_MODERN_CODEC_VP6F = 3,
     PLAYASA_FFMPEG_MODERN_CODEC_VP6A = 4,
     PLAYASA_FFMPEG_MODERN_CODEC_WMV1 = 5,
-    PLAYASA_FFMPEG_MODERN_CODEC_WMV2 = 6
+    PLAYASA_FFMPEG_MODERN_CODEC_WMV2 = 6,
+    PLAYASA_FFMPEG_MODERN_CODEC_H264 = 7,
+    PLAYASA_FFMPEG_MODERN_CODEC_MPEG2 = 8
 };
 
 enum {
@@ -61,6 +63,7 @@ PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_codec_from_fourcc(uint32_t f
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_create(uint32_t codec, PlayasaFfmpegModernSession* session);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_open(PlayasaFfmpegModernSession session, const uint8_t* extra_data, size_t extra_data_size);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_decode(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, PlayasaFfmpegModernFrameInfo* frame_info);
+PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_decode_with_pts(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, int64_t pts, PlayasaFfmpegModernFrameInfo* frame_info);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_drain(PlayasaFfmpegModernSession session, PlayasaFfmpegModernFrameInfo* frame_info);
 PLAYASA_FFMPEG_MODERN_API void playasa_ffmpeg_modern_flush(PlayasaFfmpegModernSession session);
 PLAYASA_FFMPEG_MODERN_API const char* playasa_ffmpeg_modern_last_error(PlayasaFfmpegModernSession session);

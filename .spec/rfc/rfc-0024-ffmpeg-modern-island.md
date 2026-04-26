@@ -6,7 +6,7 @@
 | **适用范围** | `src/Thirdparty/ffmpeg-modern`、`src/BuildScript`、`src/Source/filters/transform/mpcvideodec` 新版 FFmpeg adapter 与非 DXVA 软件解码路径 |
 | **相关 RFC** | [RFC-0017](./completed/rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0019](./rfc-0019-thirdparty-crt-mfc-linkage-contract.md) |
 | **创建日期** | 2026-04-25 |
-| **最后更新** | 2026-04-25 |
+| **最后更新** | 2026-04-26 |
 
 ## 1. 摘要
 
@@ -19,7 +19,7 @@ RFC-0017 已确认当前 `mpcvideodec` 内嵌 FFmpeg/libav 是 `libavcodec 52.32
 1. 新增 `src/Thirdparty/ffmpeg-modern` 作为新版 FFmpeg island，不覆盖旧 `mpcvideodec/ffmpeg`。
 2. 固定 FFmpeg 8.1 源码来源、压缩包 URL、SHA-256、许可证和最小 configure 选项。
 3. 新增最小软件解码 adapter，封装 `AVCodecContext`、`AVPacket`、`AVFrame` 生命周期。
-4. 第一阶段只迁移非 DXVA 软件 codec；H.264 / MPEG-2 / VC-1 DXVA 仍走旧路径。
+4. 第一阶段迁移软件 codec；H.264 / MPEG-2 命中 modern bridge 时禁用旧 DXVA 探测/解码，VC-1 DXVA 仍走旧路径。
 5. 每一步都必须有脚本门闩，不能靠人工记忆维护版本和边界。
 
 ## 3. 非目标
@@ -72,6 +72,8 @@ RFC-0017 已确认当前 `mpcvideodec` 内嵌 FFmpeg/libav 是 `libavcodec 52.32
 --enable-decoder=vp6f
 --enable-decoder=wmv1
 --enable-decoder=wmv2
+--enable-decoder=h264
+--enable-decoder=mpeg2video
 --enable-demuxer=avi
 --enable-demuxer=flv
 --enable-demuxer=matroska
@@ -79,6 +81,8 @@ RFC-0017 已确认当前 `mpcvideodec` 内嵌 FFmpeg/libav 是 `libavcodec 52.32
 --enable-parser=mpeg4video
 --enable-parser=h263
 --enable-parser=vp3
+--enable-parser=h264
+--enable-parser=mpegvideo
 ```
 
 `libavformat` 用于样本级 smoke test 打开容器并喂给 adapter；仍禁用 network / muxers / device / filter / hwaccel，并且默认禁用所有 decoder/demuxer/parser 后只打开第一批迁移需要的最小集合。
@@ -99,9 +103,13 @@ MSVC 侧不能直接链接 MinGW 生成的 FFmpeg 静态 `.a`。`MPCVideoDec` �
 
 实际接入 `MPCVideoDec` 时，主工程不直接链接 `.lib`，而是通过 `ModernFfmpegBridgeConsumer` 使用 `LoadLibraryA` / `GetProcAddress` 动态解析 C ABI。这样静态库配置不会把 bridge 变成强链接依赖，同时运行目录只需要部署 `playasa_ffmpeg_modern_bridge.dll`、`libiconv-2.dll` 和 `libwinpthread-1.dll`。
 
-首批真实替代范围限定为无 DXVA 模式的 first-wave 软件解码：MPEG-4 ASP/DivX/Xvid/MP4V、FLV1、VP6/VP6F/VP6A、WMV1、WMV2。`MPCVideoDecFilter` 只在这些 FourCC 命中时启用 `ModernFfmpegBridgeDecode`，其他 codec 仍保持 legacy FFmpeg 路径。
+首批真实替代范围限定为 first-wave 软件解码、H264 软件解码和 MPEG-2 软件解码：MPEG-4 ASP/DivX/Xvid/MP4V、FLV1、VP6/VP6F/VP6A、WMV1、WMV2、H264/AVC、MPEG-2。`MPCVideoDecFilter` 只在这些 FourCC 命中时启用 `ModernFfmpegBridgeDecode`，其他 codec 仍保持 legacy FFmpeg 路径。
 
 旧 FFmpeg 仍会在 H264/DXVA 兼容性探测阶段运行，因此 `MPCVideoDec` 必须始终安装 `LogLibAVCodec` 作为 libavcodec 日志回调，避免默认 `av_log_default_callback` 写 CRT `stderr` 并在 GUI/混合 CRT 链接环境中崩溃。
+
+H264 命中 modern bridge 后，旧 DXVA compatibility probe 和旧 H264 DXVA decode path 会被禁用，先保证 H264 活跃播放路径不再依赖旧 FFmpeg private internals。现代 DXVA 需要后续单独实现，不能继续复用 `FfmpegContext.c` 的 `H264Context` / `MpegEncContext` 私有字段。
+
+MPEG-2 命中 modern bridge 后，旧 MPEG-2 DXVA 强制路径也会被禁用，`FindCodec` 会把 modern bridge MPEG-2 视为软件解码能力。modern bridge codec 不再调用旧 `avcodec_open`，旧 `AVCodecContext` 只作为本工程既有宽高、extradata 和输出协商状态容器。
 
 ## 7. 第一批 codec 策略
 
@@ -110,8 +118,10 @@ MSVC 侧不能直接链接 MinGW 生成的 FFmpeg 静态 `.a`。`MPCVideoDec` �
 1. MPEG-4 ASP / DivX / Xvid
 2. FLV / VP6
 3. WMV1 / WMV2
+4. H264 / AVC
+5. MPEG-2
 
-H.264、MPEG-2、VC-1 先不迁移，因为它们当前和 DXVA / `FfmpegContext.c` 的私有结构耦合太深。
+VC-1 先不迁移，因为它当前和 DXVA / `FfmpegContext.c` 的私有结构耦合仍未拆开。
 
 ## 8. 验证
 

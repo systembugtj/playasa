@@ -18,7 +18,7 @@ Consumer::Consumer()
     , codecFromFourcc_(NULL)
     , create_(NULL)
     , open_(NULL)
-    , decode_(NULL)
+    , decodeWithPts_(NULL)
     , flush_(NULL)
     , lastError_(NULL)
     , destroy_(NULL)
@@ -65,14 +65,14 @@ bool Consumer::Open(unsigned int fourcc, const unsigned char* extraData, size_t 
     return true;
 }
 
-int Consumer::Decode(const unsigned char* data, size_t dataSize, PlayasaFfmpegModernFrameInfo* frameInfo)
+int Consumer::Decode(const unsigned char* data, size_t dataSize, int64_t pts, PlayasaFfmpegModernFrameInfo* frameInfo)
 {
-    if (!session_ || !decode_) {
+    if (!session_ || !decodeWithPts_) {
         SetError("FFmpeg modern bridge session is not open");
         return PLAYASA_FFMPEG_MODERN_STATUS_FAILURE;
     }
 
-    const int status = decode_(session_, data, dataSize, frameInfo);
+    const int status = decodeWithPts_(session_, data, dataSize, pts, frameInfo);
     if (status == PLAYASA_FFMPEG_MODERN_STATUS_FAILURE) {
         SetError(lastError_(session_));
     }
@@ -119,12 +119,12 @@ bool Consumer::LoadBridge()
     codecFromFourcc_ = reinterpret_cast<CodecFromFourccFn>(LoadRequiredProc("playasa_ffmpeg_modern_codec_from_fourcc"));
     create_ = reinterpret_cast<CreateFn>(LoadRequiredProc("playasa_ffmpeg_modern_create"));
     open_ = reinterpret_cast<OpenFn>(LoadRequiredProc("playasa_ffmpeg_modern_open"));
-    decode_ = reinterpret_cast<DecodeFn>(LoadRequiredProc("playasa_ffmpeg_modern_decode"));
+    decodeWithPts_ = reinterpret_cast<DecodeWithPtsFn>(LoadRequiredProc("playasa_ffmpeg_modern_decode_with_pts"));
     flush_ = reinterpret_cast<FlushFn>(LoadRequiredProc("playasa_ffmpeg_modern_flush"));
     lastError_ = reinterpret_cast<LastErrorFn>(LoadRequiredProc("playasa_ffmpeg_modern_last_error"));
     destroy_ = reinterpret_cast<DestroyFn>(LoadRequiredProc("playasa_ffmpeg_modern_destroy"));
 
-    if (!codecFromFourcc_ || !create_ || !open_ || !decode_ || !flush_ || !lastError_ || !destroy_) {
+    if (!codecFromFourcc_ || !create_ || !open_ || !decodeWithPts_ || !flush_ || !lastError_ || !destroy_) {
         FreeLibrary(module_);
         module_ = NULL;
         return false;

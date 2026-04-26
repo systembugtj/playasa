@@ -12,7 +12,7 @@ public:
     ~Consumer();
 
     bool Open(unsigned int fourcc, const unsigned char* extraData, size_t extraDataSize);
-    int Decode(const unsigned char* data, size_t dataSize, PlayasaFfmpegModernFrameInfo* frameInfo);
+    int Decode(const unsigned char* data, size_t dataSize, int64_t pts, PlayasaFfmpegModernFrameInfo* frameInfo);
     void Flush();
     void Close();
     const char* LastError() const;
@@ -22,7 +22,7 @@ private:
     typedef int (*CodecFromFourccFn)(uint32_t, uint32_t*);
     typedef int (*CreateFn)(uint32_t, PlayasaFfmpegModernSession*);
     typedef int (*OpenFn)(PlayasaFfmpegModernSession, const uint8_t*, size_t);
-    typedef int (*DecodeFn)(PlayasaFfmpegModernSession, const uint8_t*, size_t, PlayasaFfmpegModernFrameInfo*);
+    typedef int (*DecodeWithPtsFn)(PlayasaFfmpegModernSession, const uint8_t*, size_t, int64_t, PlayasaFfmpegModernFrameInfo*);
     typedef void (*FlushFn)(PlayasaFfmpegModernSession);
     typedef const char* (*LastErrorFn)(PlayasaFfmpegModernSession);
     typedef void (*DestroyFn)(PlayasaFfmpegModernSession);
@@ -39,7 +39,7 @@ private:
     CodecFromFourccFn codecFromFourcc_;
     CreateFn create_;
     OpenFn open_;
-    DecodeFn decode_;
+    DecodeWithPtsFn decodeWithPts_;
     FlushFn flush_;
     LastErrorFn lastError_;
     DestroyFn destroy_;

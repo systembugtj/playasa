@@ -5,6 +5,7 @@ EXPORTS
     playasa_ffmpeg_modern_create
     playasa_ffmpeg_modern_open
     playasa_ffmpeg_modern_decode
+    playasa_ffmpeg_modern_decode_with_pts
     playasa_ffmpeg_modern_drain
     playasa_ffmpeg_modern_flush
     playasa_ffmpeg_modern_last_error

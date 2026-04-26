@@ -26,6 +26,10 @@ ModernFfmpeg::DecodeCodec ToAdapterCodec(uint32_t codec)
         return ModernFfmpeg::kDecodeCodecWmv1;
     case PLAYASA_FFMPEG_MODERN_CODEC_WMV2:
         return ModernFfmpeg::kDecodeCodecWmv2;
+    case PLAYASA_FFMPEG_MODERN_CODEC_H264:
+        return ModernFfmpeg::kDecodeCodecH264;
+    case PLAYASA_FFMPEG_MODERN_CODEC_MPEG2:
+        return ModernFfmpeg::kDecodeCodecMpeg2;
     default:
         return ModernFfmpeg::kDecodeCodecMpeg4;
     }
@@ -41,6 +45,8 @@ bool IsValidCodec(uint32_t codec)
     case PLAYASA_FFMPEG_MODERN_CODEC_VP6A:
     case PLAYASA_FFMPEG_MODERN_CODEC_WMV1:
     case PLAYASA_FFMPEG_MODERN_CODEC_WMV2:
+    case PLAYASA_FFMPEG_MODERN_CODEC_H264:
+    case PLAYASA_FFMPEG_MODERN_CODEC_MPEG2:
         return true;
     default:
         return false;
@@ -130,6 +136,10 @@ uint32_t ToBridgeCodec(ModernFfmpeg::DecodeCodec codec)
         return PLAYASA_FFMPEG_MODERN_CODEC_WMV1;
     case ModernFfmpeg::kDecodeCodecWmv2:
         return PLAYASA_FFMPEG_MODERN_CODEC_WMV2;
+    case ModernFfmpeg::kDecodeCodecH264:
+        return PLAYASA_FFMPEG_MODERN_CODEC_H264;
+    case ModernFfmpeg::kDecodeCodecMpeg2:
+        return PLAYASA_FFMPEG_MODERN_CODEC_MPEG2;
     default:
         return PLAYASA_FFMPEG_MODERN_CODEC_MPEG4;
     }
@@ -193,6 +203,11 @@ int playasa_ffmpeg_modern_open(PlayasaFfmpegModernSession session, const uint8_t
 
 int playasa_ffmpeg_modern_decode(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, PlayasaFfmpegModernFrameInfo* frame_info)
 {
+    return playasa_ffmpeg_modern_decode_with_pts(session, data, data_size, 0, frame_info);
+}
+
+int playasa_ffmpeg_modern_decode_with_pts(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, int64_t pts, PlayasaFfmpegModernFrameInfo* frame_info)
+{
     ModernFfmpeg::DecodeSession* decodeSession = ToSession(session);
     if (!decodeSession) {
         return PLAYASA_FFMPEG_MODERN_STATUS_FAILURE;
@@ -200,7 +215,7 @@ int playasa_ffmpeg_modern_decode(PlayasaFfmpegModernSession session, const uint8
 
     try {
         ModernFfmpeg::DecodedFrameInfo adapterFrame = {};
-        const int status = ToBridgeStatus(decodeSession->Decode(data, data_size, &adapterFrame));
+        const int status = ToBridgeStatus(decodeSession->DecodeWithPts(data, data_size, pts, &adapterFrame));
         CopyFrameInfo(adapterFrame, frame_info);
         return status;
     } catch (...) {

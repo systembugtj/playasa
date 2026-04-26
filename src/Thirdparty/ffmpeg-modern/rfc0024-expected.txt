@@ -47,6 +47,8 @@ Configure pins:
 - --enable-decoder=vp6f
 - --enable-decoder=wmv1
 - --enable-decoder=wmv2
+- --enable-decoder=h264
+- --enable-decoder=mpeg2video
 - --enable-demuxer=avi
 - --enable-demuxer=flv
 - --enable-demuxer=matroska
@@ -54,10 +56,12 @@ Configure pins:
 - --enable-parser=mpeg4video
 - --enable-parser=h263
 - --enable-parser=vp3
+- --enable-parser=h264
+- --enable-parser=mpegvideo
 
 Boundaries:
 - Keep legacy src/Source/filters/transform/mpcvideodec/ffmpeg unchanged.
-- Keep DXVA/H.264/MPEG-2/VC-1 legacy FfmpegContext.c paths unchanged in the first phase.
+- Keep VC-1 legacy FfmpegContext.c paths unchanged in this phase.
 - Do not expose FFmpeg private headers outside src/Source/filters/transform/mpcvideodec/modern_ffmpeg.
 - Do not link this island into MPCVideoDec until adapter smoke tests exist.
 
@@ -67,6 +71,8 @@ First-wave software codecs:
 - VP6
 - WMV1
 - WMV2
+- H264 software decode
+- MPEG-2 software decode
 
 Adapter pins:
 - src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegDecodeAdapter.h
@@ -88,3 +94,6 @@ Bridge pins:
 - MPCVideoDec may only consume the bridge through dynamic loading, not direct MinGW static library linking.
 - First-wave software decode routes through ModernFfmpegBridgeDecode.
 - Legacy FFmpeg logging must use LogLibAVCodec, not CRT stderr.
+- H264 software decode routes through the modern bridge; old H264 DXVA is disabled until a modern DXVA path exists.
+- MPEG-2 software decode routes through the modern bridge; old MPEG-2 DXVA is disabled for modern-bridge MPEG-2.
+- Modern-bridge codecs must not call legacy avcodec_open.
