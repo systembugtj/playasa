@@ -5,7 +5,8 @@
 #>
 [CmdletBinding()]
 param(
-  [Parameter(Mandatory)][string]$SamplePath
+  [string]$SamplePath,
+  [switch]$BuildOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -18,6 +19,54 @@ $adapterSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\m
 $outputDir = Join-Path $repoRoot 'out\obj\MPCVideoDecModernSmoke'
 $outputExe = Join-Path $outputDir 'MPCVideoDecModernSmoke.exe'
 
+function Get-Msys2Root {
+  $candidates = @(
+    (Join-Path $env:USERPROFILE 'scoop\apps\msys2\current'),
+    (Join-Path $env:USERPROFILE 'scoop\apps\msys2\2026-03-22')
+  )
+  foreach ($candidate in $candidates) {
+    if (Test-Path -LiteralPath (Join-Path $candidate 'usr\bin\bash.exe')) {
+      return $candidate
+    }
+  }
+
+  throw 'Missing MSYS2. Install it with: scoop install msys2'
+}
+
+function Convert-ToMsysPath {
+  param([string]$Path)
+  $fullPath = [System.IO.Path]::GetFullPath($Path)
+  $drive = $fullPath.Substring(0, 1).ToLowerInvariant()
+  $rest = $fullPath.Substring(2).Replace('\', '/')
+  return "/$drive$rest"
+}
+
+function Invoke-Msys2 {
+  param(
+    [string]$Msys2Root,
+    [string]$Command
+  )
+
+  $bash = Join-Path $Msys2Root 'usr\bin\bash.exe'
+  if (-not (Test-Path -LiteralPath $bash)) {
+    throw "Missing MSYS2 bash: $bash"
+  }
+
+  $oldMsystem = $env:MSYSTEM
+  $oldChere = $env:CHERE_INVOKING
+  try {
+    $env:MSYSTEM = 'MINGW32'
+    $env:CHERE_INVOKING = '1'
+    & $bash -lc $Command
+    if ($LASTEXITCODE -ne 0) {
+      throw "MSYS2 command failed with exit code $LASTEXITCODE"
+    }
+  } finally {
+    $env:MSYSTEM = $oldMsystem
+    $env:CHERE_INVOKING = $oldChere
+  }
+}
+
 function Assert-FileExists {
   param([string]$Path)
   if (-not (Test-Path -LiteralPath $Path)) {
@@ -25,47 +74,41 @@ function Assert-FileExists {
   }
 }
 
-Assert-FileExists $SamplePath
+if (-not $BuildOnly) {
+  if (-not $SamplePath) {
+    throw 'SamplePath is required unless -BuildOnly is used.'
+  }
+  Assert-FileExists $SamplePath
+}
 Assert-FileExists $smokeSource
 Assert-FileExists $adapterSource
 Assert-FileExists (Join-Path $ffmpegInstall 'include\libavcodec\avcodec.h')
 Assert-FileExists (Join-Path $ffmpegInstall 'include\libavformat\avformat.h')
-Assert-FileExists (Join-Path $ffmpegInstall 'lib\avcodec.lib')
-Assert-FileExists (Join-Path $ffmpegInstall 'lib\avformat.lib')
-Assert-FileExists (Join-Path $ffmpegInstall 'lib\avutil.lib')
-
-$cl = Get-Command cl.exe -ErrorAction SilentlyContinue
-if (-not $cl) {
-  throw 'Missing cl.exe. Run this smoke test from a Visual Studio Developer PowerShell.'
-}
+Assert-FileExists (Join-Path $ffmpegInstall 'lib\libavcodec.a')
+Assert-FileExists (Join-Path $ffmpegInstall 'lib\libavformat.a')
+Assert-FileExists (Join-Path $ffmpegInstall 'lib\libavutil.a')
+Assert-FileExists (Join-Path $ffmpegInstall 'lib\pkgconfig\libavcodec.pc')
 
 New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
 
-$includeArg = "/I$(Join-Path $ffmpegInstall 'include')"
-$libPathArg = "/LIBPATH:$(Join-Path $ffmpegInstall 'lib')"
-$compileArgs = @(
-  '/nologo',
-  '/EHsc',
-  '/W4',
-  $includeArg,
-  $smokeSource,
-  $adapterSource,
-  '/Fe:' + $outputExe,
-  '/link',
-  $libPathArg,
-  'avcodec.lib',
-  'avformat.lib',
-  'avutil.lib'
-)
+$msys2Root = Get-Msys2Root
+$repoRootMsys = Convert-ToMsysPath $repoRoot
+$ffmpegInstallMsys = Convert-ToMsysPath $ffmpegInstall
+$smokeSourceMsys = Convert-ToMsysPath $smokeSource
+$adapterSourceMsys = Convert-ToMsysPath $adapterSource
+$outputExeMsys = Convert-ToMsysPath $outputExe
+$samplePathMsys = if ($SamplePath) { Convert-ToMsysPath $SamplePath } else { '' }
 
-& $cl.Source @compileArgs
-if ($LASTEXITCODE -ne 0) {
-  throw "MPCVideoDecModernSmoke build failed with exit code $LASTEXITCODE"
+$buildCommand = @"
+export PATH=/mingw32/bin:/usr/bin:`$PATH
+export PKG_CONFIG_PATH='$ffmpegInstallMsys/lib/pkgconfig'
+g++ -std=c++11 -Wall -Wextra '$smokeSourceMsys' '$adapterSourceMsys' -o '$outputExeMsys' `$(pkg-config --cflags --libs libavformat libavcodec libavutil libswscale libswresample)
+"@
+
+Invoke-Msys2 -Msys2Root $msys2Root -Command $buildCommand
+
+if (-not $BuildOnly) {
+  Invoke-Msys2 -Msys2Root $msys2Root -Command "'$outputExeMsys' '$samplePathMsys'"
 }
 
-& $outputExe $SamplePath
-if ($LASTEXITCODE -ne 0) {
-  throw "MPCVideoDecModernSmoke failed with exit code $LASTEXITCODE"
-}
-
-Write-Host 'test-rfc0024-modern-smoke: OK (decoded first frame)' -ForegroundColor Green
+Write-Host 'test-rfc0024-modern-smoke: OK' -ForegroundColor Green

@@ -30,7 +30,7 @@ const uint32_t kFourccwmv1 = 'w' | ('m' << 8) | ('v' << 16) | ('1' << 24);
 const uint32_t kFourccWMV2 = 'W' | ('M' << 8) | ('V' << 16) | ('2' << 24);
 const uint32_t kFourccwmv2 = 'w' | ('m' << 8) | ('v' << 16) | ('2' << 24);
 
-AVCodecID ToAvCodecId(DecodeCodec codec)
+enum AVCodecID ToAvCodecId(DecodeCodec codec)
 {
     switch (codec) {
     case kDecodeCodecMpeg4:
@@ -264,14 +264,14 @@ void DecodeSession::SetError(const char* message)
     if (!message) {
         message = "Unknown FFmpeg adapter error";
     }
-    strncpy_s(lastError_, kLastErrorCapacity, message, _TRUNCATE);
+    snprintf(lastError_, kLastErrorCapacity, "%s", message);
 }
 
 void DecodeSession::SetAvError(const char* operation, int errorCode)
 {
     char errorText[AV_ERROR_MAX_STRING_SIZE] = { 0 };
     av_strerror(errorCode, errorText, sizeof(errorText));
-    _snprintf_s(lastError_, kLastErrorCapacity, _TRUNCATE, "%s failed: %s", operation, errorText);
+    snprintf(lastError_, kLastErrorCapacity, "%s failed: %s", operation, errorText);
 }
 
 bool DecodeCodecFromFourcc(uint32_t fourcc, DecodeCodec* codec)

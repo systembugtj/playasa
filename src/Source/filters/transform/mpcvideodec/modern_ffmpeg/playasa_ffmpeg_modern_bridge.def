@@ -1,0 +1,11 @@
+LIBRARY playasa_ffmpeg_modern_bridge.dll
+EXPORTS
+    playasa_ffmpeg_modern_avcodec_version
+    playasa_ffmpeg_modern_codec_from_fourcc
+    playasa_ffmpeg_modern_create
+    playasa_ffmpeg_modern_open
+    playasa_ffmpeg_modern_decode
+    playasa_ffmpeg_modern_drain
+    playasa_ffmpeg_modern_flush
+    playasa_ffmpeg_modern_last_error
+    playasa_ffmpeg_modern_destroy

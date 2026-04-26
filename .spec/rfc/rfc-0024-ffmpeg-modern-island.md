@@ -38,8 +38,10 @@ RFC-0017 已确认当前 `mpcvideodec` 内嵌 FFmpeg/libav 是 `libavcodec 52.32
 | `src/Thirdparty/ffmpeg-modern/build/` | 本地生成目录，不应手写业务代码 |
 | `src/Thirdparty/ffmpeg-modern/install/` | 本地安装目录，不应手写业务代码 |
 | `src/Source/filters/transform/mpcvideodec/modern_ffmpeg/` | C++ adapter，只暴露本项目自定义边界 |
+| `src/Thirdparty/pkg/ffmpeg_modern_bridge.h` | MSVC 消费新版 FFmpeg island 的唯一 C ABI 头文件 |
 | `src/BuildScript/verify-rfc0024-ffmpeg-modern.ps1` | 新版 island 结构和版本门闩 |
 | `src/BuildScript/build-rfc0024-ffmpeg-modern.ps1` | 新版 FFmpeg 最小软件解码构建入口 |
+| `src/BuildScript/build-rfc0024-ffmpeg-bridge.ps1` | 构建 C ABI bridge DLL 并生成 MSVC import `.lib` |
 
 ## 5. 固定 configure 选项
 
@@ -91,6 +93,8 @@ RFC-0017 已确认当前 `mpcvideodec` 内嵌 FFmpeg/libav 是 `libavcodec 52.32
 5. `avcodec_flush_buffers`
 
 adapter 内部可以包含新版 FFmpeg header；`MPCVideoDecFilter.cpp` 只依赖 adapter 自己的头文件。
+
+MSVC 侧不能直接链接 MinGW 生成的 FFmpeg 静态 `.a`。`MPCVideoDec` 后续只允许通过 `playasa_ffmpeg_modern_bridge.dll` + `playasa_ffmpeg_modern_bridge.lib` 这个 C ABI bridge 消费新版 FFmpeg，避免 C++ ABI 和 CRT 混用。
 
 ## 7. 第一批 codec 策略
 

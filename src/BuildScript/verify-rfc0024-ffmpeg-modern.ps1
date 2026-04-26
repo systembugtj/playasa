@@ -9,12 +9,19 @@ $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $islandRoot = Join-Path $repoRoot 'src\Thirdparty\ffmpeg-modern'
 $expectedFile = Join-Path $islandRoot 'rfc0024-expected.txt'
 $sourceRoot = Join-Path $islandRoot 'src'
+$installRoot = Join-Path $islandRoot 'install'
 $downloadArchive = Join-Path $islandRoot 'download\ffmpeg-8.1.tar.xz'
 $adapterHeader = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg\ModernFfmpegDecodeAdapter.h'
 $adapterSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg\ModernFfmpegDecodeAdapter.cpp'
+$bridgeHeader = Join-Path $repoRoot 'src\Thirdparty\pkg\ffmpeg_modern_bridge.h'
+$bridgeSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg\ModernFfmpegBridge.cpp'
+$bridgeDef = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg\playasa_ffmpeg_modern_bridge.def'
+$bridgeBuildScript = Join-Path $PSScriptRoot 'build-rfc0024-ffmpeg-bridge.ps1'
 $legacyFilterSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp'
 $smokeSource = Join-Path $repoRoot 'src\Test\MPCVideoDecModernSmoke\MPCVideoDecModernSmoke.cpp'
 $smokeScript = Join-Path $PSScriptRoot 'test-rfc0024-modern-smoke.ps1'
+$bridgeSmokeSource = Join-Path $repoRoot 'src\Test\MPCVideoDecModernBridgeSmoke\MPCVideoDecModernBridgeSmoke.cpp'
+$bridgeSmokeScript = Join-Path $PSScriptRoot 'test-rfc0024-modern-bridge-smoke.ps1'
 
 function Assert-FileExists {
   param([string]$Path)
@@ -57,15 +64,22 @@ Assert-FileExists (Join-Path $sourceRoot 'libavcodec\version_major.h')
 Assert-FileExists (Join-Path $sourceRoot 'libavutil\version.h')
 Assert-FileExists $adapterHeader
 Assert-FileExists $adapterSource
+Assert-FileExists $bridgeHeader
+Assert-FileExists $bridgeSource
+Assert-FileExists $bridgeDef
+Assert-FileExists $bridgeBuildScript
 Assert-FileExists $legacyFilterSource
 Assert-FileExists $smokeSource
 Assert-FileExists $smokeScript
+Assert-FileExists $bridgeSmokeSource
+Assert-FileExists $bridgeSmokeScript
 
 Assert-Text $expectedFile 'Version:\s+8\.1' 'expected file must pin FFmpeg 8.1'
 Assert-Text $expectedFile 'Source archive SHA-256:\s+b072aed6871998cce9b36e7774033105ca29e33632be5b6347f3206898e0756a' 'expected file must pin FFmpeg 8.1 archive hash'
 Assert-Text $expectedFile 'Keep legacy src/Source/filters/transform/mpcvideodec/ffmpeg unchanged\.' 'expected file must preserve legacy FFmpeg boundary'
 Assert-Text $expectedFile 'Do not link this island into MPCVideoDec until adapter smoke tests exist\.' 'expected file must preserve no-link boundary'
 Assert-Text $expectedFile 'First-wave software codecs:' 'expected file must list first-wave software codecs'
+Assert-Text $expectedFile 'Bridge is the only supported MSVC consumption boundary for FFmpeg modern island\.' 'expected file must pin bridge consumption boundary'
 
 $release = (Get-Content -LiteralPath (Join-Path $sourceRoot 'RELEASE') -Raw).Trim()
 if ($release -ne '8.1') {
@@ -87,12 +101,37 @@ Assert-Text $adapterSource 'AV_CODEC_ID_FLV1' 'adapter must cover FLV1 first-wav
 Assert-Text $adapterSource 'AV_CODEC_ID_VP6' 'adapter must cover VP6 first-wave codec'
 Assert-Text $adapterSource 'AV_CODEC_ID_WMV1' 'adapter must cover WMV1 first-wave codec'
 Assert-Text $adapterSource 'AV_CODEC_ID_WMV2' 'adapter must cover WMV2 first-wave codec'
+Assert-Text $bridgeHeader 'PLAYASA_FFMPEG_MODERN_API' 'bridge header must expose a C ABI import/export macro'
+Assert-Text $bridgeHeader 'PlayasaFfmpegModernSession' 'bridge header must expose opaque session handle'
+Assert-Text $bridgeSource 'extern "C"' 'bridge source must export a C ABI'
+Assert-Text $bridgeSource 'playasa_ffmpeg_modern_create' 'bridge source must export create'
+Assert-Text $bridgeSource 'playasa_ffmpeg_modern_decode' 'bridge source must export decode'
+Assert-Text $bridgeBuildScript 'playasa_ffmpeg_modern_bridge\.dll' 'bridge build script must produce DLL'
+Assert-Text $bridgeBuildScript 'playasa_ffmpeg_modern_bridge\.lib' 'bridge build script must produce MSVC import lib'
+Assert-Text $bridgeDef 'playasa_ffmpeg_modern_decode' 'bridge def must list decode export'
 Assert-Text $smokeSource 'avformat_open_input' 'smoke must open a real sample container'
 Assert-Text $smokeSource 'DecodeSession' 'smoke must exercise the modern decode adapter'
 Assert-Text $smokeSource 'Decoded first frame' 'smoke must verify first-frame decode'
 Assert-Text $smokeScript 'MPCVideoDecModernSmoke\.exe' 'smoke script must build and run the smoke executable'
+Assert-Text $smokeScript 'g\+\+' 'smoke script must use the same MinGW ABI as the FFmpeg island'
+Assert-Text $smokeScript 'libavcodec\.a' 'smoke script must consume MinGW static FFmpeg libraries'
+Assert-Text $bridgeSmokeSource 'ffmpeg_modern_bridge\.h' 'bridge smoke must use public C ABI header'
+Assert-Text $bridgeSmokeScript 'cl\.exe' 'bridge smoke must verify MSVC consumer linking'
 if ((Get-Content -LiteralPath $legacyFilterSource -Raw) -match 'modern_ffmpeg|ModernFfmpegDecodeAdapter|src\\Thirdparty\\ffmpeg-modern') {
   throw 'RFC-0024 gate failed: legacy MPCVideoDecFilter.cpp must not include the modern island before smoke tests exist'
+}
+
+if (Test-Path -LiteralPath $installRoot) {
+  Assert-FileExists (Join-Path $installRoot 'include\libavcodec\avcodec.h')
+  Assert-FileExists (Join-Path $installRoot 'include\libavformat\avformat.h')
+  Assert-FileExists (Join-Path $installRoot 'lib\libavcodec.a')
+  Assert-FileExists (Join-Path $installRoot 'lib\libavformat.a')
+  Assert-FileExists (Join-Path $installRoot 'lib\libavutil.a')
+  Assert-FileExists (Join-Path $installRoot 'lib\pkgconfig\libavcodec.pc')
+  Assert-FileExists (Join-Path $installRoot 'bin\playasa_ffmpeg_modern_bridge.dll')
+  Assert-FileExists (Join-Path $installRoot 'bin\libiconv-2.dll')
+  Assert-FileExists (Join-Path $installRoot 'bin\libwinpthread-1.dll')
+  Assert-FileExists (Join-Path $installRoot 'lib\playasa_ffmpeg_modern_bridge.lib')
 }
 
 if (Test-Path -LiteralPath $downloadArchive) {

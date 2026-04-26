@@ -73,3 +73,13 @@ Adapter pins:
 - src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegDecodeAdapter.cpp
 - Adapter must use avcodec_send_packet / avcodec_receive_frame.
 - Adapter must keep FFmpeg public headers out of MPCVideoDecFilter.cpp.
+
+Bridge pins:
+- src/Thirdparty/pkg/ffmpeg_modern_bridge.h
+- src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegBridge.cpp
+- src/Source/filters/transform/mpcvideodec/modern_ffmpeg/playasa_ffmpeg_modern_bridge.def
+- src/BuildScript/build-rfc0024-ffmpeg-bridge.ps1
+- src/BuildScript/test-rfc0024-modern-bridge-smoke.ps1
+- Bridge output DLL: src/Thirdparty/ffmpeg-modern/install/bin/playasa_ffmpeg_modern_bridge.dll
+- Bridge output MSVC import lib: src/Thirdparty/ffmpeg-modern/install/lib/playasa_ffmpeg_modern_bridge.lib
+- Bridge is the only supported MSVC consumption boundary for FFmpeg modern island.

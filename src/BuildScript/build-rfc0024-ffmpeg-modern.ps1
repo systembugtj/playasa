@@ -70,6 +70,14 @@ function Invoke-Msys2 {
   }
 }
 
+function Assert-InstalledArtifact {
+  param([string]$RelativePath)
+  $path = Join-Path $installRoot $RelativePath
+  if (-not (Test-Path -LiteralPath $path)) {
+    throw "FFmpeg build did not produce expected artifact: $path"
+  }
+}
+
 if (-not (Test-Path -LiteralPath (Join-Path $sourceRoot 'configure'))) {
   throw "Missing FFmpeg configure script: $sourceRoot"
 }
@@ -127,6 +135,13 @@ if (-not $ConfigureOnly) {
   Write-Host 'Building FFmpeg 8.1 island with MSYS2 make' -ForegroundColor Cyan
   Invoke-Msys2 -Msys2Root $msys2Root -Command "$commonPrefix make -j2"
   Invoke-Msys2 -Msys2Root $msys2Root -Command "$commonPrefix make install"
+
+  Assert-InstalledArtifact 'include\libavcodec\avcodec.h'
+  Assert-InstalledArtifact 'include\libavformat\avformat.h'
+  Assert-InstalledArtifact 'lib\libavcodec.a'
+  Assert-InstalledArtifact 'lib\libavformat.a'
+  Assert-InstalledArtifact 'lib\libavutil.a'
+  Assert-InstalledArtifact 'lib\pkgconfig\libavcodec.pc'
 }
 
 Write-Host 'build-rfc0024-ffmpeg-modern: OK' -ForegroundColor Green
