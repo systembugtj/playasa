@@ -14,6 +14,7 @@ $bridgeSource = Join-Path $modernFfmpegRoot 'ModernFfmpegBridge.cpp'
 $bridgeDef = Join-Path $modernFfmpegRoot 'playasa_ffmpeg_modern_bridge.def'
 $outputBin = Join-Path $ffmpegInstall 'bin'
 $outputLib = Join-Path $ffmpegInstall 'lib'
+$runtimeBin = Join-Path $repoRoot 'out\bin\Win32\Release Unicode'
 $bridgeDll = Join-Path $outputBin 'playasa_ffmpeg_modern_bridge.dll'
 $bridgeImportLib = Join-Path $outputLib 'playasa_ffmpeg_modern_bridge.lib'
 
@@ -100,6 +101,7 @@ Assert-FileExists (Join-Path $ffmpegInstall 'lib\pkgconfig\libavcodec.pc')
 
 New-Item -ItemType Directory -Force -Path $outputBin | Out-Null
 New-Item -ItemType Directory -Force -Path $outputLib | Out-Null
+New-Item -ItemType Directory -Force -Path $runtimeBin | Out-Null
 
 $msys2Root = Get-Msys2Root
 $ffmpegInstallMsys = Convert-ToMsysPath $ffmpegInstall
@@ -122,6 +124,8 @@ foreach ($runtimeDll in @('libiconv-2.dll', 'libwinpthread-1.dll')) {
   Assert-FileExists $sourceDll
   Copy-Item -LiteralPath $sourceDll -Destination (Join-Path $outputBin $runtimeDll) -Force
 }
+Get-ChildItem -LiteralPath $outputBin -Filter '*.dll' |
+  ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $runtimeBin $_.Name) -Force }
 
 $libExe = Get-MsVcLibExe
 & $libExe /nologo /machine:x86 /def:$bridgeDef /out:$bridgeImportLib

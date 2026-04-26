@@ -1,6 +1,6 @@
 #define PLAYASA_FFMPEG_MODERN_BRIDGE_EXPORTS
 
-#include "../../../../Thirdparty/pkg/ffmpeg_modern_bridge.h"
+#include "ffmpeg_modern_bridge.h"
 #include "ModernFfmpegDecodeAdapter.h"
 
 extern "C" {
@@ -18,6 +18,10 @@ ModernFfmpeg::DecodeCodec ToAdapterCodec(uint32_t codec)
         return ModernFfmpeg::kDecodeCodecFlv1;
     case PLAYASA_FFMPEG_MODERN_CODEC_VP6:
         return ModernFfmpeg::kDecodeCodecVp6;
+    case PLAYASA_FFMPEG_MODERN_CODEC_VP6F:
+        return ModernFfmpeg::kDecodeCodecVp6f;
+    case PLAYASA_FFMPEG_MODERN_CODEC_VP6A:
+        return ModernFfmpeg::kDecodeCodecVp6a;
     case PLAYASA_FFMPEG_MODERN_CODEC_WMV1:
         return ModernFfmpeg::kDecodeCodecWmv1;
     case PLAYASA_FFMPEG_MODERN_CODEC_WMV2:
@@ -33,6 +37,8 @@ bool IsValidCodec(uint32_t codec)
     case PLAYASA_FFMPEG_MODERN_CODEC_MPEG4:
     case PLAYASA_FFMPEG_MODERN_CODEC_FLV1:
     case PLAYASA_FFMPEG_MODERN_CODEC_VP6:
+    case PLAYASA_FFMPEG_MODERN_CODEC_VP6F:
+    case PLAYASA_FFMPEG_MODERN_CODEC_VP6A:
     case PLAYASA_FFMPEG_MODERN_CODEC_WMV1:
     case PLAYASA_FFMPEG_MODERN_CODEC_WMV2:
         return true;
@@ -44,6 +50,36 @@ bool IsValidCodec(uint32_t codec)
 ModernFfmpeg::DecodeSession* ToSession(PlayasaFfmpegModernSession session)
 {
     return static_cast<ModernFfmpeg::DecodeSession*>(session);
+}
+
+int ToBridgePixelFormat(int pixelFormat)
+{
+    switch (pixelFormat) {
+    case AV_PIX_FMT_YUV420P:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_YUV420P;
+    case AV_PIX_FMT_YUVJ420P:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_YUVJ420P;
+    case AV_PIX_FMT_YUV422P:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_YUV422P;
+    case AV_PIX_FMT_YUVJ422P:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_YUVJ422P;
+    case AV_PIX_FMT_YUV444P:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_YUV444P;
+    case AV_PIX_FMT_YUVJ444P:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_YUVJ444P;
+    case AV_PIX_FMT_RGB24:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_RGB24;
+    case AV_PIX_FMT_BGR24:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_BGR24;
+    case AV_PIX_FMT_RGB32:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_RGB32;
+    case AV_PIX_FMT_PAL8:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_PAL8;
+    case AV_PIX_FMT_GRAY8:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_GRAY8;
+    default:
+        return PLAYASA_FFMPEG_MODERN_PIXFMT_UNKNOWN;
+    }
 }
 
 int ToBridgeStatus(ModernFfmpeg::DecodeStatus status)
@@ -69,8 +105,12 @@ void CopyFrameInfo(const ModernFfmpeg::DecodedFrameInfo& source, PlayasaFfmpegMo
 
     target->width = source.width;
     target->height = source.height;
-    target->pixel_format = source.pixelFormat;
+    target->pixel_format = ToBridgePixelFormat(source.pixelFormat);
     target->pts = source.pts;
+    for (int i = 0; i < 4; ++i) {
+        target->data[i] = source.data[i];
+        target->linesize[i] = source.linesize[i];
+    }
 }
 
 uint32_t ToBridgeCodec(ModernFfmpeg::DecodeCodec codec)
@@ -82,6 +122,10 @@ uint32_t ToBridgeCodec(ModernFfmpeg::DecodeCodec codec)
         return PLAYASA_FFMPEG_MODERN_CODEC_FLV1;
     case ModernFfmpeg::kDecodeCodecVp6:
         return PLAYASA_FFMPEG_MODERN_CODEC_VP6;
+    case ModernFfmpeg::kDecodeCodecVp6f:
+        return PLAYASA_FFMPEG_MODERN_CODEC_VP6F;
+    case ModernFfmpeg::kDecodeCodecVp6a:
+        return PLAYASA_FFMPEG_MODERN_CODEC_VP6A;
     case ModernFfmpeg::kDecodeCodecWmv1:
         return PLAYASA_FFMPEG_MODERN_CODEC_WMV1;
     case ModernFfmpeg::kDecodeCodecWmv2:

@@ -9,6 +9,8 @@ enum DecodeCodec {
     kDecodeCodecMpeg4,
     kDecodeCodecFlv1,
     kDecodeCodecVp6,
+    kDecodeCodecVp6f,
+    kDecodeCodecVp6a,
     kDecodeCodecWmv1,
     kDecodeCodecWmv2
 };
@@ -25,6 +27,8 @@ struct DecodedFrameInfo {
     int height;
     int pixelFormat;
     int64_t pts;
+    const uint8_t* data[4];
+    int linesize[4];
 };
 
 class DecodeSession {

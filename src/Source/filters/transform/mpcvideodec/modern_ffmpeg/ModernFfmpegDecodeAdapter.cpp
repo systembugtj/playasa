@@ -21,10 +21,26 @@ const uint32_t kFourccDIVX = 'D' | ('I' << 8) | ('V' << 16) | ('X' << 24);
 const uint32_t kFourccdivx = 'd' | ('i' << 8) | ('v' << 16) | ('x' << 24);
 const uint32_t kFourccXVID = 'X' | ('V' << 8) | ('I' << 16) | ('D' << 24);
 const uint32_t kFourccxvid = 'x' | ('v' << 8) | ('i' << 16) | ('d' << 24);
+const uint32_t kFourccXVIX = 'X' | ('V' << 8) | ('I' << 16) | ('X' << 24);
+const uint32_t kFourccxvix = 'x' | ('v' << 8) | ('i' << 16) | ('x' << 24);
+const uint32_t kFourccDX50 = 'D' | ('X' << 8) | ('5' << 16) | ('0' << 24);
+const uint32_t kFourccdx50 = 'd' | ('x' << 8) | ('5' << 16) | ('0' << 24);
+const uint32_t kFourccMP4V = 'M' | ('P' << 8) | ('4' << 16) | ('V' << 24);
+const uint32_t kFourccmp4v = 'm' | ('p' << 8) | ('4' << 16) | ('v' << 24);
 const uint32_t kFourccFLV1 = 'F' | ('L' << 8) | ('V' << 16) | ('1' << 24);
 const uint32_t kFourccflv1 = 'f' | ('l' << 8) | ('v' << 16) | ('1' << 24);
 const uint32_t kFourccVP60 = 'V' | ('P' << 8) | ('6' << 16) | ('0' << 24);
 const uint32_t kFourccvp60 = 'v' | ('p' << 8) | ('6' << 16) | ('0' << 24);
+const uint32_t kFourccVP61 = 'V' | ('P' << 8) | ('6' << 16) | ('1' << 24);
+const uint32_t kFourccvp61 = 'v' | ('p' << 8) | ('6' << 16) | ('1' << 24);
+const uint32_t kFourccVP62 = 'V' | ('P' << 8) | ('6' << 16) | ('2' << 24);
+const uint32_t kFourccvp62 = 'v' | ('p' << 8) | ('6' << 16) | ('2' << 24);
+const uint32_t kFourccVP6F = 'V' | ('P' << 8) | ('6' << 16) | ('F' << 24);
+const uint32_t kFourccvp6f = 'v' | ('p' << 8) | ('6' << 16) | ('f' << 24);
+const uint32_t kFourccFLV4 = 'F' | ('L' << 8) | ('V' << 16) | ('4' << 24);
+const uint32_t kFourccflv4 = 'f' | ('l' << 8) | ('v' << 16) | ('4' << 24);
+const uint32_t kFourccVP6A = 'V' | ('P' << 8) | ('6' << 16) | ('A' << 24);
+const uint32_t kFourccvp6a = 'v' | ('p' << 8) | ('6' << 16) | ('a' << 24);
 const uint32_t kFourccWMV1 = 'W' | ('M' << 8) | ('V' << 16) | ('1' << 24);
 const uint32_t kFourccwmv1 = 'w' | ('m' << 8) | ('v' << 16) | ('1' << 24);
 const uint32_t kFourccWMV2 = 'W' | ('M' << 8) | ('V' << 16) | ('2' << 24);
@@ -39,6 +55,10 @@ enum AVCodecID ToAvCodecId(DecodeCodec codec)
         return AV_CODEC_ID_FLV1;
     case kDecodeCodecVp6:
         return AV_CODEC_ID_VP6;
+    case kDecodeCodecVp6f:
+        return AV_CODEC_ID_VP6F;
+    case kDecodeCodecVp6a:
+        return AV_CODEC_ID_VP6A;
     case kDecodeCodecWmv1:
         return AV_CODEC_ID_WMV1;
     case kDecodeCodecWmv2:
@@ -73,6 +93,10 @@ void CopyFrameInfo(const AVFrame* frame, DecodedFrameInfo* frameInfo)
     frameInfo->height = frame->height;
     frameInfo->pixelFormat = frame->format;
     frameInfo->pts = frame->pts;
+    for (int i = 0; i < 4; ++i) {
+        frameInfo->data[i] = frame->data[i];
+        frameInfo->linesize[i] = frame->linesize[i];
+    }
 }
 
 } // namespace
@@ -285,6 +309,12 @@ bool DecodeCodecFromFourcc(uint32_t fourcc, DecodeCodec* codec)
     case kFourccdivx:
     case kFourccXVID:
     case kFourccxvid:
+    case kFourccXVIX:
+    case kFourccxvix:
+    case kFourccDX50:
+    case kFourccdx50:
+    case kFourccMP4V:
+    case kFourccmp4v:
         *codec = kDecodeCodecMpeg4;
         return true;
     case kFourccFLV1:
@@ -293,7 +323,21 @@ bool DecodeCodecFromFourcc(uint32_t fourcc, DecodeCodec* codec)
         return true;
     case kFourccVP60:
     case kFourccvp60:
+    case kFourccVP61:
+    case kFourccvp61:
+    case kFourccVP62:
+    case kFourccvp62:
         *codec = kDecodeCodecVp6;
+        return true;
+    case kFourccVP6F:
+    case kFourccvp6f:
+    case kFourccFLV4:
+    case kFourccflv4:
+        *codec = kDecodeCodecVp6f;
+        return true;
+    case kFourccVP6A:
+    case kFourccvp6a:
+        *codec = kDecodeCodecVp6a;
         return true;
     case kFourccWMV1:
     case kFourccwmv1:
@@ -322,9 +366,13 @@ bool DecodeCodecFromModernAvCodecId(int codecId, DecodeCodec* codec)
         *codec = kDecodeCodecFlv1;
         return true;
     case AV_CODEC_ID_VP6:
-    case AV_CODEC_ID_VP6F:
-    case AV_CODEC_ID_VP6A:
         *codec = kDecodeCodecVp6;
+        return true;
+    case AV_CODEC_ID_VP6F:
+        *codec = kDecodeCodecVp6f;
+        return true;
+    case AV_CODEC_ID_VP6A:
+        *codec = kDecodeCodecVp6a;
         return true;
     case AV_CODEC_ID_WMV1:
         *codec = kDecodeCodecWmv1;
@@ -343,6 +391,8 @@ bool IsFirstWaveSoftwareCodec(DecodeCodec codec)
     case kDecodeCodecMpeg4:
     case kDecodeCodecFlv1:
     case kDecodeCodecVp6:
+    case kDecodeCodecVp6f:
+    case kDecodeCodecVp6a:
     case kDecodeCodecWmv1:
     case kDecodeCodecWmv2:
         return true;

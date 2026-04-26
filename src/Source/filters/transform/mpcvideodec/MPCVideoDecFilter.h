@@ -40,6 +40,7 @@
 #include "..\..\..\decss\DeCSSInputPin.h"
 #include "DXVADecoder.h"
 #include "TlibavcodecExt.h"
+#include "modern_ffmpeg\ModernFfmpegBridgeConsumer.h"
 
 struct AVCodec;
 struct AVCodecContext;
@@ -127,6 +128,8 @@ protected:
 	
 	bool									m_bUseDXVA;
 	bool									m_bUseFFmpeg;				
+	bool									m_bUseModernFfmpegBridge;
+	ModernFfmpegBridge::Consumer			m_modernFfmpegBridge;
 	CSize 									m_sar;
 
 	// === DXVA common variables
@@ -170,6 +173,7 @@ protected:
     bool                bIsConnectedToEVR;
 	void				SetTypeSpecificFlags(IMediaSample* pMS);
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+	HRESULT				ModernFfmpegBridgeDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	//void				FindStartCodeVC1  (BYTE** pDataIn, int& nSize);
 	//void				FindStartCodeH264 (BYTE** pDataIn, int& nSize);
 	//void				AppendBuffer (BYTE* pDataIn, int nSize);

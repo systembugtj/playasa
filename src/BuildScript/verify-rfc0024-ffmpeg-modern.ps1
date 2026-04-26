@@ -16,8 +16,12 @@ $adapterSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\m
 $bridgeHeader = Join-Path $repoRoot 'src\Thirdparty\pkg\ffmpeg_modern_bridge.h'
 $bridgeSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg\ModernFfmpegBridge.cpp'
 $bridgeDef = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg\playasa_ffmpeg_modern_bridge.def'
+$bridgeConsumerHeader = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg\ModernFfmpegBridgeConsumer.h'
+$bridgeConsumerSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg\ModernFfmpegBridgeConsumer.cpp'
 $bridgeBuildScript = Join-Path $PSScriptRoot 'build-rfc0024-ffmpeg-bridge.ps1'
 $legacyFilterSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp'
+$legacyFilterHeader = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.h'
+$legacyFilterProject = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj'
 $smokeSource = Join-Path $repoRoot 'src\Test\MPCVideoDecModernSmoke\MPCVideoDecModernSmoke.cpp'
 $smokeScript = Join-Path $PSScriptRoot 'test-rfc0024-modern-smoke.ps1'
 $bridgeSmokeSource = Join-Path $repoRoot 'src\Test\MPCVideoDecModernBridgeSmoke\MPCVideoDecModernBridgeSmoke.cpp'
@@ -67,8 +71,12 @@ Assert-FileExists $adapterSource
 Assert-FileExists $bridgeHeader
 Assert-FileExists $bridgeSource
 Assert-FileExists $bridgeDef
+Assert-FileExists $bridgeConsumerHeader
+Assert-FileExists $bridgeConsumerSource
 Assert-FileExists $bridgeBuildScript
 Assert-FileExists $legacyFilterSource
+Assert-FileExists $legacyFilterHeader
+Assert-FileExists $legacyFilterProject
 Assert-FileExists $smokeSource
 Assert-FileExists $smokeScript
 Assert-FileExists $bridgeSmokeSource
@@ -80,6 +88,8 @@ Assert-Text $expectedFile 'Keep legacy src/Source/filters/transform/mpcvideodec/
 Assert-Text $expectedFile 'Do not link this island into MPCVideoDec until adapter smoke tests exist\.' 'expected file must preserve no-link boundary'
 Assert-Text $expectedFile 'First-wave software codecs:' 'expected file must list first-wave software codecs'
 Assert-Text $expectedFile 'Bridge is the only supported MSVC consumption boundary for FFmpeg modern island\.' 'expected file must pin bridge consumption boundary'
+Assert-Text $expectedFile 'MPCVideoDec may only consume the bridge through dynamic loading' 'expected file must pin dynamic bridge loading'
+Assert-Text $expectedFile 'First-wave software decode routes through ModernFfmpegBridgeDecode' 'expected file must pin first-wave bridge routing'
 
 $release = (Get-Content -LiteralPath (Join-Path $sourceRoot 'RELEASE') -Raw).Trim()
 if ($release -ne '8.1') {
@@ -101,14 +111,32 @@ Assert-Text $adapterSource 'AV_CODEC_ID_FLV1' 'adapter must cover FLV1 first-wav
 Assert-Text $adapterSource 'AV_CODEC_ID_VP6' 'adapter must cover VP6 first-wave codec'
 Assert-Text $adapterSource 'AV_CODEC_ID_WMV1' 'adapter must cover WMV1 first-wave codec'
 Assert-Text $adapterSource 'AV_CODEC_ID_WMV2' 'adapter must cover WMV2 first-wave codec'
+Assert-Text $adapterSource 'kFourccXVIX' 'adapter must cover XVIX MPEG-4 alias'
+Assert-Text $adapterSource 'kFourccVP61' 'adapter must cover VP61 alias'
+Assert-Text $adapterSource 'kFourccVP62' 'adapter must cover VP62 alias'
 Assert-Text $bridgeHeader 'PLAYASA_FFMPEG_MODERN_API' 'bridge header must expose a C ABI import/export macro'
 Assert-Text $bridgeHeader 'PlayasaFfmpegModernSession' 'bridge header must expose opaque session handle'
+Assert-Text $bridgeHeader 'data\[4\]' 'bridge frame info must expose planes for MPCVideoDec output copy'
+Assert-Text $bridgeHeader 'linesize\[4\]' 'bridge frame info must expose strides for MPCVideoDec output copy'
 Assert-Text $bridgeSource 'extern "C"' 'bridge source must export a C ABI'
 Assert-Text $bridgeSource 'playasa_ffmpeg_modern_create' 'bridge source must export create'
 Assert-Text $bridgeSource 'playasa_ffmpeg_modern_decode' 'bridge source must export decode'
+Assert-Text $bridgeSource 'ToBridgePixelFormat' 'bridge source must map pixel formats to stable C ABI values'
+Assert-Text $bridgeConsumerHeader 'class\s+Consumer' 'MSVC-side consumer must wrap dynamic bridge loading'
+Assert-Text $bridgeConsumerSource 'LoadLibraryA' 'MSVC-side consumer must dynamically load the bridge DLL'
+Assert-Text $bridgeConsumerSource 'GetProcAddress' 'MSVC-side consumer must resolve C ABI exports dynamically'
 Assert-Text $bridgeBuildScript 'playasa_ffmpeg_modern_bridge\.dll' 'bridge build script must produce DLL'
 Assert-Text $bridgeBuildScript 'playasa_ffmpeg_modern_bridge\.lib' 'bridge build script must produce MSVC import lib'
+Assert-Text $bridgeBuildScript 'out\\bin\\Win32\\Release Unicode' 'bridge build script must deploy runtime DLLs for player smoke'
 Assert-Text $bridgeDef 'playasa_ffmpeg_modern_decode' 'bridge def must list decode export'
+Assert-Text $legacyFilterHeader 'ModernFfmpegBridgeConsumer\.h' 'MPCVideoDec must own the MSVC-side bridge consumer'
+Assert-Text $legacyFilterSource 'ModernFfmpegBridgeDecode' 'MPCVideoDec must route first-wave software decode through bridge'
+Assert-Text $legacyFilterSource 'IsModernFfmpegBridgeCodec' 'MPCVideoDec must restrict bridge use to first-wave codecs'
+Assert-Text $legacyFilterSource 'av_log_set_callback\(LogLibAVCodec\)' 'MPCVideoDec must not let legacy FFmpeg log through CRT stderr'
+Assert-Text $legacyFilterSource "MAKEFOURCC\('X','V','I','X'\)" 'MPCVideoDec must route XVIX alias through bridge'
+Assert-Text $legacyFilterSource "MAKEFOURCC\('V','P','6','1'\)" 'MPCVideoDec must route VP61 alias through bridge'
+Assert-Text $legacyFilterSource "MAKEFOURCC\('V','P','6','2'\)" 'MPCVideoDec must route VP62 alias through bridge'
+Assert-Text $legacyFilterProject 'ModernFfmpegBridgeConsumer\.cpp' 'MPCVideoDec project must compile bridge consumer'
 Assert-Text $smokeSource 'avformat_open_input' 'smoke must open a real sample container'
 Assert-Text $smokeSource 'DecodeSession' 'smoke must exercise the modern decode adapter'
 Assert-Text $smokeSource 'Decoded first frame' 'smoke must verify first-frame decode'
@@ -132,6 +160,13 @@ if (Test-Path -LiteralPath $installRoot) {
   Assert-FileExists (Join-Path $installRoot 'bin\libiconv-2.dll')
   Assert-FileExists (Join-Path $installRoot 'bin\libwinpthread-1.dll')
   Assert-FileExists (Join-Path $installRoot 'lib\playasa_ffmpeg_modern_bridge.lib')
+}
+
+$runtimeBin = Join-Path $repoRoot 'out\bin\Win32\Release Unicode'
+if (Test-Path -LiteralPath $runtimeBin) {
+  Assert-FileExists (Join-Path $runtimeBin 'playasa_ffmpeg_modern_bridge.dll')
+  Assert-FileExists (Join-Path $runtimeBin 'libiconv-2.dll')
+  Assert-FileExists (Join-Path $runtimeBin 'libwinpthread-1.dll')
 }
 
 if (Test-Path -LiteralPath $downloadArchive) {
