@@ -26,6 +26,7 @@ $smokeSource = Join-Path $repoRoot 'src\Test\MPCVideoDecModernSmoke\MPCVideoDecM
 $smokeScript = Join-Path $PSScriptRoot 'test-rfc0024-modern-smoke.ps1'
 $bridgeSmokeSource = Join-Path $repoRoot 'src\Test\MPCVideoDecModernBridgeSmoke\MPCVideoDecModernBridgeSmoke.cpp'
 $bridgeSmokeScript = Join-Path $PSScriptRoot 'test-rfc0024-modern-bridge-smoke.ps1'
+$playerSelfcheckScript = Join-Path $PSScriptRoot 'test-rfc0024-splayer-selfcheck.ps1'
 
 function Assert-FileExists {
   param([string]$Path)
@@ -81,6 +82,7 @@ Assert-FileExists $smokeSource
 Assert-FileExists $smokeScript
 Assert-FileExists $bridgeSmokeSource
 Assert-FileExists $bridgeSmokeScript
+Assert-FileExists $playerSelfcheckScript
 
 Assert-Text $expectedFile 'Version:\s+8\.1' 'expected file must pin FFmpeg 8.1'
 Assert-Text $expectedFile 'Source archive SHA-256:\s+b072aed6871998cce9b36e7774033105ca29e33632be5b6347f3206898e0756a' 'expected file must pin FFmpeg 8.1 archive hash'
@@ -106,6 +108,13 @@ Assert-Text $adapterHeader 'class\s+DecodeSession' 'adapter must define DecodeSe
 Assert-Text $adapterHeader 'DecodeCodecFromFourcc' 'adapter must expose first-wave codec mapping'
 Assert-Text $adapterSource 'avcodec_send_packet' 'adapter must use modern send_packet API'
 Assert-Text $adapterSource 'avcodec_receive_frame' 'adapter must use modern receive_frame API'
+Assert-Text $adapterSource 'av_parser_parse2' 'adapter must parse VC-1/WMV3 packet boundaries before send_packet'
+Assert-Text $adapterSource 'H264NalLengthSizeFromExtradata' 'adapter must detect AVC length-prefixed H264 packet format'
+Assert-Text $adapterSource 'DetectH264NalLengthSize' 'adapter must infer H264 NAL length size from packets when media type omits it'
+Assert-Text $adapterSource 'ConvertAvcConfigurationToAnnexB' 'adapter must convert H264 avcC extradata to Annex-B parameter sets'
+Assert-Text $adapterSource 'ConvertLengthPrefixedParameterSetsToAnnexB' 'adapter must convert DirectShow H264 SPS/PPS extradata to Annex-B parameter sets'
+Assert-Text $adapterSource 'ConvertAvcLengthPrefixedToAnnexB' 'adapter must convert AVC length-prefixed H264 packets before modern decode'
+Assert-Text $adapterSource 'h264PendingAccessUnit_' 'adapter must aggregate DirectShow chunked H264 NALs into access units'
 Assert-Text $adapterSource 'AV_CODEC_ID_MPEG4' 'adapter must cover MPEG-4 first-wave codec'
 Assert-Text $adapterSource 'AV_CODEC_ID_FLV1' 'adapter must cover FLV1 first-wave codec'
 Assert-Text $adapterSource 'AV_CODEC_ID_VP6' 'adapter must cover VP6 first-wave codec'
@@ -113,17 +122,25 @@ Assert-Text $adapterSource 'AV_CODEC_ID_WMV1' 'adapter must cover WMV1 first-wav
 Assert-Text $adapterSource 'AV_CODEC_ID_WMV2' 'adapter must cover WMV2 first-wave codec'
 Assert-Text $adapterSource 'AV_CODEC_ID_H264' 'adapter must cover H264 modern software codec'
 Assert-Text $adapterSource 'AV_CODEC_ID_MPEG2VIDEO' 'adapter must cover MPEG-2 modern software codec'
+Assert-Text $adapterSource 'AV_CODEC_ID_WMV3' 'adapter must cover WMV3 modern software codec'
+Assert-Text $adapterSource 'AV_CODEC_ID_VC1' 'adapter must cover VC-1 modern software codec'
 Assert-Text $adapterSource 'kFourccXVIX' 'adapter must cover XVIX MPEG-4 alias'
 Assert-Text $adapterSource 'kFourccVP61' 'adapter must cover VP61 alias'
 Assert-Text $adapterSource 'kFourccVP62' 'adapter must cover VP62 alias'
 Assert-Text $adapterSource 'kFourccMPG2' 'adapter must cover MPEG-2 alias'
+Assert-Text $adapterSource 'kFourccWMV3' 'adapter must cover WMV3 alias'
+Assert-Text $adapterSource 'kFourccWVC1' 'adapter must cover VC-1 alias'
 Assert-Text $bridgeHeader 'PLAYASA_FFMPEG_MODERN_API' 'bridge header must expose a C ABI import/export macro'
 Assert-Text $bridgeHeader 'PlayasaFfmpegModernSession' 'bridge header must expose opaque session handle'
 Assert-Text $bridgeHeader 'PLAYASA_FFMPEG_MODERN_CODEC_MPEG2' 'bridge header must expose MPEG-2 codec id'
+Assert-Text $bridgeHeader 'PLAYASA_FFMPEG_MODERN_CODEC_WMV3' 'bridge header must expose WMV3 codec id'
+Assert-Text $bridgeHeader 'PLAYASA_FFMPEG_MODERN_CODEC_VC1' 'bridge header must expose VC-1 codec id'
+Assert-Text $bridgeHeader 'playasa_ffmpeg_modern_open_with_h264_nal_length_size' 'bridge header must expose H264 NAL length-size open option'
 Assert-Text $bridgeHeader 'data\[4\]' 'bridge frame info must expose planes for MPCVideoDec output copy'
 Assert-Text $bridgeHeader 'linesize\[4\]' 'bridge frame info must expose strides for MPCVideoDec output copy'
 Assert-Text $bridgeSource 'extern "C"' 'bridge source must export a C ABI'
 Assert-Text $bridgeSource 'playasa_ffmpeg_modern_create' 'bridge source must export create'
+Assert-Text $bridgeSource 'OpenWithH264NalLengthSize' 'bridge source must pass H264 NAL length size into adapter'
 Assert-Text $bridgeSource 'playasa_ffmpeg_modern_decode' 'bridge source must export decode'
 Assert-Text $bridgeSource 'playasa_ffmpeg_modern_decode_with_pts' 'bridge source must export timestamp-aware decode'
 Assert-Text $bridgeSource 'ToBridgePixelFormat' 'bridge source must map pixel formats to stable C ABI values'
@@ -134,18 +151,30 @@ Assert-Text $bridgeBuildScript 'playasa_ffmpeg_modern_bridge\.dll' 'bridge build
 Assert-Text $bridgeBuildScript 'playasa_ffmpeg_modern_bridge\.lib' 'bridge build script must produce MSVC import lib'
 Assert-Text $bridgeBuildScript 'out\\bin\\Win32\\Release Unicode' 'bridge build script must deploy runtime DLLs for player smoke'
 Assert-Text $bridgeDef 'playasa_ffmpeg_modern_decode' 'bridge def must list decode export'
+Assert-Text $bridgeDef 'playasa_ffmpeg_modern_open_with_h264_nal_length_size' 'bridge def must list H264 NAL length-size open export'
 Assert-Text $legacyFilterHeader 'ModernFfmpegBridgeConsumer\.h' 'MPCVideoDec must own the MSVC-side bridge consumer'
 Assert-Text $legacyFilterSource 'ModernFfmpegBridgeDecode' 'MPCVideoDec must route first-wave software decode through bridge'
 Assert-Text $legacyFilterSource 'IsModernFfmpegBridgeCodec' 'MPCVideoDec must restrict bridge use to first-wave codecs'
 Assert-Text $legacyFilterSource 'av_log_set_callback\(LogLibAVCodec\)' 'MPCVideoDec must not let legacy FFmpeg log through CRT stderr'
 Assert-Text $legacyFilterSource 'CODEC_ID_H264\)' 'MPCVideoDec must route H264 through bridge eligibility'
 Assert-Text $legacyFilterSource 'CODEC_ID_MPEG2VIDEO' 'MPCVideoDec must route MPEG-2 through bridge eligibility'
+Assert-Text $legacyFilterSource 'CODEC_ID_WMV3' 'MPCVideoDec must route WMV3 through bridge eligibility'
+Assert-Text $legacyFilterSource 'CODEC_ID_VC1' 'MPCVideoDec must route VC-1 through bridge eligibility'
 Assert-Text $legacyFilterSource 'm_bUseDXVA = false' 'MPCVideoDec must disable old H264 DXVA path after bridge activation'
+Assert-Text $legacyFilterSource 'h264NalLengthSize' 'MPCVideoDec must pass H264 NAL length size into modern bridge'
 Assert-Text $legacyFilterSource '!m_bUseModernFfmpegBridge' 'MPCVideoDec must not run legacy MPEG-2 DXVA setup for modern bridge'
-Assert-Text $legacyFilterSource 'else\s+\{\s+int avcRet = avcodec_open' 'MPCVideoDec must not open legacy decoders for modern bridge codecs'
+Assert-Text $legacyFilterSource 'CODEC_ID_VC1 && !m_bUseModernFfmpegBridge && FFIsInterlaced' 'MPCVideoDec must not run old VC-1 interlace probe for modern bridge'
+Assert-Text $adapterSource 'SendH264Packet' 'MPCVideoDec must keep H264 on modern bridge and convert AVC packets in the adapter'
+Assert-Text $legacyFilterSource 'int avcRet = avcodec_open' 'MPCVideoDec must keep legacy decoder open isolated from modern bridge codecs'
+Assert-Text $legacyFilterSource 'm_modernFfmpegBridge\.Close\(\)' 'MPCVideoDec must close failed modern bridge sessions before legacy fallback'
+Assert-Text $legacyFilterSource '!bUseModernBridgeCodec\s+&&\s+\(m_nThreadNumber > 1\)' 'MPCVideoDec must not initialize legacy decoder threads for modern bridge codecs'
+Assert-Text $legacyFilterSource 'm_pAVCtx && !m_bUseModernFfmpegBridge' 'MPCVideoDec must not flush unopened legacy contexts for modern bridge codecs'
+Assert-Text $legacyFilterSource '!wasUsingModernFfmpegBridge\s+&&\s+\(m_nThreadNumber > 1\)' 'MPCVideoDec must not free legacy decoder threads for modern bridge codecs'
 Assert-Text $legacyFilterSource "MAKEFOURCC\('X','V','I','X'\)" 'MPCVideoDec must route XVIX alias through bridge'
 Assert-Text $legacyFilterSource "MAKEFOURCC\('V','P','6','1'\)" 'MPCVideoDec must route VP61 alias through bridge'
 Assert-Text $legacyFilterSource "MAKEFOURCC\('V','P','6','2'\)" 'MPCVideoDec must route VP62 alias through bridge'
+Assert-Text $legacyFilterSource "MAKEFOURCC\('W','M','V','3'\)" 'MPCVideoDec must route WMV3 alias through bridge'
+Assert-Text $legacyFilterSource "MAKEFOURCC\('W','V','C','1'\)" 'MPCVideoDec must route VC-1 alias through bridge'
 Assert-Text $legacyFilterProject 'ModernFfmpegBridgeConsumer\.cpp' 'MPCVideoDec project must compile bridge consumer'
 Assert-Text $smokeSource 'avformat_open_input' 'smoke must open a real sample container'
 Assert-Text $smokeSource 'DecodeSession' 'smoke must exercise the modern decode adapter'
@@ -154,7 +183,10 @@ Assert-Text $smokeScript 'MPCVideoDecModernSmoke\.exe' 'smoke script must build 
 Assert-Text $smokeScript 'g\+\+' 'smoke script must use the same MinGW ABI as the FFmpeg island'
 Assert-Text $smokeScript 'libavcodec\.a' 'smoke script must consume MinGW static FFmpeg libraries'
 Assert-Text $bridgeSmokeSource 'ffmpeg_modern_bridge\.h' 'bridge smoke must use public C ABI header'
+Assert-Text $bridgeSmokeSource 'kFourccWvc1' 'bridge smoke must verify VC-1 bridge mapping'
+Assert-Text $bridgeSmokeSource 'kFourccWmv3' 'bridge smoke must verify WMV3 bridge mapping'
 Assert-Text $bridgeSmokeScript 'cl\.exe' 'bridge smoke must verify MSVC consumer linking'
+Assert-Text $playerSelfcheckScript 'Modern FFmpeg bridge first frame ready' 'player selfcheck must verify modern H264 playback reaches first frame'
 if ((Get-Content -LiteralPath $legacyFilterSource -Raw) -match 'modern_ffmpeg|ModernFfmpegDecodeAdapter|src\\Thirdparty\\ffmpeg-modern') {
   throw 'RFC-0024 gate failed: legacy MPCVideoDecFilter.cpp must not include the modern island before smoke tests exist'
 }
@@ -186,7 +218,7 @@ if (Test-Path -LiteralPath $downloadArchive) {
   }
 }
 
-foreach ($option in @(
+$configureOptions = @(
   '--disable-programs',
   '--disable-doc',
   '--disable-debug',
@@ -210,8 +242,10 @@ foreach ($option in @(
   '--enable-decoder=vp6f',
   '--enable-decoder=wmv1',
   '--enable-decoder=wmv2',
+  '--enable-decoder=wmv3',
   '--enable-decoder=h264',
   '--enable-decoder=mpeg2video',
+  '--enable-decoder=vc1',
   '--enable-demuxer=avi',
   '--enable-demuxer=flv',
   '--enable-demuxer=matroska',
@@ -220,9 +254,14 @@ foreach ($option in @(
   '--enable-parser=h263',
   '--enable-parser=vp3',
   '--enable-parser=h264',
-  '--enable-parser=mpegvideo'
-)) {
-  Assert-Text $expectedFile ([regex]::Escape($option)) "missing configure option $option"
+  '--enable-parser=mpegvideo',
+  '--enable-parser=vc1'
+)
+
+$configureOptions | ForEach-Object {
+  $configureOption = $_
+  $escapedOption = [regex]::Escape($configureOption)
+  Assert-Text -Path $expectedFile -Pattern $escapedOption -Description "missing configure option $configureOption"
 }
 
 Write-Host 'verify-rfc0024-ffmpeg-modern: OK (FFmpeg 8.1 island pins match)' -ForegroundColor Green

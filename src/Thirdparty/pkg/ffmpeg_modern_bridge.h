@@ -15,6 +15,8 @@ extern "C" {
 
 typedef void* PlayasaFfmpegModernSession;
 
+#define PLAYASA_FFMPEG_MODERN_NO_PTS INT64_MIN
+
 enum {
     PLAYASA_FFMPEG_MODERN_CODEC_MPEG4 = 0,
     PLAYASA_FFMPEG_MODERN_CODEC_FLV1 = 1,
@@ -24,7 +26,9 @@ enum {
     PLAYASA_FFMPEG_MODERN_CODEC_WMV1 = 5,
     PLAYASA_FFMPEG_MODERN_CODEC_WMV2 = 6,
     PLAYASA_FFMPEG_MODERN_CODEC_H264 = 7,
-    PLAYASA_FFMPEG_MODERN_CODEC_MPEG2 = 8
+    PLAYASA_FFMPEG_MODERN_CODEC_MPEG2 = 8,
+    PLAYASA_FFMPEG_MODERN_CODEC_WMV3 = 9,
+    PLAYASA_FFMPEG_MODERN_CODEC_VC1 = 10
 };
 
 enum {
@@ -54,6 +58,7 @@ typedef struct PlayasaFfmpegModernFrameInfo {
     int32_t height;
     int32_t pixel_format;
     int64_t pts;
+    int64_t duration;
     const uint8_t* data[4];
     int32_t linesize[4];
 } PlayasaFfmpegModernFrameInfo;
@@ -62,8 +67,11 @@ PLAYASA_FFMPEG_MODERN_API uint32_t playasa_ffmpeg_modern_avcodec_version(void);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_codec_from_fourcc(uint32_t fourcc, uint32_t* codec);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_create(uint32_t codec, PlayasaFfmpegModernSession* session);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_open(PlayasaFfmpegModernSession session, const uint8_t* extra_data, size_t extra_data_size);
+PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_open_with_h264_nal_length_size(PlayasaFfmpegModernSession session, const uint8_t* extra_data, size_t extra_data_size, int32_t h264_nal_length_size);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_decode(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, PlayasaFfmpegModernFrameInfo* frame_info);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_decode_with_pts(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, int64_t pts, PlayasaFfmpegModernFrameInfo* frame_info);
+PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_decode_with_timing(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, int64_t pts, int64_t duration, PlayasaFfmpegModernFrameInfo* frame_info);
+PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_receive_pending(PlayasaFfmpegModernSession session, PlayasaFfmpegModernFrameInfo* frame_info);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_drain(PlayasaFfmpegModernSession session, PlayasaFfmpegModernFrameInfo* frame_info);
 PLAYASA_FFMPEG_MODERN_API void playasa_ffmpeg_modern_flush(PlayasaFfmpegModernSession session);
 PLAYASA_FFMPEG_MODERN_API const char* playasa_ffmpeg_modern_last_error(PlayasaFfmpegModernSession session);

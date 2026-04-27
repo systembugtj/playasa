@@ -130,6 +130,8 @@ protected:
 	bool									m_bUseFFmpeg;				
 	bool									m_bUseModernFfmpegBridge;
 	ModernFfmpegBridge::Consumer			m_modernFfmpegBridge;
+	int										m_modernFfmpegDecodeLogCount;
+	bool									m_modernFfmpegLoggedFirstFrame;
 	CSize 									m_sar;
 
 	// === DXVA common variables
@@ -174,6 +176,7 @@ protected:
 	void				SetTypeSpecificFlags(IMediaSample* pMS);
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	HRESULT				ModernFfmpegBridgeDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+	HRESULT				DeliverModernFfmpegFrame(IMediaSample* pIn, PlayasaFfmpegModernFrameInfo& frameInfo, REFERENCE_TIME inputDuration, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	//void				FindStartCodeVC1  (BYTE** pDataIn, int& nSize);
 	//void				FindStartCodeH264 (BYTE** pDataIn, int& nSize);
 	//void				AppendBuffer (BYTE* pDataIn, int nSize);

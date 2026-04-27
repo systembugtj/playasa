@@ -47,8 +47,10 @@ Configure pins:
 - --enable-decoder=vp6f
 - --enable-decoder=wmv1
 - --enable-decoder=wmv2
+- --enable-decoder=wmv3
 - --enable-decoder=h264
 - --enable-decoder=mpeg2video
+- --enable-decoder=vc1
 - --enable-demuxer=avi
 - --enable-demuxer=flv
 - --enable-demuxer=matroska
@@ -58,10 +60,11 @@ Configure pins:
 - --enable-parser=vp3
 - --enable-parser=h264
 - --enable-parser=mpegvideo
+- --enable-parser=vc1
 
 Boundaries:
 - Keep legacy src/Source/filters/transform/mpcvideodec/ffmpeg unchanged.
-- Keep VC-1 legacy FfmpegContext.c paths unchanged in this phase.
+- Keep legacy FfmpegContext.c DXVA internals unchanged in this phase.
 - Do not expose FFmpeg private headers outside src/Source/filters/transform/mpcvideodec/modern_ffmpeg.
 - Do not link this island into MPCVideoDec until adapter smoke tests exist.
 
@@ -73,11 +76,17 @@ First-wave software codecs:
 - WMV2
 - H264 software decode
 - MPEG-2 software decode
+- WMV3 software decode
+- VC-1 software decode
 
 Adapter pins:
 - src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegDecodeAdapter.h
 - src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegDecodeAdapter.cpp
 - Adapter must use avcodec_send_packet / avcodec_receive_frame.
+- Adapter must convert H264 AVC length-prefixed packets to Annex-B before modern decode.
+- Adapter must convert H264 DirectShow 2-byte length-prefixed SPS/PPS extradata to Annex-B parameter sets.
+- Adapter must aggregate DirectShow chunked H264 VCL NALs into access units before modern decode.
+- Adapter must use av_parser_parse2 for VC-1/WMV3 packet boundary handling.
 - Adapter must keep FFmpeg public headers out of MPCVideoDecFilter.cpp.
 
 Bridge pins:
@@ -94,6 +103,9 @@ Bridge pins:
 - MPCVideoDec may only consume the bridge through dynamic loading, not direct MinGW static library linking.
 - First-wave software decode routes through ModernFfmpegBridgeDecode.
 - Legacy FFmpeg logging must use LogLibAVCodec, not CRT stderr.
-- H264 software decode routes through the modern bridge; old H264 DXVA is disabled until a modern DXVA path exists.
+- H264 software decode routes through the modern bridge, converts avcC or DirectShow 2-byte length-prefixed SPS/PPS extradata to Annex-B parameter sets, passes DirectShow's H264 NAL length size into the adapter when available, infers NAL length size from packets when the media type omits it, and aggregates chunked DirectShow H264 NAL delivery into access units; old H264 DXVA remains disabled until a modern DXVA path exists.
 - MPEG-2 software decode routes through the modern bridge; old MPEG-2 DXVA is disabled for modern-bridge MPEG-2.
+- WMV3 and VC-1 software decode route through the modern bridge; old VC-1 DXVA and interlace probe are disabled for modern-bridge VC-1.
+- Modern bridge open failure falls back to the legacy software decoder instead of rejecting the DirectShow media type.
 - Modern-bridge codecs must not call legacy avcodec_open.
+- Modern-bridge codecs must not call legacy avcodec_thread_init/free or avcodec_flush_buffers.

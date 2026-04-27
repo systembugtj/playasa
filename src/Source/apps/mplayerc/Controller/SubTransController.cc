@@ -187,6 +187,16 @@ void SubTransController::_Thread()
   Logging( L"SubTransController::_thread exit %x", m_operation);
 }
 
+static bool ShouldHashVideoForSubtitleLookup(const std::wstring& videoFile)
+{
+  static const ULONGLONG kMaxSubtitleLookupHashBytes = 32ull * 1024ull * 1024ull;
+  CFileStatus fileStatus;
+  if (!CFile::GetStatus(videoFile.c_str(), fileStatus))
+    return false;
+
+  return static_cast<ULONGLONG>(fileStatus.m_size) <= kMaxSubtitleLookupHashBytes;
+}
+
 void SubTransController::_thread_download()
 {
   std::vector<std::wstring> subtitles;
@@ -196,8 +206,13 @@ void SubTransController::_thread_download()
   subtitles.push_back(Strings::Format(L"%d", m_subnum));
 
   std::vector<std::wstring> szaSubDescs, tmpfiles;
-  std::wstring szFileHash = HashController::GetInstance()->GetSPHash(m_videofile.c_str());
-  Logging(L"Downloading sub for %s" ,szFileHash.c_str());
+  std::wstring szFileHash;
+  if (ShouldHashVideoForSubtitleLookup(m_videofile)) {
+    szFileHash = HashController::GetInstance()->GetSPHash(m_videofile.c_str());
+    Logging(L"Downloading sub for %s" ,szFileHash.c_str());
+  } else {
+    Logging(L"Downloading sub without video hash for large file: %s", m_videofile.c_str());
+  }
 
   refptr<pool> pool = pool::create_instance();
   refptr<task> task = task::create_instance();

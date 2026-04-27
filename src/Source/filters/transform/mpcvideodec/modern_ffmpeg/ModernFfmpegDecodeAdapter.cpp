@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <limits.h>
+#include <vector>
 
 extern "C" {
 #include "libavcodec/avcodec.h"
@@ -16,6 +17,10 @@ namespace ModernFfmpeg {
 namespace {
 
 const size_t kLastErrorCapacity = 256;
+const uint8_t kAnnexBStartCode[] = { 0, 0, 0, 1 };
+const int kUnknownH264NalLengthSize = 0;
+const int64_t kNoPts = INT64_MIN;
+const AVRational kDirectShowTimeBase = { 1, 10000000 };
 
 const uint32_t kFourccDIVX = 'D' | ('I' << 8) | ('V' << 16) | ('X' << 24);
 const uint32_t kFourccdivx = 'd' | ('i' << 8) | ('v' << 16) | ('x' << 24);
@@ -59,6 +64,10 @@ const uint32_t kFourccMPG2 = 'M' | ('P' << 8) | ('G' << 16) | ('2' << 24);
 const uint32_t kFourccmpg2 = 'm' | ('p' << 8) | ('g' << 16) | ('2' << 24);
 const uint32_t kFourccMMES = 'M' | ('M' << 8) | ('E' << 16) | ('S' << 24);
 const uint32_t kFourccmmes = 'm' | ('m' << 8) | ('e' << 16) | ('s' << 24);
+const uint32_t kFourccWMV3 = 'W' | ('M' << 8) | ('V' << 16) | ('3' << 24);
+const uint32_t kFourccwmv3 = 'w' | ('m' << 8) | ('v' << 16) | ('3' << 24);
+const uint32_t kFourccWVC1 = 'W' | ('V' << 8) | ('C' << 16) | ('1' << 24);
+const uint32_t kFourccwvc1 = 'w' | ('v' << 8) | ('c' << 16) | ('1' << 24);
 
 enum AVCodecID ToAvCodecId(DecodeCodec codec)
 {
@@ -81,6 +90,10 @@ enum AVCodecID ToAvCodecId(DecodeCodec codec)
         return AV_CODEC_ID_H264;
     case kDecodeCodecMpeg2:
         return AV_CODEC_ID_MPEG2VIDEO;
+    case kDecodeCodecWmv3:
+        return AV_CODEC_ID_WMV3;
+    case kDecodeCodecVc1:
+        return AV_CODEC_ID_VC1;
     default:
         return AV_CODEC_ID_NONE;
     }
@@ -101,6 +114,264 @@ AVFrame* AsFrame(void* value)
     return static_cast<AVFrame*>(value);
 }
 
+bool IsAvcDecoderConfigurationRecord(const uint8_t* extraData, size_t extraDataSize)
+{
+    return extraData && extraDataSize >= 5 && extraData[0] == 1;
+}
+
+int H264NalLengthSizeFromExtradata(const uint8_t* extraData, size_t extraDataSize)
+{
+    if (!IsAvcDecoderConfigurationRecord(extraData, extraDataSize)) {
+        return kUnknownH264NalLengthSize;
+    }
+
+    return (extraData[4] & 0x03) + 1;
+}
+
+bool StartsWithAnnexBStartCode(const uint8_t* data, size_t dataSize)
+{
+    if (!data || dataSize < 4) {
+        return false;
+    }
+
+    return (data[0] == 0 && data[1] == 0 && data[2] == 1) ||
+        (data[0] == 0 && data[1] == 0 && data[2] == 0 && data[3] == 1);
+}
+
+bool ConvertAvcLengthPrefixedToAnnexB(const uint8_t* data, size_t dataSize, int nalLengthSize, std::vector<uint8_t>* output)
+{
+    if (!data || !output || nalLengthSize < 1 || nalLengthSize > 4) {
+        return false;
+    }
+
+    output->clear();
+    size_t offset = 0;
+    while (offset < dataSize) {
+        if (dataSize - offset < static_cast<size_t>(nalLengthSize)) {
+            return false;
+        }
+
+        uint32_t nalSize = 0;
+        for (int i = 0; i < nalLengthSize; ++i) {
+            nalSize = (nalSize << 8) | data[offset + i];
+        }
+        offset += nalLengthSize;
+
+        if (nalSize == 0 || dataSize - offset < nalSize) {
+            return false;
+        }
+
+        output->insert(output->end(), kAnnexBStartCode, kAnnexBStartCode + sizeof(kAnnexBStartCode));
+        output->insert(output->end(), data + offset, data + offset + nalSize);
+        offset += nalSize;
+    }
+
+    return !output->empty();
+}
+
+uint8_t H264NalType(uint8_t nalHeader)
+{
+    return nalHeader & 0x1f;
+}
+
+bool IsH264VclNalType(uint8_t nalType)
+{
+    return nalType >= 1 && nalType <= 5;
+}
+
+bool H264NalStartsNewSlice(const uint8_t* nalData, size_t nalSize)
+{
+    if (!nalData || nalSize < 2 || !IsH264VclNalType(H264NalType(nalData[0]))) {
+        return false;
+    }
+
+    // The first Exp-Golomb value after the NAL header is first_mb_in_slice.
+    // For the common new-frame case it is zero, encoded as a single '1' bit.
+    return (nalData[1] & 0x80) != 0;
+}
+
+bool ContainsAvcLengthPrefixedVclNal(const uint8_t* data, size_t dataSize, int nalLengthSize)
+{
+    if (!data || nalLengthSize < 1 || nalLengthSize > 4) {
+        return true;
+    }
+
+    size_t offset = 0;
+    while (offset < dataSize) {
+        if (dataSize - offset < static_cast<size_t>(nalLengthSize)) {
+            return true;
+        }
+
+        uint32_t nalSize = 0;
+        for (int i = 0; i < nalLengthSize; ++i) {
+            nalSize = (nalSize << 8) | data[offset + i];
+        }
+        offset += nalLengthSize;
+        if (nalSize == 0 || dataSize - offset < nalSize) {
+            return true;
+        }
+
+        if (IsH264VclNalType(H264NalType(data[offset]))) {
+            return true;
+        }
+        offset += nalSize;
+    }
+
+    return false;
+}
+
+bool AvcLengthPrefixedStartsNewVclSlice(const uint8_t* data, size_t dataSize, int nalLengthSize)
+{
+    if (!data || nalLengthSize < 1 || nalLengthSize > 4) {
+        return false;
+    }
+
+    size_t offset = 0;
+    while (offset < dataSize) {
+        if (dataSize - offset < static_cast<size_t>(nalLengthSize)) {
+            return false;
+        }
+
+        uint32_t nalSize = 0;
+        for (int i = 0; i < nalLengthSize; ++i) {
+            nalSize = (nalSize << 8) | data[offset + i];
+        }
+        offset += nalLengthSize;
+        if (nalSize == 0 || dataSize - offset < nalSize) {
+            return false;
+        }
+
+        if (H264NalStartsNewSlice(data + offset, nalSize)) {
+            return true;
+        }
+        offset += nalSize;
+    }
+
+    return false;
+}
+
+int DetectH264NalLengthSize(const uint8_t* data, size_t dataSize)
+{
+    if (!data || dataSize < 2 || StartsWithAnnexBStartCode(data, dataSize)) {
+        return kUnknownH264NalLengthSize;
+    }
+
+    const int candidates[] = { 4, 2, 1 };
+    for (size_t candidateIndex = 0; candidateIndex < sizeof(candidates) / sizeof(candidates[0]); ++candidateIndex) {
+        const int nalLengthSize = candidates[candidateIndex];
+        size_t offset = 0;
+        bool foundNal = false;
+        while (offset < dataSize) {
+            if (dataSize - offset < static_cast<size_t>(nalLengthSize)) {
+                foundNal = false;
+                break;
+            }
+
+            uint32_t nalSize = 0;
+            for (int i = 0; i < nalLengthSize; ++i) {
+                nalSize = (nalSize << 8) | data[offset + i];
+            }
+            offset += nalLengthSize;
+            if (nalSize == 0 || dataSize - offset < nalSize) {
+                foundNal = false;
+                break;
+            }
+
+            foundNal = true;
+            offset += nalSize;
+        }
+
+        if (foundNal && offset == dataSize) {
+            return nalLengthSize;
+        }
+    }
+
+    return kUnknownH264NalLengthSize;
+}
+
+bool AppendAvcParameterSet(const uint8_t* extraData, size_t extraDataSize, size_t* offset, std::vector<uint8_t>* output)
+{
+    if (!extraData || !offset || !output || extraDataSize - *offset < 2) {
+        return false;
+    }
+
+    const uint16_t nalSize = (static_cast<uint16_t>(extraData[*offset]) << 8) | extraData[*offset + 1];
+    *offset += 2;
+    if (nalSize == 0 || extraDataSize - *offset < nalSize) {
+        return false;
+    }
+
+    output->insert(output->end(), kAnnexBStartCode, kAnnexBStartCode + sizeof(kAnnexBStartCode));
+    output->insert(output->end(), extraData + *offset, extraData + *offset + nalSize);
+    *offset += nalSize;
+    return true;
+}
+
+bool ConvertAvcConfigurationToAnnexB(const uint8_t* extraData, size_t extraDataSize, std::vector<uint8_t>* output)
+{
+    if (!IsAvcDecoderConfigurationRecord(extraData, extraDataSize) || !output) {
+        return false;
+    }
+
+    output->clear();
+    size_t offset = 5;
+    if (extraDataSize - offset < 1) {
+        return false;
+    }
+
+    const uint8_t spsCount = extraData[offset++] & 0x1f;
+    for (uint8_t i = 0; i < spsCount; ++i) {
+        if (!AppendAvcParameterSet(extraData, extraDataSize, &offset, output)) {
+            return false;
+        }
+    }
+
+    if (extraDataSize - offset < 1) {
+        return false;
+    }
+
+    const uint8_t ppsCount = extraData[offset++];
+    for (uint8_t i = 0; i < ppsCount; ++i) {
+        if (!AppendAvcParameterSet(extraData, extraDataSize, &offset, output)) {
+            return false;
+        }
+    }
+
+    return !output->empty();
+}
+
+bool ConvertLengthPrefixedParameterSetsToAnnexB(const uint8_t* extraData, size_t extraDataSize, std::vector<uint8_t>* output)
+{
+    if (!extraData || !output || extraDataSize < 3 || StartsWithAnnexBStartCode(extraData, extraDataSize)) {
+        return false;
+    }
+
+    output->clear();
+    size_t offset = 0;
+    while (offset < extraDataSize) {
+        if (extraDataSize - offset < 2) {
+            return false;
+        }
+
+        const uint16_t nalSize = (static_cast<uint16_t>(extraData[offset]) << 8) | extraData[offset + 1];
+        offset += 2;
+        if (nalSize == 0 || extraDataSize - offset < nalSize) {
+            return false;
+        }
+
+        const uint8_t nalType = H264NalType(extraData[offset]);
+        if (nalType != 7 && nalType != 8) {
+            return false;
+        }
+
+        output->insert(output->end(), kAnnexBStartCode, kAnnexBStartCode + sizeof(kAnnexBStartCode));
+        output->insert(output->end(), extraData + offset, extraData + offset + nalSize);
+        offset += nalSize;
+    }
+
+    return !output->empty();
+}
+
 void CopyFrameInfo(const AVFrame* frame, DecodedFrameInfo* frameInfo)
 {
     if (!frameInfo) {
@@ -110,7 +381,8 @@ void CopyFrameInfo(const AVFrame* frame, DecodedFrameInfo* frameInfo)
     frameInfo->width = frame->width;
     frameInfo->height = frame->height;
     frameInfo->pixelFormat = frame->format;
-    frameInfo->pts = frame->pts;
+    frameInfo->pts = frame->best_effort_timestamp != AV_NOPTS_VALUE ? frame->best_effort_timestamp : frame->pts;
+    frameInfo->duration = frame->duration > 0 ? frame->duration : kNoPts;
     for (int i = 0; i < 4; ++i) {
         frameInfo->data[i] = frame->data[i];
         frameInfo->linesize[i] = frame->linesize[i];
@@ -122,25 +394,45 @@ void CopyFrameInfo(const AVFrame* frame, DecodedFrameInfo* frameInfo)
 DecodeSession::DecodeSession(DecodeCodec codec)
     : codec_(codec)
     , codecContext_(0)
+    , parser_(0)
     , packet_(0)
     , frame_(0)
+    , h264NalLengthSize_(kUnknownH264NalLengthSize)
+    , h264PendingPts_(0)
+    , h264ExtraDataPrepended_(false)
+    , h264UseNativeAvc_(false)
+    , h264HasPendingVcl_(false)
+    , hasDecodedFrame_(false)
 {
     lastError_[0] = '\0';
+    h264PendingDuration_ = kNoPts;
 }
 
 DecodeSession::~DecodeSession()
 {
     AVCodecContext* context = AsContext(codecContext_);
+    AVCodecParserContext* parser = static_cast<AVCodecParserContext*>(parser_);
     AVPacket* packet = AsPacket(packet_);
     AVFrame* frame = AsFrame(frame_);
 
+    av_parser_close(parser);
     avcodec_free_context(&context);
     av_packet_free(&packet);
     av_frame_free(&frame);
 
     codecContext_ = 0;
+    parser_ = 0;
     packet_ = 0;
     frame_ = 0;
+    h264NalLengthSize_ = kUnknownH264NalLengthSize;
+    h264AnnexBExtraData_.clear();
+    h264PendingAccessUnit_.clear();
+    h264PendingPts_ = 0;
+    h264PendingDuration_ = kNoPts;
+    h264ExtraDataPrepended_ = false;
+    h264UseNativeAvc_ = false;
+    h264HasPendingVcl_ = false;
+    hasDecodedFrame_ = false;
 }
 
 bool DecodeSession::Open()
@@ -149,6 +441,11 @@ bool DecodeSession::Open()
 }
 
 bool DecodeSession::OpenWithExtradata(const uint8_t* extraData, size_t extraDataSize)
+{
+    return OpenWithH264NalLengthSize(extraData, extraDataSize, kUnknownH264NalLengthSize);
+}
+
+bool DecodeSession::OpenWithH264NalLengthSize(const uint8_t* extraData, size_t extraDataSize, int h264NalLengthSize)
 {
     const AVCodec* codec = avcodec_find_decoder(ToAvCodecId(codec_));
     if (!codec) {
@@ -162,21 +459,38 @@ bool DecodeSession::OpenWithExtradata(const uint8_t* extraData, size_t extraData
         return false;
     }
 
-    if (extraData && extraDataSize > 0) {
-        if (extraDataSize > static_cast<size_t>(INT_MAX)) {
+    std::vector<uint8_t> annexBExtraData;
+    const uint8_t* contextExtraData = extraData;
+    size_t contextExtraDataSize = extraDataSize;
+    const int parsedH264NalLengthSize = codec_ == kDecodeCodecH264 ? H264NalLengthSizeFromExtradata(extraData, extraDataSize) : kUnknownH264NalLengthSize;
+    const bool h264UseNativeAvc = false;
+    if (codec_ == kDecodeCodecH264 && !h264UseNativeAvc) {
+        if (ConvertAvcConfigurationToAnnexB(extraData, extraDataSize, &annexBExtraData) ||
+            ConvertLengthPrefixedParameterSetsToAnnexB(extraData, extraDataSize, &annexBExtraData)) {
+            contextExtraData = &annexBExtraData[0];
+            contextExtraDataSize = annexBExtraData.size();
+        }
+    }
+
+    if (contextExtraData && contextExtraDataSize > 0) {
+        if (contextExtraDataSize > static_cast<size_t>(INT_MAX)) {
             avcodec_free_context(&context);
             SetError("Codec extradata is too large");
             return false;
         }
-        context->extradata = static_cast<uint8_t*>(av_mallocz(extraDataSize + AV_INPUT_BUFFER_PADDING_SIZE));
+        context->extradata = static_cast<uint8_t*>(av_mallocz(contextExtraDataSize + AV_INPUT_BUFFER_PADDING_SIZE));
         if (!context->extradata) {
             avcodec_free_context(&context);
             SetError("Failed to allocate codec extradata");
             return false;
         }
-        memcpy(context->extradata, extraData, extraDataSize);
-        context->extradata_size = static_cast<int>(extraDataSize);
+        memcpy(context->extradata, contextExtraData, contextExtraDataSize);
+        context->extradata_size = static_cast<int>(contextExtraDataSize);
     }
+    if (codec_ == kDecodeCodecH264) {
+        context->flags2 |= AV_CODEC_FLAG2_CHUNKS;
+    }
+    context->pkt_timebase = kDirectShowTimeBase;
 
     const int openResult = avcodec_open2(context, codec, 0);
     if (openResult < 0) {
@@ -185,8 +499,14 @@ bool DecodeSession::OpenWithExtradata(const uint8_t* extraData, size_t extraData
         return false;
     }
 
+    AVCodecParserContext* parser = 0;
+    if (codec_ == kDecodeCodecH264 || codec_ == kDecodeCodecVc1 || codec_ == kDecodeCodecWmv3) {
+        parser = av_parser_init(codec->id);
+    }
+
     AVPacket* packet = av_packet_alloc();
     if (!packet) {
+        av_parser_close(parser);
         avcodec_free_context(&context);
         SetError("Failed to allocate AVPacket");
         return false;
@@ -194,6 +514,7 @@ bool DecodeSession::OpenWithExtradata(const uint8_t* extraData, size_t extraData
 
     AVFrame* frame = av_frame_alloc();
     if (!frame) {
+        av_parser_close(parser);
         av_packet_free(&packet);
         avcodec_free_context(&context);
         SetError("Failed to allocate AVFrame");
@@ -201,22 +522,50 @@ bool DecodeSession::OpenWithExtradata(const uint8_t* extraData, size_t extraData
     }
 
     codecContext_ = context;
+    parser_ = parser;
     packet_ = packet;
     frame_ = frame;
+    h264NalLengthSize_ = kUnknownH264NalLengthSize;
+    h264AnnexBExtraData_.clear();
+    h264PendingAccessUnit_.clear();
+    h264PendingPts_ = 0;
+    h264PendingDuration_ = kNoPts;
+    h264ExtraDataPrepended_ = false;
+    h264UseNativeAvc_ = false;
+    h264HasPendingVcl_ = false;
+    hasDecodedFrame_ = false;
+    if (codec_ == kDecodeCodecH264) {
+        h264UseNativeAvc_ = h264UseNativeAvc;
+        if (h264NalLengthSize >= 1 && h264NalLengthSize <= 4) {
+            h264NalLengthSize_ = h264NalLengthSize;
+        } else {
+            h264NalLengthSize_ = parsedH264NalLengthSize;
+        }
+        if (!annexBExtraData.empty()) {
+            h264AnnexBExtraData_ = annexBExtraData;
+        } else if (StartsWithAnnexBStartCode(extraData, extraDataSize)) {
+            h264AnnexBExtraData_.assign(extraData, extraData + extraDataSize);
+        }
+    }
     lastError_[0] = '\0';
     return true;
 }
 
 DecodeStatus DecodeSession::Decode(const uint8_t* data, size_t dataSize, DecodedFrameInfo* frameInfo)
 {
-    return DecodeWithPts(data, dataSize, 0, frameInfo);
+    return DecodeWithPts(data, dataSize, kNoPts, frameInfo);
 }
 
 DecodeStatus DecodeSession::DecodeWithPts(const uint8_t* data, size_t dataSize, int64_t pts, DecodedFrameInfo* frameInfo)
 {
+    return DecodeWithTiming(data, dataSize, pts, kNoPts, frameInfo);
+}
+
+DecodeStatus DecodeSession::DecodeWithTiming(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo)
+{
     AVCodecContext* context = AsContext(codecContext_);
-    AVPacket* packet = AsPacket(packet_);
-    if (!context || !packet) {
+    AVCodecParserContext* parser = static_cast<AVCodecParserContext*>(parser_);
+    if (!context) {
         SetError("DecodeSession is not open");
         return kDecodeStatusFailure;
     }
@@ -229,6 +578,26 @@ DecodeStatus DecodeSession::DecodeWithPts(const uint8_t* data, size_t dataSize, 
         return kDecodeStatusFailure;
     }
 
+    if (codec_ == kDecodeCodecH264) {
+        return SendH264Packet(data, dataSize, pts, duration, frameInfo);
+    }
+
+    if (!parser) {
+        return SendPacket(data, dataSize, pts, duration, frameInfo);
+    }
+
+    return SendParsedPacket(data, dataSize, pts, duration, frameInfo);
+}
+
+DecodeStatus DecodeSession::SendPacket(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo)
+{
+    AVCodecContext* context = AsContext(codecContext_);
+    AVPacket* packet = AsPacket(packet_);
+    if (!context || !packet) {
+        SetError("DecodeSession is not open");
+        return kDecodeStatusFailure;
+    }
+
     av_packet_unref(packet);
     const int packetResult = av_new_packet(packet, static_cast<int>(dataSize));
     if (packetResult < 0) {
@@ -238,17 +607,145 @@ DecodeStatus DecodeSession::DecodeWithPts(const uint8_t* data, size_t dataSize, 
 
     memcpy(packet->data, data, dataSize);
     packet->pts = pts;
-    packet->dts = pts;
+    packet->dts = AV_NOPTS_VALUE;
+    packet->duration = duration > 0 ? duration : 0;
     const int sendResult = avcodec_send_packet(context, packet);
     av_packet_unref(packet);
     if (sendResult == AVERROR(EAGAIN)) {
         return ReceiveFrame(frameInfo);
     }
     if (sendResult < 0) {
+        if (codec_ == kDecodeCodecH264 && !hasDecodedFrame_ && sendResult == AVERROR_INVALIDDATA) {
+            SetAvError("avcodec_send_packet", sendResult);
+            return kDecodeStatusNeedMoreInput;
+        }
         SetAvError("avcodec_send_packet", sendResult);
         return kDecodeStatusFailure;
     }
 
+    return ReceiveFrame(frameInfo);
+}
+
+DecodeStatus DecodeSession::SendParsedPacket(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo)
+{
+    AVCodecContext* context = AsContext(codecContext_);
+    AVCodecParserContext* parser = static_cast<AVCodecParserContext*>(parser_);
+    if (!context || !parser) {
+        return SendPacket(data, dataSize, pts, duration, frameInfo);
+    }
+    if (dataSize > static_cast<size_t>(INT_MAX)) {
+        SetError("Decode input is too large");
+        return kDecodeStatusFailure;
+    }
+
+    const uint8_t* input = data;
+    int inputSize = static_cast<int>(dataSize);
+    bool sentPacket = false;
+    while (inputSize > 0) {
+        uint8_t* parsedData = 0;
+        int parsedSize = 0;
+        const int used = av_parser_parse2(parser, context, &parsedData, &parsedSize, input, inputSize, pts, AV_NOPTS_VALUE, AV_NOPTS_VALUE);
+        if (used < 0) {
+            SetAvError("av_parser_parse2", used);
+            return kDecodeStatusFailure;
+        }
+
+        input += used;
+        inputSize -= used;
+        if (parsedSize > 0) {
+            sentPacket = true;
+            const DecodeStatus status = SendPacket(parsedData, static_cast<size_t>(parsedSize), pts, duration, frameInfo);
+            if (status == kDecodeStatusFrameReady || status == kDecodeStatusFailure) {
+                return status;
+            }
+        }
+        if (used == 0 && parsedSize == 0) {
+            break;
+        }
+    }
+
+    if (!sentPacket && codec_ == kDecodeCodecH264) {
+        uint8_t* parsedData = 0;
+        int parsedSize = 0;
+        const int used = av_parser_parse2(parser, context, &parsedData, &parsedSize, 0, 0, pts, AV_NOPTS_VALUE, AV_NOPTS_VALUE);
+        if (used < 0) {
+            SetAvError("av_parser_parse2", used);
+            return kDecodeStatusFailure;
+        }
+        if (parsedSize > 0) {
+            sentPacket = true;
+            const DecodeStatus status = SendPacket(parsedData, static_cast<size_t>(parsedSize), pts, duration, frameInfo);
+            if (status == kDecodeStatusFrameReady || status == kDecodeStatusFailure) {
+                return status;
+            }
+        }
+    }
+
+    return sentPacket ? ReceiveFrame(frameInfo) : kDecodeStatusNeedMoreInput;
+}
+
+DecodeStatus DecodeSession::SendH264Packet(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo)
+{
+    if (h264UseNativeAvc_) {
+        return SendPacket(data, dataSize, pts, duration, frameInfo);
+    }
+
+    if (StartsWithAnnexBStartCode(data, dataSize)) {
+        if (!h264ExtraDataPrepended_ && !h264AnnexBExtraData_.empty()) {
+            std::vector<uint8_t> packetWithExtraData = h264AnnexBExtraData_;
+            packetWithExtraData.insert(packetWithExtraData.end(), data, data + dataSize);
+            h264ExtraDataPrepended_ = true;
+            return SendParsedPacket(&packetWithExtraData[0], packetWithExtraData.size(), pts, duration, frameInfo);
+        }
+        return SendParsedPacket(data, dataSize, pts, duration, frameInfo);
+    }
+
+    const int nalLengthSize = h264NalLengthSize_ != kUnknownH264NalLengthSize ?
+        h264NalLengthSize_ :
+        DetectH264NalLengthSize(data, dataSize);
+    if (nalLengthSize == kUnknownH264NalLengthSize) {
+        return SendPacket(data, dataSize, pts, duration, frameInfo);
+    }
+    if (!ContainsAvcLengthPrefixedVclNal(data, dataSize, nalLengthSize)) {
+        return kDecodeStatusNeedMoreInput;
+    }
+    const bool startsNewSlice = AvcLengthPrefixedStartsNewVclSlice(data, dataSize, nalLengthSize);
+
+    std::vector<uint8_t> annexBPacket;
+    if (!ConvertAvcLengthPrefixedToAnnexB(data, dataSize, nalLengthSize, &annexBPacket)) {
+        return SendPacket(data, dataSize, pts, duration, frameInfo);
+    }
+    if (!h264ExtraDataPrepended_ && !h264AnnexBExtraData_.empty()) {
+        annexBPacket.insert(annexBPacket.begin(), h264AnnexBExtraData_.begin(), h264AnnexBExtraData_.end());
+        h264ExtraDataPrepended_ = true;
+    }
+    if (pts != kNoPts) {
+        return SendPacket(&annexBPacket[0], annexBPacket.size(), pts, duration, frameInfo);
+    }
+
+    if (h264HasPendingVcl_ && startsNewSlice) {
+        std::vector<uint8_t> readyAccessUnit;
+        readyAccessUnit.swap(h264PendingAccessUnit_);
+        h264PendingAccessUnit_.insert(h264PendingAccessUnit_.end(), annexBPacket.begin(), annexBPacket.end());
+        const int64_t readyPts = h264PendingPts_;
+        const int64_t readyDuration = h264PendingDuration_;
+        h264PendingPts_ = pts;
+        h264PendingDuration_ = duration;
+        h264HasPendingVcl_ = true;
+        return SendParsedPacket(&readyAccessUnit[0], readyAccessUnit.size(), readyPts, readyDuration, frameInfo);
+    }
+
+    if (h264PendingAccessUnit_.empty()) {
+        h264PendingPts_ = pts;
+        h264PendingDuration_ = duration;
+    }
+    h264PendingAccessUnit_.insert(h264PendingAccessUnit_.end(), annexBPacket.begin(), annexBPacket.end());
+    h264HasPendingVcl_ = true;
+    return kDecodeStatusNeedMoreInput;
+}
+
+DecodeStatus DecodeSession::ReceivePending(DecodedFrameInfo* frameInfo)
+{
     return ReceiveFrame(frameInfo);
 }
 
@@ -275,6 +772,12 @@ void DecodeSession::Flush()
     if (context) {
         avcodec_flush_buffers(context);
     }
+    h264PendingAccessUnit_.clear();
+    h264PendingPts_ = 0;
+    h264PendingDuration_ = kNoPts;
+    h264ExtraDataPrepended_ = false;
+    h264HasPendingVcl_ = false;
+    hasDecodedFrame_ = false;
 }
 
 const char* DecodeSession::LastError() const
@@ -294,6 +797,7 @@ DecodeStatus DecodeSession::ReceiveFrame(DecodedFrameInfo* frameInfo)
     av_frame_unref(frame);
     const int receiveResult = avcodec_receive_frame(context, frame);
     if (receiveResult == 0) {
+        hasDecodedFrame_ = true;
         CopyFrameInfo(frame, frameInfo);
         return kDecodeStatusFrameReady;
     }
@@ -390,6 +894,14 @@ bool DecodeCodecFromFourcc(uint32_t fourcc, DecodeCodec* codec)
     case kFourccmmes:
         *codec = kDecodeCodecMpeg2;
         return true;
+    case kFourccWMV3:
+    case kFourccwmv3:
+        *codec = kDecodeCodecWmv3;
+        return true;
+    case kFourccWVC1:
+    case kFourccwvc1:
+        *codec = kDecodeCodecVc1;
+        return true;
     default:
         return false;
     }
@@ -429,6 +941,12 @@ bool DecodeCodecFromModernAvCodecId(int codecId, DecodeCodec* codec)
     case AV_CODEC_ID_MPEG2VIDEO:
         *codec = kDecodeCodecMpeg2;
         return true;
+    case AV_CODEC_ID_WMV3:
+        *codec = kDecodeCodecWmv3;
+        return true;
+    case AV_CODEC_ID_VC1:
+        *codec = kDecodeCodecVc1;
+        return true;
     default:
         return false;
     }
@@ -446,6 +964,8 @@ bool IsFirstWaveSoftwareCodec(DecodeCodec codec)
     case kDecodeCodecWmv2:
     case kDecodeCodecH264:
     case kDecodeCodecMpeg2:
+    case kDecodeCodecWmv3:
+    case kDecodeCodecVc1:
         return true;
     default:
         return false;

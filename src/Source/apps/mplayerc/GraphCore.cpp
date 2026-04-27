@@ -2157,6 +2157,11 @@ void CGraphCore::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		}
 	}
 
+	SendStatusMessage(ResStr(IDS_CONTROLS_OPENING), 5000);
+	GetMainFrame()->PostMessage(WM_KICKIDLE);
+	GetMainFrame()->UpdateWindow();
+	GetVideoView()->UpdateWindow();
+
 	if (m_iMediaLoadState != MLS_CLOSED)
 		CloseMedia();
 
@@ -2172,7 +2177,7 @@ void CGraphCore::OpenMedia(CAutoPtr<OpenMediaData> pOMD)
 		if (p->fns.GetCount() > 0)
 		{
 			engine_t e = s.Formats.GetEngine(p->fns.GetHead());
-			fUseThread = e == DirectShow /*|| e == RealMedia || e == QuickTime*/;
+			fUseThread = e == DirectShow || e == RealMedia || e == QuickTime;
 
 		}
 	}

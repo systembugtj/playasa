@@ -5,6 +5,34 @@
 namespace {
 
 const uint32_t kFourccXvid = 'X' | ('V' << 8) | ('I' << 16) | ('D' << 24);
+const uint32_t kFourccWvc1 = 'W' | ('V' << 8) | ('C' << 16) | ('1' << 24);
+const uint32_t kFourccWmv3 = 'W' | ('M' << 8) | ('V' << 16) | ('3' << 24);
+
+bool CheckCodec(uint32_t fourcc, bool openSession)
+{
+    uint32_t codec = 0;
+    if (!playasa_ffmpeg_modern_codec_from_fourcc(fourcc, &codec)) {
+        fprintf(stderr, "fourcc 0x%08x was not mapped\n", fourcc);
+        return false;
+    }
+
+    PlayasaFfmpegModernSession session = 0;
+    if (!playasa_ffmpeg_modern_create(codec, &session) || !session) {
+        fprintf(stderr, "failed to create bridge session for 0x%08x\n", fourcc);
+        return false;
+    }
+
+    if (openSession) {
+        if (!playasa_ffmpeg_modern_open(session, 0, 0)) {
+            fprintf(stderr, "failed to open bridge session for 0x%08x: %s\n", fourcc, playasa_ffmpeg_modern_last_error(session));
+            playasa_ffmpeg_modern_destroy(session);
+            return false;
+        }
+    }
+
+    playasa_ffmpeg_modern_destroy(session);
+    return true;
+}
 
 } // namespace
 
@@ -16,19 +44,16 @@ int main()
         return 1;
     }
 
-    uint32_t codec = 0;
-    if (!playasa_ffmpeg_modern_codec_from_fourcc(kFourccXvid, &codec)) {
-        fprintf(stderr, "XVID fourcc was not mapped\n");
+    if (!CheckCodec(kFourccXvid, true)) {
         return 2;
     }
-
-    PlayasaFfmpegModernSession session = 0;
-    if (!playasa_ffmpeg_modern_create(codec, &session) || !session) {
-        fprintf(stderr, "failed to create bridge session\n");
+    if (!CheckCodec(kFourccWvc1, false)) {
         return 3;
     }
+    if (!CheckCodec(kFourccWmv3, false)) {
+        return 4;
+    }
 
-    playasa_ffmpeg_modern_destroy(session);
-    printf("bridge smoke OK: avcodec=%u codec=%u\n", version, codec);
+    printf("bridge smoke OK: avcodec=%u\n", version);
     return 0;
 }

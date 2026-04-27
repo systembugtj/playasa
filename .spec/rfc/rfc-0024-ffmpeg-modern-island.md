@@ -72,8 +72,10 @@ RFC-0017 已确认当前 `mpcvideodec` 内嵌 FFmpeg/libav 是 `libavcodec 52.32
 --enable-decoder=vp6f
 --enable-decoder=wmv1
 --enable-decoder=wmv2
+--enable-decoder=wmv3
 --enable-decoder=h264
 --enable-decoder=mpeg2video
+--enable-decoder=vc1
 --enable-demuxer=avi
 --enable-demuxer=flv
 --enable-demuxer=matroska
@@ -83,6 +85,7 @@ RFC-0017 已确认当前 `mpcvideodec` 内嵌 FFmpeg/libav 是 `libavcodec 52.32
 --enable-parser=vp3
 --enable-parser=h264
 --enable-parser=mpegvideo
+--enable-parser=vc1
 ```
 
 `libavformat` 用于样本级 smoke test 打开容器并喂给 adapter；仍禁用 network / muxers / device / filter / hwaccel，并且默认禁用所有 decoder/demuxer/parser 后只打开第一批迁移需要的最小集合。
@@ -96,6 +99,10 @@ RFC-0017 已确认当前 `mpcvideodec` 内嵌 FFmpeg/libav 是 `libavcodec 52.32
 3. `av_frame_alloc` / `av_frame_unref`
 4. `avcodec_send_packet` / `avcodec_receive_frame`
 5. `avcodec_flush_buffers`
+6. Adapter-local AVC length-prefixed to Annex-B conversion for H264 packets
+7. Adapter-local H264 SPS/PPS conversion for both avcC and DirectShow 2-byte length-prefixed parameter sets
+8. Adapter-local H264 access-unit aggregation for DirectShow chunked NAL delivery
+9. `av_parser_parse2` for VC-1/WMV3 packet boundary handling
 
 adapter 内部可以包含新版 FFmpeg header；`MPCVideoDecFilter.cpp` 只依赖 adapter 自己的头文件。
 
@@ -103,13 +110,17 @@ MSVC 侧不能直接链接 MinGW 生成的 FFmpeg 静态 `.a`。`MPCVideoDec` �
 
 实际接入 `MPCVideoDec` 时，主工程不直接链接 `.lib`，而是通过 `ModernFfmpegBridgeConsumer` 使用 `LoadLibraryA` / `GetProcAddress` 动态解析 C ABI。这样静态库配置不会把 bridge 变成强链接依赖，同时运行目录只需要部署 `playasa_ffmpeg_modern_bridge.dll`、`libiconv-2.dll` 和 `libwinpthread-1.dll`。
 
-首批真实替代范围限定为 first-wave 软件解码、H264 软件解码和 MPEG-2 软件解码：MPEG-4 ASP/DivX/Xvid/MP4V、FLV1、VP6/VP6F/VP6A、WMV1、WMV2、H264/AVC、MPEG-2。`MPCVideoDecFilter` 只在这些 FourCC 命中时启用 `ModernFfmpegBridgeDecode`，其他 codec 仍保持 legacy FFmpeg 路径。
+首批真实替代范围限定为 first-wave 软件解码、H264 软件解码、MPEG-2 软件解码和 VC-1/WMV3 软件解码：MPEG-4 ASP/DivX/Xvid/MP4V、FLV1、VP6/VP6F/VP6A、WMV1、WMV2、H264/AVC、MPEG-2、WMV3、VC-1。`MPCVideoDecFilter` 只在这些 FourCC 命中时启用 `ModernFfmpegBridgeDecode`，其他 codec 仍保持 legacy FFmpeg 路径。
 
 旧 FFmpeg 仍会在 H264/DXVA 兼容性探测阶段运行，因此 `MPCVideoDec` 必须始终安装 `LogLibAVCodec` 作为 libavcodec 日志回调，避免默认 `av_log_default_callback` 写 CRT `stderr` 并在 GUI/混合 CRT 链接环境中崩溃。
 
-H264 命中 modern bridge 后，旧 DXVA compatibility probe 和旧 H264 DXVA decode path 会被禁用，先保证 H264 活跃播放路径不再依赖旧 FFmpeg private internals。现代 DXVA 需要后续单独实现，不能继续复用 `FfmpegContext.c` 的 `H264Context` / `MpegEncContext` 私有字段。
+H264 software decode 保持 modern bridge 路由。DirectShow 侧解析出的 H264 NAL length size 会通过 bridge open 传给 adapter；如果 media type 没有提供，adapter 会从 packet 自动探测 4/2/1 字节 NAL length。adapter 会把 avcC extradata 或 DirectShow 2 字节长度前缀 SPS/PPS 参数集转成 Annex-B，并把 Matroska/MP4 风格的 `avc1/AVC1` length-prefixed packet 转成 Annex-B packet。对于 DirectShow splitter 逐 NAL/chunk 送样本的 H264，adapter 会聚合 VCL NAL 成 access unit 后再送新版 FFmpeg，避免持续 `NEED_MORE_INPUT`。旧 H264 DXVA 输出协商仍被禁用，直到后续实现新的 DXVA path。
 
 MPEG-2 命中 modern bridge 后，旧 MPEG-2 DXVA 强制路径也会被禁用，`FindCodec` 会把 modern bridge MPEG-2 视为软件解码能力。modern bridge codec 不再调用旧 `avcodec_open`，旧 `AVCodecContext` 只作为本工程既有宽高、extradata 和输出协商状态容器。
+
+WMV3 和 VC-1 命中 modern bridge 后，旧 VC-1 DXVA path 和旧 `FFIsInterlaced` 探测会被禁用。modern bridge codec 不调用旧 `avcodec_open`、`avcodec_thread_init/free` 或 `avcodec_flush_buffers`，旧 `AVCodecContext` 只保留 DirectShow 侧协商所需状态。VC-1/WMV3 通过新版 parser 处理 Matroska 等 splitter 可能给出的 packet boundary 差异。
+
+如果 modern bridge 因缺少 codec private data 等原因无法打开，`MPCVideoDec` 必须回退到旧 software decoder，而不是拒绝 DirectShow media type。这样 Matroska 中不完整 extradata 的 VC-1/WMV3 仍能出画面。
 
 ## 7. 第一批 codec 策略
 
@@ -120,8 +131,9 @@ MPEG-2 命中 modern bridge 后，旧 MPEG-2 DXVA 强制路径也会被禁用，
 3. WMV1 / WMV2
 4. H264 / AVC
 5. MPEG-2
+6. WMV3 / VC-1
 
-VC-1 先不迁移，因为它当前和 DXVA / `FfmpegContext.c` 的私有结构耦合仍未拆开。
+VC-1 的 DXVA 私有结构仍不迁移；本阶段只替换 WMV3/VC-1 software decode 和旧探测入口。
 
 ## 8. 验证
 
@@ -130,6 +142,7 @@ VC-1 先不迁移，因为它当前和 DXVA / `FfmpegContext.c` 的私有结构�
 3. `build-rfc0024-ffmpeg-modern.ps1` 必须能在本地生成最小软件解码库或给出明确缺失工具诊断。
 4. `MPCVideoDec.vcxproj` 和 `splayer.sln` 的旧路径构建不能回归。
 5. 第一批 codec 迁移后必须新增至少一个“解码一帧”的 smoke。
+6. H264 DirectShow 播放链路必须有 `splayer.exe` 级 selfcheck，验证 modern bridge 首帧日志。
 
 ## 9. 风险与缓解
 

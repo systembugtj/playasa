@@ -30,6 +30,56 @@
 
 using namespace MatroskaReader;
 
+namespace {
+
+const REFERENCE_TIME kMatroskaFallbackVideoFrameDuration = 400000; // 25 fps in DirectShow 100ns units.
+const LONG kMatroskaTimingLogLimit = 80;
+LONG g_matroskaTimingLogCount = 0;
+
+bool IsMatroskaVideoTrack(TrackEntry* trackEntry)
+{
+	if (!trackEntry) {
+		return false;
+	}
+	const int trackType = trackEntry->TrackType;
+	return trackType == TrackEntry::TypeVideo;
+}
+
+bool IsMatroskaSubtitleTrack(TrackEntry* trackEntry)
+{
+	if (!trackEntry) {
+		return false;
+	}
+	const int trackType = trackEntry->TrackType;
+	return trackType == TrackEntry::TypeSubtitle;
+}
+
+REFERENCE_TIME GetMatroskaTrackDefaultDuration(TrackEntry* trackEntry)
+{
+	if (!trackEntry || !trackEntry->DefaultDuration.IsValid()) {
+		return 0;
+	}
+
+	const REFERENCE_TIME defaultDuration = trackEntry->DefaultDuration / 100;
+	return defaultDuration > 0 ? defaultDuration : 0;
+}
+
+bool IsMatroskaVideoMediaType(const CMediaType& mediaType)
+{
+	return mediaType.majortype == MEDIATYPE_Video;
+}
+
+REFERENCE_TIME GetMatroskaPinFallbackDuration(const CMediaType& mediaType, REFERENCE_TIME defaultDuration)
+{
+	if (defaultDuration > 0) {
+		return defaultDuration;
+	}
+
+	return IsMatroskaVideoMediaType(mediaType) ? kMatroskaFallbackVideoFrameDuration : 1;
+}
+
+} // namespace
+
 #ifdef REGISTER_FILTER
 
 const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] =
@@ -917,7 +967,7 @@ STDMETHODIMP CMatroskaSplitterFilter::Count(DWORD* pcStreams)
   return S_OK;
 }
 
-// lIndex 代表是第几个video stream（在所有的video stream中计数）
+// lIndex ??????????video stream??????????video stream????????
 // Ignore the dwFlags
 // When enable lIndex video stream, will automatically disable all other video streams
 STDMETHODIMP CMatroskaSplitterFilter::Enable(long lIndex, DWORD /* dwFlags */)
@@ -1220,16 +1270,20 @@ bool CMatroskaSplitterFilter::DemuxLoop()
 				if(!pTE) continue;
 
 				p->rtStart = m_pFile->m_segment.GetRefTime((REFERENCE_TIME)c.TimeCode + p->bg->Block.TimeCode);
-				p->rtStop = p->rtStart + (p->bg->BlockDuration.IsValid() ? m_pFile->m_segment.GetRefTime(p->bg->BlockDuration) : 1);
-
-				// Fix subtitle with duration = 0
-				int TEntry = TrackEntry::TypeSubtitle;
-				try{
-					TEntry = pTE->TrackType;
-				}catch(...){}
-				if( TEntry == TrackEntry::TypeSubtitle && !p->bg->BlockDuration.IsValid())
-				{
-					p->bg->BlockDuration.Set(1); // just setting it to be valid
+				if (p->bg->BlockDuration.IsValid()) {
+					p->rtStop = p->rtStart + m_pFile->m_segment.GetRefTime(p->bg->BlockDuration);
+				} else if (IsMatroskaSubtitleTrack(pTE)) {
+					p->bg->BlockDuration.Set(1); // Marker only: subtitle cues may intentionally have zero duration.
+					p->rtStop = p->rtStart;
+				} else if (IsMatroskaVideoTrack(pTE)) {
+					const REFERENCE_TIME defaultDuration = GetMatroskaTrackDefaultDuration(pTE);
+					if (defaultDuration > 0) {
+						p->bg->BlockDuration.Set(1); // Marker only: the actual duration is already in rtStop.
+						p->rtStop = p->rtStart + defaultDuration;
+					} else {
+						p->rtStop = p->rtStart;
+					}
+				} else {
 					p->rtStop = p->rtStart;
 				}
 				
@@ -1357,6 +1411,8 @@ HRESULT CMatroskaSplitterOutputPin::DeliverEndOfStream()
 			mp->rtStop = m_rob.GetHead()->rtStart;
 		else if(m_rob.GetCount() == 0 && m_rtDefaultDuration > 0)
 			mp->rtStop = mp->rtStart + m_rtDefaultDuration;
+		else if(m_rob.GetCount() == 0 && !mp->bg->BlockDuration.IsValid() && IsMatroskaVideoMediaType(m_mt))
+			mp->rtStop = mp->rtStart + kMatroskaFallbackVideoFrameDuration;
 
 		timeoverride to = {mp->rtStart, mp->rtStop};
 		m_tos.AddTail(to);
@@ -1411,6 +1467,7 @@ HRESULT CMatroskaSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 				AfxMessageBox(str);
 */				
 				// TRACE(_T("mp1->rtStart (%I64d) >= mp2->rtStart (%I64d)!!!\n"), mp1->rtStart, mp2->rtStart);
+				mp1->rtStop = mp1->rtStart + GetMatroskaPinFallbackDuration(m_mt, m_rtDefaultDuration);
 			}
 			else
 			{
@@ -1422,7 +1479,14 @@ HRESULT CMatroskaSplitterOutputPin::DeliverPacket(CAutoPtr<Packet> p)
 	while(m_packets.GetCount())
 	{
 		mp = m_packets.GetHead();
-		if(!mp->bg->BlockDuration.IsValid()) break;
+		if(!mp->bg->BlockDuration.IsValid()) {
+			if (IsMatroskaVideoMediaType(m_mt)) {
+				mp->bg->BlockDuration.Set(1); // Marker only: use a conservative video fallback instead of 100ns.
+				mp->rtStop = mp->rtStart + GetMatroskaPinFallbackDuration(m_mt, m_rtDefaultDuration);
+			} else {
+				break;
+			}
+		}
         
 		mp = m_rob.RemoveHead();
 		timeoverride to = {mp->rtStart, mp->rtStop};
@@ -1453,8 +1517,27 @@ HRESULT CMatroskaSplitterOutputPin::DeliverBlock(MatroskaPacket* p)
 		
 	REFERENCE_TIME 
 		rtStart = p->rtStart,
-		rtDelta = (p->rtStop - p->rtStart) / p->bg->Block.BlockData.GetCount(),
+		rtDuration = p->rtStop - p->rtStart,
+		rtDelta = 0,
 		rtStop = p->rtStart + rtDelta;
+
+	const int blockCount = p->bg->Block.BlockData.GetCount();
+	if(blockCount <= 0) return S_OK;
+
+	if(IsMatroskaVideoMediaType(m_mt) && rtDuration < blockCount)
+	{
+		rtDuration = GetMatroskaPinFallbackDuration(m_mt, m_rtDefaultDuration) * blockCount;
+	}
+
+	rtDelta = rtDuration / blockCount;
+	rtStop = p->rtStart + rtDelta;
+
+	if(IsMatroskaVideoMediaType(m_mt) && InterlockedIncrement(&g_matroskaTimingLogCount) <= kMatroskaTimingLogLimit)
+	{
+		SVP_LogMsg5(L"MKV timing track=%d start=%I64d stop=%I64d duration=%I64d blockDurationValid=%d lacingCount=%d keyframe=%d",
+			p->TrackNumber, p->rtStart, p->rtStop, p->rtStop - p->rtStart,
+			p->bg->BlockDuration.IsValid() ? 1 : 0, blockCount, p->bSyncPoint ? 1 : 0);
+	}
 
 	POSITION pos = p->bg->Block.BlockData.GetHeadPosition();
 	while(pos)

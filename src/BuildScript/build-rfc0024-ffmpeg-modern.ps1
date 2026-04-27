@@ -114,8 +114,10 @@ $configureArgs = @(
   '--enable-decoder=vp6f',
   '--enable-decoder=wmv1',
   '--enable-decoder=wmv2',
+  '--enable-decoder=wmv3',
   '--enable-decoder=h264',
   '--enable-decoder=mpeg2video',
+  '--enable-decoder=vc1',
   '--enable-demuxer=avi',
   '--enable-demuxer=flv',
   '--enable-demuxer=matroska',
@@ -125,6 +127,7 @@ $configureArgs = @(
   '--enable-parser=vp3',
   '--enable-parser=h264',
   '--enable-parser=mpegvideo',
+  '--enable-parser=vc1',
   '--disable-x86asm',
   "--prefix=$installRootMsys"
 )

@@ -17,8 +17,9 @@ Consumer::Consumer()
     , session_(NULL)
     , codecFromFourcc_(NULL)
     , create_(NULL)
-    , open_(NULL)
-    , decodeWithPts_(NULL)
+    , openWithH264NalLengthSize_(NULL)
+    , decodeWithTiming_(NULL)
+    , receivePending_(NULL)
     , flush_(NULL)
     , lastError_(NULL)
     , destroy_(NULL)
@@ -35,7 +36,7 @@ Consumer::~Consumer()
     }
 }
 
-bool Consumer::Open(unsigned int fourcc, const unsigned char* extraData, size_t extraDataSize)
+bool Consumer::Open(unsigned int fourcc, const unsigned char* extraData, size_t extraDataSize, int h264NalLengthSize)
 {
     Close();
     if (!LoadBridge()) {
@@ -55,7 +56,7 @@ bool Consumer::Open(unsigned int fourcc, const unsigned char* extraData, size_t 
         SetError("Failed to create FFmpeg modern bridge session");
         return false;
     }
-    if (!open_(session_, extraData, extraDataSize)) {
+    if (!openWithH264NalLengthSize_(session_, extraData, extraDataSize, h264NalLengthSize)) {
         SetError(lastError_(session_));
         Close();
         return false;
@@ -65,14 +66,28 @@ bool Consumer::Open(unsigned int fourcc, const unsigned char* extraData, size_t 
     return true;
 }
 
-int Consumer::Decode(const unsigned char* data, size_t dataSize, int64_t pts, PlayasaFfmpegModernFrameInfo* frameInfo)
+int Consumer::Decode(const unsigned char* data, size_t dataSize, int64_t pts, int64_t duration, PlayasaFfmpegModernFrameInfo* frameInfo)
 {
-    if (!session_ || !decodeWithPts_) {
+    if (!session_ || !decodeWithTiming_) {
         SetError("FFmpeg modern bridge session is not open");
         return PLAYASA_FFMPEG_MODERN_STATUS_FAILURE;
     }
 
-    const int status = decodeWithPts_(session_, data, dataSize, pts, frameInfo);
+    const int status = decodeWithTiming_(session_, data, dataSize, pts, duration, frameInfo);
+    if (status == PLAYASA_FFMPEG_MODERN_STATUS_FAILURE) {
+        SetError(lastError_(session_));
+    }
+    return status;
+}
+
+int Consumer::ReceivePending(PlayasaFfmpegModernFrameInfo* frameInfo)
+{
+    if (!session_ || !receivePending_) {
+        SetError("FFmpeg modern bridge session is not open");
+        return PLAYASA_FFMPEG_MODERN_STATUS_FAILURE;
+    }
+
+    const int status = receivePending_(session_, frameInfo);
     if (status == PLAYASA_FFMPEG_MODERN_STATUS_FAILURE) {
         SetError(lastError_(session_));
     }
@@ -118,13 +133,14 @@ bool Consumer::LoadBridge()
 
     codecFromFourcc_ = reinterpret_cast<CodecFromFourccFn>(LoadRequiredProc("playasa_ffmpeg_modern_codec_from_fourcc"));
     create_ = reinterpret_cast<CreateFn>(LoadRequiredProc("playasa_ffmpeg_modern_create"));
-    open_ = reinterpret_cast<OpenFn>(LoadRequiredProc("playasa_ffmpeg_modern_open"));
-    decodeWithPts_ = reinterpret_cast<DecodeWithPtsFn>(LoadRequiredProc("playasa_ffmpeg_modern_decode_with_pts"));
+    openWithH264NalLengthSize_ = reinterpret_cast<OpenWithH264NalLengthSizeFn>(LoadRequiredProc("playasa_ffmpeg_modern_open_with_h264_nal_length_size"));
+    decodeWithTiming_ = reinterpret_cast<DecodeWithTimingFn>(LoadRequiredProc("playasa_ffmpeg_modern_decode_with_timing"));
+    receivePending_ = reinterpret_cast<ReceivePendingFn>(LoadRequiredProc("playasa_ffmpeg_modern_receive_pending"));
     flush_ = reinterpret_cast<FlushFn>(LoadRequiredProc("playasa_ffmpeg_modern_flush"));
     lastError_ = reinterpret_cast<LastErrorFn>(LoadRequiredProc("playasa_ffmpeg_modern_last_error"));
     destroy_ = reinterpret_cast<DestroyFn>(LoadRequiredProc("playasa_ffmpeg_modern_destroy"));
 
-    if (!codecFromFourcc_ || !create_ || !open_ || !decodeWithPts_ || !flush_ || !lastError_ || !destroy_) {
+    if (!codecFromFourcc_ || !create_ || !openWithH264NalLengthSize_ || !decodeWithTiming_ || !receivePending_ || !flush_ || !lastError_ || !destroy_) {
         FreeLibrary(module_);
         module_ = NULL;
         return false;

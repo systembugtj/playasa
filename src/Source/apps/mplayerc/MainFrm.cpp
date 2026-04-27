@@ -3884,7 +3884,6 @@ void CMainFrame::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		m_wndSeekBar.GetRange(t_start_time, t_stop_time);
 		// 		t_target_time = max( t_start_time , min( t_stop_time , m_wndSeekBar.GetPos()) );
 
-
 		if ((::GetKeyState(VK_SHIFT) & 0x8000)){
 			SeekTo(m_wndSeekBar.GetPos(), 0);
 		}
@@ -4753,10 +4752,15 @@ void CMainFrame::OnFilePostOpenmedia()
 	// this point, it will deadlock when OpenMediaPrivate is
 	// still running and the renderer window was created on
 	// the same worker-thread
-	std::wstring szFileHash = HashController::GetInstance()->GetSPHash(m_fnCurPlayingFile);
-
-	CString FPath = szFileHash.c_str();
-
+	CString FPath;
+	static const ULONGLONG kMaxUiThreadHistoryHashBytes = 32ull * 1024ull * 1024ull;
+	CFileStatus fileStatus;
+	if (AfxGetMyApp()->sqlite_local_record
+		&& CFile::GetStatus(m_fnCurPlayingFile, fileStatus)
+		&& static_cast<ULONGLONG>(fileStatus.m_size) <= kMaxUiThreadHistoryHashBytes) {
+		std::wstring szFileHash = HashController::GetInstance()->GetSPHash(m_fnCurPlayingFile);
+		FPath = szFileHash.c_str();
+	}
 	if (m_pCAP && (!m_fAudioOnly || m_fRealMediaGraph))
 	{
 		if (m_pSubStreams.GetCount() == 0){
@@ -4770,7 +4774,7 @@ void CMainFrame::OnFilePostOpenmedia()
 		if (s.fEnableSubtitles && m_pSubStreams.GetCount() > 0){
 			BOOL HavSubs1 = FALSE;
 
-			if (AfxGetMyApp()->sqlite_local_record){
+			if (AfxGetMyApp()->sqlite_local_record && !FPath.IsEmpty()){
 				CString szSQL;
 				szSQL.Format(L"SELECT subid FROM histories WHERE fpath = \"%s\" ", FPath);
 				int subid = AfxGetMyApp()->sqlite_local_record->get_single_int_from_sql(szSQL.GetBuffer(), -1);
@@ -4865,7 +4869,7 @@ void CMainFrame::OnFilePostOpenmedia()
 			if (s.fAutoloadSubtitles2 && m_pSubStreams2.GetCount() > 1){
 				BOOL HavSubs = false;
 
-				if (AfxGetMyApp()->sqlite_local_record){
+				if (AfxGetMyApp()->sqlite_local_record && !FPath.IsEmpty()){
 					CString szSQL;
 					szSQL.Format(L"SELECT subid2 FROM histories WHERE fpath = \"%s\" ", FPath);
 					int subid = AfxGetMyApp()->sqlite_local_record->get_single_int_from_sql(szSQL.GetBuffer(), -1);
@@ -4968,7 +4972,7 @@ void CMainFrame::OnFilePostOpenmedia()
 		UpdateSubtitle2(true);
 	}
 
-	if (AfxGetMyApp()->sqlite_local_record){
+	if (AfxGetMyApp()->sqlite_local_record && !FPath.IsEmpty()){
 		CString szSQL;
 		szSQL.Format(L"SELECT audioid FROM histories WHERE fpath = \"%s\" ", FPath);
 		//SVP_LogMsg5(szSQL);
@@ -4987,7 +4991,7 @@ void CMainFrame::OnFilePostOpenmedia()
 	}
 
 
-	if (AfxGetMyApp()->sqlite_local_record)
+	if (AfxGetMyApp()->sqlite_local_record && !FPath.IsEmpty())
 	{
 		CString szSQL;
 		if (s.fEnableSubtitles){
@@ -5004,7 +5008,7 @@ void CMainFrame::OnFilePostOpenmedia()
 		}
 	}
 
-	if (AfxGetMyApp()->sqlite_local_record)
+	if (AfxGetMyApp()->sqlite_local_record && !FPath.IsEmpty())
 	{
 		CString szSQL;
 		szSQL.Format(L"SELECT arg1 FROM histories_stereo WHERE fpath = \"%s\" ", FPath);
@@ -7867,19 +7871,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, int fSeekToKeyFrame, REFERENCE_TIM
 		int iKeyFlag = 0;
 		if (fSeekToKeyFrame)
 		{
-			if (!m_kfs.IsEmpty())
-			{
-				UINT i = rangebsearch(rtPos, m_kfs, fSeekToKeyFrame);
-				if (i >= 0 && i < m_kfs.GetCount()){
-					if (maxStep <= 0 || (maxStep > 0 && _abs64(m_kfs[i] - rtPos) < maxStep)){
-						rtPos = m_kfs[i];
-						iKeyFlag = AM_SEEKING_SeekToKeyFrame;
-						//SVP_LogMsg5(L"Got seek to keyframe");
-					}
-
-				}
-			}
-
+			iKeyFlag = AM_SEEKING_SeekToKeyFrame;
 		}
 		__int64 t_start_time, t_stop_time, t_target_time;
 		m_wndSeekBar.GetRange(t_start_time, t_stop_time);
@@ -7891,7 +7883,9 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, int fSeekToKeyFrame, REFERENCE_TIM
 			}
 		}
 
+		SVP_LogMsg5(L"SeekTo begin pos=%I64d key=%d", rtPos, iKeyFlag ? 1 : 0);
 		hr = pMS->SetPositions(&rtPos, AM_SEEKING_AbsolutePositioning | iKeyFlag, NULL, AM_SEEKING_NoPositioning);
+		SVP_LogMsg5(L"SeekTo end hr=%08x pos=%I64d", hr, rtPos);
 	}
 	else if (m_iPlaybackMode == PM_DVD && m_iDVDDomain == DVD_DOMAIN_Title)
 	{
