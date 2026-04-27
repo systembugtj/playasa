@@ -23,10 +23,10 @@ $legacyFilterSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideo
 $legacyFilterHeader = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.h'
 $legacyFilterProject = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\MPCVideoDec.vcxproj'
 $smokeSource = Join-Path $repoRoot 'src\Test\MPCVideoDecModernSmoke\MPCVideoDecModernSmoke.cpp'
-$smokeScript = Join-Path $PSScriptRoot 'test-rfc0024-modern-smoke.ps1'
+$smokeScript = Join-Path $repoRoot 'src\Test\Scripts\test-rfc0024-modern-smoke.ps1'
 $bridgeSmokeSource = Join-Path $repoRoot 'src\Test\MPCVideoDecModernBridgeSmoke\MPCVideoDecModernBridgeSmoke.cpp'
-$bridgeSmokeScript = Join-Path $PSScriptRoot 'test-rfc0024-modern-bridge-smoke.ps1'
-$playerSelfcheckScript = Join-Path $PSScriptRoot 'test-rfc0024-splayer-selfcheck.ps1'
+$bridgeSmokeScript = Join-Path $repoRoot 'src\Test\Scripts\test-rfc0024-modern-bridge-smoke.ps1'
+$playerSelfcheckScript = Join-Path $repoRoot 'src\Test\Scripts\test-rfc0024-splayer-selfcheck.ps1'
 
 function Assert-FileExists {
   param([string]$Path)

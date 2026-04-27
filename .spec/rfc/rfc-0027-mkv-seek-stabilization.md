@@ -66,8 +66,8 @@ Modern FFmpeg bridge flush on segment: start=... stop=...
 新增：
 
 ```powershell
-src\BuildScript\test-rfc0027-mkv-seek-selfcheck.ps1
-src\BuildScript\test-rfc0027-uia-tree-selfcheck.ps1
+src\Test\Scripts\test-rfc0027-mkv-seek-selfcheck.ps1
+src\Test\Scripts\test-rfc0027-uia-tree-selfcheck.ps1
 ```
 
 该脚本启动 MKV 样本，等待 modern FFmpeg 首帧，通过 `WM_COMMAND` 触发真实播放器 seek，然后检查：
@@ -82,7 +82,7 @@ src\BuildScript\test-rfc0027-uia-tree-selfcheck.ps1
 现有 `src\BuildScript\test*.ps1` 已迁移到共享测试模块：
 
 ```powershell
-src\BuildScript\TestSupport\SplayerTestSupport.psm1
+src\Test\Scripts\TestSupport\SplayerTestSupport.psm1
 ```
 
 该模块集中管理 MSBuild/MSYS2 查找、文件断言、splayer 启停、日志等待、窗口响应检查、Win32 command fallback 和 UIA 查询，避免每个 smoke test 维护各自的重复实现。
@@ -133,9 +133,9 @@ RFC-0027 的 seek 回归测试在 UIA tree 可用后应迁移到 FlaUI：
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "src\BuildScript\build-rfc0024-ffmpeg-bridge.ps1"
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\dev.ps1" buildFast
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "src\BuildScript\test-rfc0024-splayer-selfcheck.ps1" -SteadyStateSeconds 30 -AllowedUnresponsiveSeconds 5 -CheckWindowResponding -TimeoutSeconds 60
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "src\BuildScript\test-rfc0027-mkv-seek-selfcheck.ps1" -CheckWindowResponding
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "src\BuildScript\test-rfc0027-uia-tree-selfcheck.ps1"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "src\Test\Scripts\test-rfc0024-splayer-selfcheck.ps1" -SteadyStateSeconds 30 -AllowedUnresponsiveSeconds 5 -CheckWindowResponding -TimeoutSeconds 60
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "src\Test\Scripts\test-rfc0027-mkv-seek-selfcheck.ps1" -CheckWindowResponding
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "src\Test\Scripts\test-rfc0027-uia-tree-selfcheck.ps1"
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "src\BuildScript\verify-rfc0024-ffmpeg-modern.ps1"
 ```
 
@@ -180,8 +180,8 @@ UIA/FlaUI 验证目标：
 2. `src/Source/filters/parser/MatroskaSplitter/MatroskaSplitter.cpp`
 3. `src/Source/filters/parser/BaseSplitter/BaseSplitter.cpp`
 4. `src/Source/filters/transform/mpcvideodec/MPCVideoDecFilter.cpp`
-5. `src/BuildScript/test-rfc0027-mkv-seek-selfcheck.ps1`
-6. `src/BuildScript/test-rfc0027-uia-tree-selfcheck.ps1`
-7. `src/BuildScript/TestSupport/SplayerTestSupport.psm1`
+5. `src/Test/Scripts/test-rfc0027-mkv-seek-selfcheck.ps1`
+6. `src/Test/Scripts/test-rfc0027-uia-tree-selfcheck.ps1`
+7. `src/Test/Scripts/TestSupport/SplayerTestSupport.psm1`
 8. `src/Source/apps/mplayerc/PlayerSeekBar.cpp`
 9. `src/Source/apps/mplayerc/ChildView.cpp`

@@ -11,9 +11,8 @@ $ErrorActionPreference = 'Stop'
 
 Import-Module (Join-Path $PSScriptRoot 'TestSupport\SplayerTestSupport.psm1') -Force
 
-$buildScriptRoot = $PSScriptRoot
-$srcRoot = Split-Path -Parent $buildScriptRoot
-$repoRoot = Split-Path -Parent $srcRoot
+$srcRoot = Get-SplayerSrcRoot
+$repoRoot = Get-SplayerRepoRoot
 $msbuild = Get-SplayerMsBuildPath
 
 $libzmqProject = Join-Path $srcRoot 'Thirdparty\zeromq\libzmq.vcxproj'

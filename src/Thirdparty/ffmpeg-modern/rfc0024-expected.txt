@@ -96,7 +96,7 @@ Bridge pins:
 - src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegBridgeConsumer.h
 - src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegBridgeConsumer.cpp
 - src/BuildScript/build-rfc0024-ffmpeg-bridge.ps1
-- src/BuildScript/test-rfc0024-modern-bridge-smoke.ps1
+- src/Test/Scripts/test-rfc0024-modern-bridge-smoke.ps1
 - Bridge output DLL: src/Thirdparty/ffmpeg-modern/install/bin/playasa_ffmpeg_modern_bridge.dll
 - Bridge output MSVC import lib: src/Thirdparty/ffmpeg-modern/install/lib/playasa_ffmpeg_modern_bridge.lib
 - Bridge is the only supported MSVC consumption boundary for FFmpeg modern island.

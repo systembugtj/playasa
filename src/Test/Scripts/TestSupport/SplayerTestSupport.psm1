@@ -1,7 +1,7 @@
 Set-StrictMode -Version Latest
 
 function Get-SplayerRepoRoot {
-  return (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
+  return (Resolve-Path (Join-Path $PSScriptRoot '..\..\..\..')).Path
 }
 
 function Get-SplayerSrcRoot {

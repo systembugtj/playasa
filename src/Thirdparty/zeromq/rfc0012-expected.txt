@@ -1,4 +1,4 @@
 zeromq-2.1.3-abi-pinned
 ZMQ_VERSION=2.1.3
 ABI=static-lib;ZMQ_STATIC;FD_SETSIZE=1024;Win32;Release;/MT
-RuntimeSmoke=src/BuildScript/test-zeromq-smoke.ps1
+RuntimeSmoke=src/Test/Scripts/test-zeromq-smoke.ps1

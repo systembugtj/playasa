@@ -16,7 +16,7 @@ $ErrorActionPreference = 'Stop'
 
 Import-Module (Join-Path $PSScriptRoot 'TestSupport\SplayerTestSupport.psm1') -Force
 
-$repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
+$repoRoot = Get-SplayerRepoRoot
 if ([string]::IsNullOrWhiteSpace($SamplePath)) {
   $SamplePath = Join-Path $repoRoot 'out\selfcheck\genius_party_sample.mkv'
 }
