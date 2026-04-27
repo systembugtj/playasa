@@ -14,75 +14,34 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+Import-Module (Join-Path $PSScriptRoot 'TestSupport\SplayerTestSupport.psm1') -Force
+
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 if ([string]::IsNullOrWhiteSpace($SamplePath)) {
   $SamplePath = Join-Path $repoRoot 'out\selfcheck\genius_party_sample.mkv'
 }
-$playerPath = Join-Path $repoRoot 'out\bin\Win32\Release Unicode\splayer.exe'
-$logPath = Join-Path $repoRoot 'out\bin\Win32\Release Unicode\SVPDebug.log'
 $firstFrameNeedle = 'Modern FFmpeg bridge first frame ready'
 $failureNeedle = 'Modern FFmpeg bridge decode failed'
 $hangEventStart = Get-Date
 
-function Assert-FileExists {
-  param([string]$Path)
-  if (-not (Test-Path -LiteralPath $Path)) {
-    throw "Missing required file: $Path"
-  }
-}
-
-Assert-FileExists $playerPath
-Assert-FileExists $SamplePath
-
-Get-Process -Name splayer -ErrorAction SilentlyContinue | Stop-Process -Force
-Remove-Item -LiteralPath $logPath -Force -ErrorAction SilentlyContinue
-
-$process = Start-Process -FilePath $playerPath -ArgumentList "`"$SamplePath`"" -PassThru
+Stop-SplayerProcesses
+Clear-SplayerLog
+$process = Start-SplayerForSample -SamplePath $SamplePath
 $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
 try {
-  $sawFirstFrame = $false
-  while ((Get-Date) -lt $deadline) {
-    Start-Sleep -Milliseconds 500
+  Wait-SplayerLogNeedle `
+    -Process $process `
+    -Needle $firstFrameNeedle `
+    -Deadline $deadline `
+    -FailureNeedles @($failureNeedle) `
+    -TimeoutMessage "Timed out waiting for modern FFmpeg first frame; inspect $(Get-SplayerLogPath)"
 
-    if ($process.HasExited) {
-      throw "splayer exited early with code $($process.ExitCode)"
-    }
-
-    if (Test-Path -LiteralPath $logPath) {
-      $logText = Get-Content -LiteralPath $logPath -Raw
-      if ($logText -match [regex]::Escape($failureNeedle)) {
-        throw "splayer modern FFmpeg decode failed; inspect $logPath"
-      }
-      if ($logText -match [regex]::Escape($firstFrameNeedle)) {
-        $sawFirstFrame = $true
-        break
-      }
-    }
-  }
-
-  if (-not $sawFirstFrame) {
-    throw "Timed out waiting for modern FFmpeg first frame; inspect $logPath"
-  }
-
-  $steadyDeadline = (Get-Date).AddSeconds($SteadyStateSeconds)
-  $unresponsiveStartedAt = $null
-  while ((Get-Date) -lt $steadyDeadline) {
-    Start-Sleep -Milliseconds 500
-    $current = Get-Process -Id $process.Id -ErrorAction SilentlyContinue
-    if (-not $current) {
-      throw 'splayer exited during steady-state playback'
-    }
-    if ($CheckWindowResponding -and -not $current.Responding) {
-      if (-not $unresponsiveStartedAt) {
-        $unresponsiveStartedAt = Get-Date
-      }
-      if (((Get-Date) - $unresponsiveStartedAt).TotalSeconds -ge $AllowedUnresponsiveSeconds) {
-        throw "splayer UI stopped responding during steady-state playback; inspect $logPath"
-      }
-    } else {
-      $unresponsiveStartedAt = $null
-    }
-  }
+  Assert-SplayerResponsive `
+    -Process $process `
+    -Deadline (Get-Date).AddSeconds($SteadyStateSeconds) `
+    -AllowedUnresponsiveSeconds $AllowedUnresponsiveSeconds `
+    -CheckWindowResponding:$CheckWindowResponding `
+    -FailureMessage 'splayer UI stopped responding during steady-state playback'
 
   $hangEvents = Get-WinEvent -FilterHashtable @{LogName = 'Application'; StartTime = $hangEventStart} -ErrorAction SilentlyContinue |
     Where-Object { $_.ProviderName -in @('Application Hang', 'Windows Error Reporting') -and $_.Message -match 'splayer|AppHang' } |

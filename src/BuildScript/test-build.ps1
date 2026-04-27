@@ -2,9 +2,9 @@
 # 测试构建环境并尝试构建
 
 $ErrorActionPreference = "Continue"
-$scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-$srcPath = Split-Path -Parent $scriptPath
-$rootPath = Split-Path -Parent $srcPath
+Import-Module (Join-Path $PSScriptRoot 'TestSupport\SplayerTestSupport.psm1') -Force
+
+$srcPath = Get-SplayerSrcRoot
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Build Test and Diagnostics" -ForegroundColor Cyan
@@ -14,26 +14,11 @@ Write-Host ""
 # 1. Check for MSBuild
 Write-Host "[1] Checking for MSBuild..." -ForegroundColor Yellow
 
-$msbuildPaths = @(
-    "${env:ProgramFiles}\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles}\Microsoft Visual Studio\2026\Community\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2026\Community\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles}\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles}\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
-)
-
 $msbuildPath = $null
-foreach ($path in $msbuildPaths) {
-    if (Test-Path $path) {
-        Write-Host "  [OK] Found: $path" -ForegroundColor Green
-        $msbuildPath = $path
-        break
-    }
-}
-
-if ($null -eq $msbuildPath) {
+try {
+    $msbuildPath = Get-SplayerMsBuildPath
+    Write-Host "  [OK] Found: $msbuildPath" -ForegroundColor Green
+} catch {
     Write-Host "  [X] MSBuild not found" -ForegroundColor Red
     Write-Host ""
     Write-Host "  Please install Visual Studio Build Tools or Visual Studio" -ForegroundColor Yellow

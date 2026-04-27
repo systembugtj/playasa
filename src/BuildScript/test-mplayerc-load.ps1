@@ -4,20 +4,15 @@
 $ErrorActionPreference = "Continue"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
+Import-Module (Join-Path $PSScriptRoot 'TestSupport\SplayerTestSupport.psm1') -Force
+
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Test mplayerc Project Load" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-$msbuild = "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe"
-
-$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$srcPath = Split-Path -Parent $scriptDir
-
-if (-not (Test-Path $msbuild)) {
-    Write-Host "[ERROR] MSBuild not found at: $msbuild" -ForegroundColor Red
-    exit 1
-}
+$msbuild = Get-SplayerMsBuildPath
+$srcPath = Get-SplayerSrcRoot
 
 Write-Host "MSBuild found: $msbuild" -ForegroundColor Green
 Write-Host ""

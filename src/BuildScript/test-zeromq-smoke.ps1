@@ -9,52 +9,12 @@ param()
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Get-MsBuildPathFromVsWhere {
-    $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
-    if (-not (Test-Path -LiteralPath $vswhere)) {
-        return $null
-    }
-    $found = & $vswhere -latest -products * -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' 2>$null |
-        Select-Object -First 1
-    if ($found -and (Test-Path -LiteralPath $found)) {
-        return $found
-    }
-    return $null
-}
-
-function Get-MsBuildPathFromWellKnown {
-    $candidates = @(
-        (Join-Path $env:ProgramFiles 'Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe'),
-        (Join-Path $env:ProgramFiles 'Microsoft Visual Studio\2026\Community\MSBuild\Current\Bin\MSBuild.exe'),
-        (Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\2026\Community\MSBuild\Current\Bin\MSBuild.exe'),
-        (Join-Path $env:ProgramFiles 'Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe'),
-        (Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe'),
-        (Join-Path $env:ProgramFiles 'Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe'),
-        (Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe')
-    )
-    foreach ($path in $candidates) {
-        if (Test-Path -LiteralPath $path) {
-            return $path
-        }
-    }
-    return $null
-}
-
-function Get-MsBuildExecutable {
-    $fromVsWhere = Get-MsBuildPathFromVsWhere
-    if ($fromVsWhere) {
-        return $fromVsWhere
-    }
-    return Get-MsBuildPathFromWellKnown
-}
+Import-Module (Join-Path $PSScriptRoot 'TestSupport\SplayerTestSupport.psm1') -Force
 
 $buildScriptRoot = $PSScriptRoot
 $srcRoot = Split-Path -Parent $buildScriptRoot
 $repoRoot = Split-Path -Parent $srcRoot
-$msbuild = Get-MsBuildExecutable
-if (-not $msbuild) {
-    throw 'MSBuild not found. Install Visual Studio Build Tools or update the well-known path list.'
-}
+$msbuild = Get-SplayerMsBuildPath
 
 $libzmqProject = Join-Path $srcRoot 'Thirdparty\zeromq\libzmq.vcxproj'
 Write-Host "Step: build libzmq -> $libzmqProject"
