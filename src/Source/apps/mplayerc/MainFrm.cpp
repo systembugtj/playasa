@@ -3,6 +3,7 @@
 #include "mplayerc.h"
 
 #include "MainFrm.h"
+#include "MainFrameUiaProvider.h"
 
 #include <psapi.h>
 #include <math.h>
@@ -120,6 +121,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_WM_CREATE()
 	ON_WM_DESTROY()
 	ON_WM_CLOSE()
+	ON_MESSAGE(WM_GETOBJECT, OnGetObject)
 
 	ON_REGISTERED_MESSAGE(s_uTaskbarRestart, OnTaskBarRestart)
 	ON_REGISTERED_MESSAGE(WM_NOTIFYICON, OnNotifyIcon)
@@ -574,7 +576,8 @@ m_lyricDownloadThread(NULL),
 m_secret_switch(NULL),
 m_movieShared(false),
 m_bmenuinitialize(FALSE),
-m_pUserAccountDlg(0)
+m_pUserAccountDlg(0),
+m_uiaProvider(NULL)
 {
 	m_wndFloatToolBar = new CPlayerFloatToolBar();
 	m_pEverBoxUploadFile = NULL;
@@ -582,7 +585,24 @@ m_pUserAccountDlg(0)
 
 CMainFrame::~CMainFrame()
 {
+	if (m_uiaProvider) {
+		m_uiaProvider->Release();
+		m_uiaProvider = NULL;
+	}
 	//	m_owner.DestroyWindow();
+}
+
+LRESULT CMainFrame::OnGetObject(WPARAM wParam, LPARAM lParam)
+{
+	if (lParam == UiaRootObjectId) {
+		if (!m_uiaProvider) {
+			m_uiaProvider = new CMainFrameUiaProvider(this);
+		}
+
+		return UiaReturnRawElementProvider(m_hWnd, wParam, lParam, m_uiaProvider);
+	}
+
+	return CFrameWnd::Default();
 }
 CMainFrame* CMainFrame::GetMainFrame()
 {

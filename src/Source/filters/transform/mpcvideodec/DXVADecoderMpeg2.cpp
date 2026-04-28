@@ -83,11 +83,20 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIM
 	HRESULT						hr;
 	int							nSurfaceIndex;
 	CComPtr<IMediaSample>		pSampleToDeliver;
-	int							nFieldType;
-	int							nSliceType;
+	DxvaMpeg2PictureContext		pictureContext;
 
-	FFMpeg2DecodeFrame (&m_PictureParams, &m_QMatrixData, m_SliceInfo, &m_nSliceCount, m_pFilter->GetAVCtx(), 
-						m_pFilter->GetFrame(), &m_nNextCodecIndex, &nFieldType, &nSliceType, pDataIn, nSize);
+	memset(&pictureContext, 0, sizeof(pictureContext));
+	pictureContext.pictureParams = m_PictureParams;
+	pictureContext.qmatrixData = m_QMatrixData;
+	memcpy(pictureContext.sliceInfo, m_SliceInfo, sizeof(DXVA_SliceInfo) * m_nSliceCount);
+	pictureContext.sliceCount = m_nSliceCount;
+	pictureContext.nextCodecIndex = m_nNextCodecIndex;
+	CHECK_HR(FFMpeg2ReadPictureContext(&pictureContext, m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize));
+	m_PictureParams = pictureContext.pictureParams;
+	m_QMatrixData = pictureContext.qmatrixData;
+	memcpy(m_SliceInfo, pictureContext.sliceInfo, sizeof(DXVA_SliceInfo) * pictureContext.sliceCount);
+	m_nSliceCount = pictureContext.sliceCount;
+	m_nNextCodecIndex = pictureContext.nextCodecIndex;
 
 	// Wait I frame after a flush
 	if (m_bFlushed && ! m_PictureParams.bPicIntra)
@@ -102,9 +111,9 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIM
 
 	CHECK_HR (BeginFrame(nSurfaceIndex, pSampleToDeliver));
 
-	UpdatePictureParams(nSurfaceIndex);
+	UpdatePictureParams(nSurfaceIndex, pictureContext.alternateScan);
 
-	TRACE_MPEG2 ("=> %s   %I64d  Surf=%d\n", GetFFMpegPictureType(nSliceType), rtStart, nSurfaceIndex);
+	TRACE_MPEG2 ("=> %s   %I64d  Surf=%d\n", GetFFMpegPictureType(pictureContext.sliceType), rtStart, nSurfaceIndex);
 
 	TRACE_MPEG2("CDXVADecoderMpeg2 : Decode frame %i\n", m_PictureParams.bPicScanMethod);
 
@@ -121,13 +130,13 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIM
 	CHECK_HR (EndFrame(nSurfaceIndex));
 
 	AddToStore (nSurfaceIndex, pSampleToDeliver, (m_PictureParams.bPicBackwardPrediction != 1), rtStart, rtStop, 
-				false,(FF_FIELD_TYPE)nFieldType, (FF_SLICE_TYPE)nSliceType, FFGetCodedPicture(m_pFilter->GetAVCtx()));
+				false,(FF_FIELD_TYPE)pictureContext.fieldType, (FF_SLICE_TYPE)pictureContext.sliceType, pictureContext.codedPictureNumber);
 	m_bFlushed = false;
 
 	return DisplayNextFrame();
 }
 
-void CDXVADecoderMpeg2::UpdatePictureParams(int nSurfaceIndex)
+void CDXVADecoderMpeg2::UpdatePictureParams(int nSurfaceIndex, BOOL bAlternateScan)
 {
 	DXVA2_ConfigPictureDecode*	cpd = GetDXVA2Config();		// Ok for DXVA1 too (parameters have been copied)
 
@@ -168,7 +177,7 @@ void CDXVADecoderMpeg2::UpdatePictureParams(int nSurfaceIndex)
 
 		if (cpd->ConfigHostInverseScan != 0)
 			m_PictureParams.bPicScanMethod	= 3;	// 11 = Arbitrary scan with absolute coefficient address.
-		else if (FFGetAlternateScan(m_pFilter->GetAVCtx()))
+		else if (bAlternateScan)
 			m_PictureParams.bPicScanMethod	= 1;	// 00 = Zig-zag scan (MPEG-2 Figure 7-2)
 		else
 			m_PictureParams.bPicScanMethod	= 0;	// 01 = Alternate-vertical (MPEG-2 Figure 7-3),

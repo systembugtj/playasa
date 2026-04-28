@@ -76,6 +76,16 @@ static void ModernFfmpegSelfcheckLog(LPCTSTR format, ...)
 	SVP_LogMsg(message);
 }
 
+static void DxvaSelfcheckLog(LPCTSTR format, ...)
+{
+	CString message;
+	va_list args;
+	va_start(args, format);
+	message.FormatV(format, args);
+	va_end(args);
+	SVP_LogMsg(message);
+}
+
 static CString ModernFfmpegPacketPrefix(const BYTE* data, int size)
 {
 	CString prefix;
@@ -1539,6 +1549,10 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 
 			
 			
+			DxvaSelfcheckLog(_T("DXVA selection: codec=%d fourcc=0x%08x modernCandidate=%d useModern=%d useDXVA=%d compatible=%d supported=%d width=%d height=%d"),
+				ffCodecs[m_nCodecNb].nFFCodec, ffCodecs[m_nCodecNb].fourcc, bUseModernBridgeCodec ? 1 : 0,
+				m_bUseModernFfmpegBridge ? 1 : 0, m_bUseDXVA ? 1 : 0, m_bDXVACompatible ? 1 : 0,
+				IsDXVASupported() ? 1 : 0, m_nWidth, m_nHeight);
 			BuildDXVAOutputFormat();
 		}
 	}
@@ -1754,6 +1768,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 				m_nDXVAMode  = MODE_DXVA2;
             else
                 SVP_LogMsg5( L"CMPCVideoDecFilter::CompleteConnect ConfigureDXVA2 Failed");
+			DxvaSelfcheckLog(_T("DXVA connect: codec=%d mode=%d supported=%d"), m_nCodecNb >= 0 ? ffCodecs[m_nCodecNb].nFFCodec : -1, m_nDXVAMode, IsDXVASupported() ? 1 : 0);
 			
 						HRESULT hrDXVA = S_OK;
 						GUID*	DxvaGui = NULL;

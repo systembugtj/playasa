@@ -26,6 +26,7 @@
 #include <ksmedia.h>
 #include "libmpeg2.h"
 #include "Mpeg2DecFilter.h"
+#include "Mpeg2ModernDecodeAdapter.h"
 
 #include <xmmintrin.h>
 #include <emmintrin.h>
@@ -44,6 +45,25 @@
 #define SVP_LogMsg6 __noop
 
 #define EPSILON 1e-4
+
+static void ModernMpeg2SelfcheckLog(LPCTSTR format, ...)
+{
+	CString message;
+	va_list args;
+	va_start(args, format);
+	message.FormatV(format, args);
+	va_end(args);
+	SVP_LogMsg(message);
+}
+
+static bool IsModernMpeg2EnvironmentEnabled()
+{
+	char value[16] = { 0 };
+	if (GetEnvironmentVariableA("PLAYASA_MPEG2_MODERN", value, sizeof(value)) == 0) {
+		return false;
+	}
+	return value[0] == '1';
+}
 
 #ifdef REGISTER_FILTER
 
@@ -203,7 +223,11 @@ CMpeg2DecFilterApp theApp;
 
 CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr) 
 	: CBaseVideoFilter(NAME("CMpeg2DecFilter"), lpunk, phr, __uuidof(this), 1)
+	, m_AvgTimePerFrame(0)
 	, m_fWaitForKeyFrame(true)
+	, m_fUseModernMpeg2(false)
+	, m_fModernMpeg2Failed(false)
+	, m_fModernMpeg2LoggedFirstFrame(false)
 {
 	delete m_pInput;
 //	delete m_pOutput;
@@ -326,6 +350,10 @@ HRESULT CMpeg2DecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop,
 void CMpeg2DecFilter::InputTypeChanged()
 {
 	CAutoLock cAutoLock(&m_csReceive);
+	if (m_modernDec) {
+		m_modernDec->Flush();
+	}
+	m_fModernMpeg2LoggedFirstFrame = false;
 	
 	TRACE(_T("ResetMpeg2Decoder()\n"));
 
@@ -475,6 +503,20 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 	hr = pIn->GetTime(&rtStart, &rtStop);
 	if(FAILED(hr)) rtStart = rtStop = _I64_MIN;
 
+	if (m_fUseModernMpeg2 && !m_fModernMpeg2Failed) {
+		hr = TransformModern(pIn, pDataIn, len, rtStart, rtStop);
+		if (SUCCEEDED(hr)) {
+			return hr;
+		}
+		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg fallback: hr=0x%08x error=%S"), hr, m_modernDec ? m_modernDec->LastError() : "adapter missing");
+		m_fModernMpeg2Failed = true;
+		m_fUseModernMpeg2 = false;
+		if (m_modernDec) {
+			m_modernDec->Close();
+		}
+		InputTypeChanged();
+	}
+
 	while(len >= 0)
 	{
         SVP_LogMsg6("mpeg2_parse");
@@ -554,6 +596,98 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
     }
     SVP_LogMsg6("Return");
 	return S_OK;
+}
+
+HRESULT CMpeg2DecFilter::TransformModern(IMediaSample* pIn, BYTE* pDataIn, long len, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+{
+	if (!m_modernDec || !m_modernDec->IsOpen()) {
+		return E_UNEXPECTED;
+	}
+	if (len < 0) {
+		return E_INVALIDARG;
+	}
+
+	const int64_t pts = rtStart == _I64_MIN ? PLAYASA_FFMPEG_MODERN_NO_PTS : rtStart;
+	const int64_t duration = (rtStart != _I64_MIN && rtStop > rtStart) ? (rtStop - rtStart) : PLAYASA_FFMPEG_MODERN_NO_PTS;
+	PlayasaFfmpegModernFrameInfo frameInfo = {};
+	int status = m_modernDec->Decode(pDataIn, static_cast<size_t>(len), pts, duration, &frameInfo);
+	while (status == PLAYASA_FFMPEG_MODERN_STATUS_FRAME_READY) {
+		HRESULT hr = DeliverModernFrame(frameInfo, duration);
+		if (FAILED(hr)) {
+			return hr;
+		}
+		status = m_modernDec->ReceivePending(&frameInfo);
+	}
+
+	return status == PLAYASA_FFMPEG_MODERN_STATUS_FAILURE ? E_FAIL : S_OK;
+}
+
+HRESULT CMpeg2DecFilter::DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& frameInfo, REFERENCE_TIME inputDuration)
+{
+	if (frameInfo.pixel_format != PLAYASA_FFMPEG_MODERN_PIXFMT_YUV420P
+		&& frameInfo.pixel_format != PLAYASA_FFMPEG_MODERN_PIXFMT_YUVJ420P) {
+		return VFW_E_TYPE_NOT_ACCEPTED;
+	}
+	if (!frameInfo.data[0] || !frameInfo.data[1] || !frameInfo.data[2] || frameInfo.width <= 0 || frameInfo.height <= 0) {
+		return E_INVALIDARG;
+	}
+
+	const int width = frameInfo.width;
+	const int height = frameInfo.height;
+	const int pitch = (width + 31) & ~31;
+	if (m_fb.w != width || m_fb.h != height || m_fb.pitch != pitch) {
+		m_fb.alloc(width, height, pitch);
+	}
+
+	for (int y = 0; y < height; ++y) {
+		memcpy(m_fb.buf[0] + y * pitch, frameInfo.data[0] + y * frameInfo.linesize[0], width);
+	}
+	for (int y = 0; y < height / 2; ++y) {
+		memcpy(m_fb.buf[1] + y * (pitch / 2), frameInfo.data[1] + y * frameInfo.linesize[1], width / 2);
+		memcpy(m_fb.buf[2] + y * (pitch / 2), frameInfo.data[2] + y * frameInfo.linesize[2], width / 2);
+	}
+	m_fb.flags = PIC_FLAG_PROGRESSIVE_FRAME;
+
+	CComPtr<IMediaSample> pOut;
+	BYTE* pDataOut = NULL;
+	HRESULT hr = GetDeliveryBuffer(width, height, &pOut);
+	if (FAILED(hr) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
+		return hr;
+	}
+
+	hr = CopyBuffer(pDataOut, m_fb.buf, width, height, pitch, MEDIASUBTYPE_I420, false);
+	if (FAILED(hr)) {
+		return hr;
+	}
+
+	REFERENCE_TIME rtStart = frameInfo.pts == PLAYASA_FFMPEG_MODERN_NO_PTS ? m_fb.rtStop : frameInfo.pts;
+	REFERENCE_TIME duration = frameInfo.duration == PLAYASA_FFMPEG_MODERN_NO_PTS ? inputDuration : frameInfo.duration;
+	if (duration <= 10000 && inputDuration > 10000) {
+		duration = inputDuration;
+	}
+	if (duration == PLAYASA_FFMPEG_MODERN_NO_PTS || duration <= 10000) {
+		duration = m_AvgTimePerFrame > 0 ? m_AvgTimePerFrame : 400000;
+	}
+	REFERENCE_TIME rtStop = rtStart + duration;
+	m_fb.rtStart = rtStart;
+	m_fb.rtStop = rtStop;
+
+	pOut->SetTime(&rtStart, &rtStop);
+	pOut->SetMediaTime(NULL, NULL);
+	SetTypeSpecificFlags(pOut);
+
+	if (!m_fModernMpeg2LoggedFirstFrame) {
+		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg first frame ready: width=%d height=%d start=%I64d stop=%I64d duration=%I64d"),
+			width, height, rtStart, rtStop, rtStop - rtStart);
+		m_fModernMpeg2LoggedFirstFrame = true;
+	}
+
+	return m_pOutput->Deliver(pOut);
+}
+
+bool CMpeg2DecFilter::IsModernMpeg2Enabled() const
+{
+	return IsModernMpeg2EnvironmentEnabled();
 }
 
 bool CMpeg2DecFilter::IsVideoInterlaced()
@@ -1004,6 +1138,17 @@ HRESULT CMpeg2DecFilter::StartStreaming()
 	if(!m_dec) return E_OUTOFMEMORY;
 
 	InputTypeChanged();
+	m_fUseModernMpeg2 = false;
+	m_fModernMpeg2Failed = false;
+	m_fModernMpeg2LoggedFirstFrame = false;
+	if (IsModernMpeg2Enabled()) {
+		m_modernDec.Attach(new CMpeg2ModernDecodeAdapter());
+		if (!m_modernDec) {
+			return E_OUTOFMEMORY;
+		}
+		m_fUseModernMpeg2 = m_modernDec->Open();
+		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg open %s: %S"), m_fUseModernMpeg2 ? _T("OK") : _T("failed"), m_modernDec->LastError());
+	}
 
 //	g_clock = clock();
 
@@ -1017,6 +1162,11 @@ HRESULT CMpeg2DecFilter::StopStreaming()
 	str.Format(_T("%d"), clock()-g_clock);
 	AfxMessageBox(str);
 */
+	if (m_modernDec) {
+		m_modernDec->Close();
+		m_modernDec.Free();
+	}
+	m_fUseModernMpeg2 = false;
 	m_dec.Free();
 
 	return __super::StopStreaming();

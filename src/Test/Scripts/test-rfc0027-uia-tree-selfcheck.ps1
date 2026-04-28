@@ -41,7 +41,7 @@ try {
   }
 
   if ($RequireSeekBar) {
-    Assert-SplayerSeekBarAutomation -Root $automationRoot | Out-Null
+    Assert-SplayerSeekBarAutomation -Root $automationRoot -ProcessId $process.Id | Out-Null
   }
 
   Write-Host 'test-rfc0027-uia-tree-selfcheck: OK' -ForegroundColor Green

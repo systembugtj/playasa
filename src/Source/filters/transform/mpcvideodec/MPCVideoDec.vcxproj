@@ -307,6 +307,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CpuId.h" />
+    <ClInclude Include="DxvaCodecContext.h" />
     <ClInclude Include="DXVADecoder.h" />
     <ClInclude Include="DXVADecoderH264.h" />
     <ClInclude Include="DXVADecoderMpeg2.h" />

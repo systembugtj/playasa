@@ -26,6 +26,8 @@
 #include "SeekBarTip.h"
 #include "TimeBmpManage.h"
 
+class CPlayerSeekBarUiaProvider;
+
 class CPlayerSeekBar : public CDialogBar
 {
 	DECLARE_DYNAMIC(CPlayerSeekBar)
@@ -39,6 +41,7 @@ private:
   BITMAP m_curbm;
   BITMAP m_rmnbm;
   TimeBmpManage m_tbmn;
+	CPlayerSeekBarUiaProvider* m_uiaProvider;
 	
 	void MoveThumb(CPoint point);
 	void SetPosInternal(__int64 pos);
@@ -59,6 +62,8 @@ public:
 	void SetRange(__int64 start, __int64 stop);
 	__int64 GetPos(), GetPosReal();
 	void SetPos(__int64 pos);
+	bool IsSeekEnabled() const;
+	void SetAutomationPos(__int64 pos);
 
 	//CToolTipCtrl m_toolTip;
 	//TOOLINFO	m_ti;
@@ -81,6 +86,7 @@ protected:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+	afx_msg LRESULT OnGetObject(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:

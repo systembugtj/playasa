@@ -34,6 +34,7 @@
 #include "SkinFolderManager.h"
 #include "UserInterface/Dialogs/OAuthDlg.h"
 
+class CMainFrameUiaProvider;
 
 static int (__stdcall * m_pEverBoxUploadFile)(const WCHAR* pPathFile, DWORD* pTskID, bool bShowProgress);
 
@@ -200,6 +201,7 @@ public:
 
   CPlayerSeekBar m_wndSeekBar;
   CPlayerToolBar m_wndToolBar;
+  CMainFrameUiaProvider* m_uiaProvider;
 
   CPlayerFloatToolBar* m_wndFloatToolBar;
   CNEWOSDWnd m_wndNewOSD;
@@ -399,6 +401,7 @@ public:
   afx_msg void OnEnterMenuLoop( BOOL bIsTrackPopupMenu );
   afx_msg void OnExitMenuLoop( BOOL bIsTrackPopupMenu );
   afx_msg LRESULT OnTaskBarRestart(WPARAM, LPARAM);
+  afx_msg LRESULT OnGetObject(WPARAM wParam, LPARAM lParam);
   afx_msg LRESULT OnNotifyIcon(WPARAM, LPARAM);
   afx_msg void OnSetFocus(CWnd* pOldWnd);
   afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);

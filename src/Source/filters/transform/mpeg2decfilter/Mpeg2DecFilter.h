@@ -26,11 +26,13 @@
 #include "..\..\..\decss\DeCSSInputPin.h"
 #include "..\BaseVideoFilter\BaseVideoFilter.h"
 #include "IMpeg2DecFilter.h"
+#include "Mpeg2ModernDecodeAdapter.h"
 #include "Mpeg2DecSettingsWnd.h"
 
 class CSubpicInputPin;
 class CClosedCaptionOutputPin;
 class CMpeg2Dec;
+class CMpeg2ModernDecodeAdapter;
 
 
 class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478")) CMpeg2DecFilter 
@@ -42,9 +44,13 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478")) CMpeg2DecFilter
 	CClosedCaptionOutputPin* m_pClosedCaptionOutput;
 
 	CAutoPtr<CMpeg2Dec> m_dec;
+	CAutoPtr<CMpeg2ModernDecodeAdapter> m_modernDec;
 
 	REFERENCE_TIME m_AvgTimePerFrame;
 	bool m_fWaitForKeyFrame;
+	bool m_fUseModernMpeg2;
+	bool m_fModernMpeg2Failed;
+	bool m_fModernMpeg2LoggedFirstFrame;
 
 	struct framebuf 
 	{
@@ -92,6 +98,9 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478")) CMpeg2DecFilter
 protected:
 	void InputTypeChanged();
 	HRESULT Transform(IMediaSample* pIn);
+	HRESULT TransformModern(IMediaSample* pIn, BYTE* pDataIn, long len, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
+	HRESULT DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& frameInfo, REFERENCE_TIME inputDuration);
+	bool IsModernMpeg2Enabled() const;
 	bool IsVideoInterlaced();
 
 public:

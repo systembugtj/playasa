@@ -165,7 +165,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386  /LTCG /FORCE:MULTIPLE %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;subpic.lib;Rpcrt4.lib;Winmm.lib;Wbemuuid.lib;Dsound.lib;Imm32.lib;Dbghelp.lib;Psapi.lib;libssf.lib;detours.lib;delayimp.lib;unrar.lib;qtmlClient.lib;dxguid.lib;libsamplerate.a;libzmq.lib;libphashaudio.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;subpic.lib;Rpcrt4.lib;Winmm.lib;Wbemuuid.lib;Dsound.lib;Imm32.lib;Dbghelp.lib;Psapi.lib;Uiautomationcore.lib;libssf.lib;detours.lib;delayimp.lib;unrar.lib;qtmlClient.lib;dxguid.lib;libsamplerate.a;libzmq.lib;libphashaudio.a;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\;$(SolutionDir)..\out\bin\$(Platform)\release-utf16\;$(SolutionDir)Thirdparty\unrar;../../../Thirdparty/sqlitepp/lib;../../../lib;../../../lib/wm7;../../../lib/qt6;../../../lib/detours;../../../thirdparty/courgette\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <UACExecutionLevel>AsInvoker</UACExecutionLevel>
       <IgnoreSpecificDefaultLibraries>MSVCRT;nafxcw.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -214,7 +214,7 @@ copy /Y "$(SolutionDir)Thirdparty\unrar\unrar.dll" "$(OutDir)unrar.dll"
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libsqliteD.lib;Delayimp.lib;psapi.lib;detours.lib;qtmlClient.lib;wmstub.lib;Dsound.lib;dxguid.lib;strmbaseDU.lib;dsutilDU.lib;subpicDU.lib;subtitlesDU.lib;libssfDU.lib;asyncreaderDU.lib;bufferfilter.lib;cddareader.lib;cdxareader.lib;d2vsource.lib;decssfilter.lib;flicsource.lib;dtsac3source.lib;basesource.lib;subtitlesource.lib;wavdest.lib;shoutcastsource.lib;streamdrivethru.lib;vtsreader.lib;basesplitterlib;MatroskaSplitter.lib;MatroskaMuxer.lib;RealMediaSplitter.lib;AviSplitter.lib;Mpeg2DecFilter.lib;MpaDecFilter.lib;RoQSplitter.lib;OggSplitter.lib;NutSplitter.lib;MpegSplitter.lib;DiracSplitter.lib;MpaSplitter.lib;DSMSplitter.lib;MP4Splitter.lib;BaseMuxer.lib;DSMMuxer.lib;UDPReader.lib;FLVSplitter.lib;zlibD.lib;filtersDU.lib;libvorbisidecD.lib;SSFSplitterDU.lib;libpngD.lib;comsuppwd.lib;Imm32.lib;Winmm.lib;Wbemuuid.lib;base.lib;courgette_lib.lib;lzma_sdk.lib;modp_b64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libsqliteD.lib;Delayimp.lib;psapi.lib;detours.lib;qtmlClient.lib;wmstub.lib;Dsound.lib;dxguid.lib;Uiautomationcore.lib;strmbaseDU.lib;dsutilDU.lib;subpicDU.lib;subtitlesDU.lib;libssfDU.lib;asyncreaderDU.lib;bufferfilter.lib;cddareader.lib;cdxareader.lib;d2vsource.lib;decssfilter.lib;flicsource.lib;dtsac3source.lib;basesource.lib;subtitlesource.lib;wavdest.lib;shoutcastsource.lib;streamdrivethru.lib;vtsreader.lib;basesplitterlib;MatroskaSplitter.lib;MatroskaMuxer.lib;RealMediaSplitter.lib;AviSplitter.lib;Mpeg2DecFilter.lib;MpaDecFilter.lib;RoQSplitter.lib;OggSplitter.lib;NutSplitter.lib;MpegSplitter.lib;DiracSplitter.lib;MpaSplitter.lib;DSMSplitter.lib;MP4Splitter.lib;BaseMuxer.lib;DSMMuxer.lib;UDPReader.lib;FLVSplitter.lib;zlibD.lib;filtersDU.lib;libvorbisidecD.lib;SSFSplitterDU.lib;libpngD.lib;comsuppwd.lib;Imm32.lib;Winmm.lib;Wbemuuid.lib;base.lib;courgette_lib.lib;lzma_sdk.lib;modp_b64.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)..\out\lib\$(Platform)\;$(SolutionDir)lib\;$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\;$(SolutionDir)lib/wm7;;$(SolutionDir)lib\qt6;../../../lib/detours;../../../thirdparty/courgette\debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -259,7 +259,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>Delayimp.lib;psapi.lib;detours.lib;qtmlClient.lib;wmstub.lib;Dsound.lib;dxguid.lib;strmbaseR.lib;dsutilR.lib;subpicR.lib;subtitlesR.lib;libssfR.lib;asyncreaderR.lib;audioswitcherR.lib;avi2ac3filterR.lib;bufferfilterR.lib;cddareaderR.lib;cdxareaderR.lib;d2vsourceR.lib;decssfilterR.lib;flicsourceR.lib;dtsac3sourceR.lib;basesourceR.lib;wavdestR.lib;shoutcastsourceR.lib;streamdrivethruR.lib;vtsreaderR.lib;basesplitterR.lib;MatroskaSplitterR.lib;MatroskaMuxerR.lib;RealMediaSplitterR.lib;AviSplitterR.lib;Mpeg2DecFilterR.lib;MpaDecFilterR.lib;RoQSplitterR.lib;OggSplitterR.lib;NutSplitterR.lib;MpegSplitterR.lib;DiracSplitterR.lib;MpaSplitterR.lib;DSMSplitterR.lib;MP4SplitterR.lib;BaseMuxerR.lib;DSMMuxerR.lib;UDPReaderR.lib;FLVSplitterR.lib;zlibR.lib;subtitlesourceR.lib;filtersR.lib;libvorbisidecR.lib;SSFSplitterR.lib;libpngR.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Delayimp.lib;psapi.lib;detours.lib;qtmlClient.lib;wmstub.lib;Dsound.lib;dxguid.lib;Uiautomationcore.lib;strmbaseR.lib;dsutilR.lib;subpicR.lib;subtitlesR.lib;libssfR.lib;asyncreaderR.lib;audioswitcherR.lib;avi2ac3filterR.lib;bufferfilterR.lib;cddareaderR.lib;cdxareaderR.lib;d2vsourceR.lib;decssfilterR.lib;flicsourceR.lib;dtsac3sourceR.lib;basesourceR.lib;wavdestR.lib;shoutcastsourceR.lib;streamdrivethruR.lib;vtsreaderR.lib;basesplitterR.lib;MatroskaSplitterR.lib;MatroskaMuxerR.lib;RealMediaSplitterR.lib;AviSplitterR.lib;Mpeg2DecFilterR.lib;MpaDecFilterR.lib;RoQSplitterR.lib;OggSplitterR.lib;NutSplitterR.lib;MpegSplitterR.lib;DiracSplitterR.lib;MpaSplitterR.lib;DSMSplitterR.lib;MP4SplitterR.lib;BaseMuxerR.lib;DSMMuxerR.lib;UDPReaderR.lib;FLVSplitterR.lib;zlibR.lib;subtitlesourceR.lib;filtersR.lib;libvorbisidecR.lib;SSFSplitterR.lib;libpngR.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>../../../lib;../../../lib/wm7;../../../lib/qt6;../../../lib/detours;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -310,7 +310,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>Delayimp.lib;psapi.lib;detours.lib;qtmlClient.lib;wmstub.lib;Dsound.lib;dxguid.lib;strmbaseD.lib;dsutilD.lib;subpicD.lib;subtitlesD.lib;libssfD.lib;asyncreaderD.lib;audioswitcherD.lib;avi2ac3filterD.lib;bufferfilterD.lib;cddareaderD.lib;cdxareaderD.lib;d2vsourceD.lib;decssfilterD.lib;flicsourceD.lib;dtsac3sourceD.lib;basesourceD.lib;subtitlesourceD.lib;wavdestD.lib;shoutcastsourceD.lib;streamdrivethruD.lib;vtsreaderD.lib;basesplitterD.lib;MatroskaSplitterD.lib;MatroskaMuxerD.lib;RealMediaSplitterD.lib;AviSplitterD.lib;Mpeg2DecFilterD.lib;MpaDecFilterD.lib;RoQSplitterD.lib;OggSplitterD.lib;NutSplitterD.lib;MpegSplitterD.lib;DiracSplitterD.lib;MpaSplitterD.lib;DSMSplitterD.lib;MP4SplitterD.lib;BaseMuxerD.lib;DSMMuxerD.lib;UDPReaderD.lib;FLVSplitterD.lib;zlibD.lib;filtersD.lib;libvorbisidecD.lib;SSFSplitterD.lib;libpngD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Delayimp.lib;psapi.lib;detours.lib;qtmlClient.lib;wmstub.lib;Dsound.lib;dxguid.lib;Uiautomationcore.lib;strmbaseD.lib;dsutilD.lib;subpicD.lib;subtitlesD.lib;libssfD.lib;asyncreaderD.lib;audioswitcherD.lib;avi2ac3filterD.lib;bufferfilterD.lib;cddareaderD.lib;cdxareaderD.lib;d2vsourceD.lib;decssfilterD.lib;flicsourceD.lib;dtsac3sourceD.lib;basesourceD.lib;subtitlesourceD.lib;wavdestD.lib;shoutcastsourceD.lib;streamdrivethruD.lib;vtsreaderD.lib;basesplitterD.lib;MatroskaSplitterD.lib;MatroskaMuxerD.lib;RealMediaSplitterD.lib;AviSplitterD.lib;Mpeg2DecFilterD.lib;MpaDecFilterD.lib;RoQSplitterD.lib;OggSplitterD.lib;NutSplitterD.lib;MpegSplitterD.lib;DiracSplitterD.lib;MpaSplitterD.lib;DSMSplitterD.lib;MP4SplitterD.lib;BaseMuxerD.lib;DSMMuxerD.lib;UDPReaderD.lib;FLVSplitterD.lib;zlibD.lib;filtersD.lib;libvorbisidecD.lib;SSFSplitterD.lib;libpngD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>../../../lib;../../../lib/wm7;../../../lib/qt6;../../../lib/detours;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT;LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -340,6 +340,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile Include="InfoReport.cpp" />
     <ClCompile Include="KeyProvider.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="MainFrameUiaProvider.cpp" />
     <ClCompile Include="MakeMultiplyBmp.cpp" />
     <ClCompile Include="MediaFormats.cpp" />
     <ClCompile Include="MediaTypesDlg.cpp" />
@@ -360,6 +361,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile Include="PlayerListCtrl.cpp" />
     <ClCompile Include="PlayerPlaylistBar.cpp" />
     <ClCompile Include="PlayerSeekBar.cpp" />
+    <ClCompile Include="PlayerSeekBarUiaProvider.cpp" />
     <ClCompile Include="PlayerToolBar.cpp" />
     <ClCompile Include="PlayerToolTopBar.cpp" />
     <ClCompile Include="Playlist.cpp" />
@@ -529,6 +531,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClInclude Include="InfoReport.h" />
     <ClInclude Include="KeyProvider.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="MainFrameUiaProvider.h" />
     <ClInclude Include="MakeMultiplyBmp.h" />
     <ClInclude Include="MediaFormats.h" />
     <ClInclude Include="MediaTypesDlg.h" />
@@ -548,6 +551,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClInclude Include="PlayerListCtrl.h" />
     <ClInclude Include="PlayerPlaylistBar.h" />
     <ClInclude Include="PlayerSeekBar.h" />
+    <ClInclude Include="PlayerSeekBarUiaProvider.h" />
     <ClInclude Include="PlayerToolBar.h" />
     <ClInclude Include="PlayerToolTopBar.h" />
     <ClInclude Include="Playlist.h" />

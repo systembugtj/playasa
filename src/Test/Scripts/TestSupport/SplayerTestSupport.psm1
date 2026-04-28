@@ -78,6 +78,46 @@ function Wait-SplayerLogNeedle {
   throw $TimeoutMessage
 }
 
+function Get-SplayerLogMatchCount {
+  param([Parameter(Mandatory = $true)][string]$Needle)
+
+  $logText = Get-SplayerLogText
+  $matches = [regex]::Matches($logText, [regex]::Escape($Needle))
+  return $matches.Count
+}
+
+function Wait-SplayerLogMatchCount {
+  param(
+    [Parameter(Mandatory = $true)][System.Diagnostics.Process]$Process,
+    [Parameter(Mandatory = $true)][string]$Needle,
+    [Parameter(Mandatory = $true)][int]$MinimumCount,
+    [Parameter(Mandatory = $true)][datetime]$Deadline,
+    [Parameter(Mandatory = $true)][string]$TimeoutMessage,
+    [string[]]$FailureNeedles = @()
+  )
+
+  while ((Get-Date) -lt $Deadline) {
+    Start-Sleep -Milliseconds 250
+    if ($Process.HasExited) {
+      throw "splayer exited early with code $($Process.ExitCode)"
+    }
+
+    $logText = Get-SplayerLogText
+    foreach ($failureNeedle in $FailureNeedles) {
+      if ($logText -match [regex]::Escape($failureNeedle)) {
+        throw "splayer failure log found: $failureNeedle; inspect $(Get-SplayerLogPath)"
+      }
+    }
+
+    $matches = [regex]::Matches($logText, [regex]::Escape($Needle))
+    if ($matches.Count -ge $MinimumCount) {
+      return
+    }
+  }
+
+  throw $TimeoutMessage
+}
+
 function Assert-SplayerResponsive {
   param(
     [Parameter(Mandatory = $true)][System.Diagnostics.Process]$Process,
@@ -228,13 +268,66 @@ function Find-SplayerAutomationElementByControlType {
   return $Root.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
 }
 
+function Find-SplayerAutomationElementByProcessAndId {
+  param(
+    [Parameter(Mandatory = $true)][int]$ProcessId,
+    [Parameter(Mandatory = $true)][string]$AutomationId
+  )
+
+  Initialize-SplayerUiAutomation
+  $processCondition = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::ProcessIdProperty,
+    $ProcessId
+  )
+  $automationIdCondition = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::AutomationIdProperty,
+    $AutomationId
+  )
+  $condition = New-Object System.Windows.Automation.AndCondition($processCondition, $automationIdCondition)
+  return [System.Windows.Automation.AutomationElement]::RootElement.FindFirst(
+    [System.Windows.Automation.TreeScope]::Descendants,
+    $condition
+  )
+}
+
+function Find-SplayerAutomationElementByProcessAndControlType {
+  param(
+    [Parameter(Mandatory = $true)][int]$ProcessId,
+    [Parameter(Mandatory = $true)][System.Windows.Automation.ControlType]$ControlType
+  )
+
+  Initialize-SplayerUiAutomation
+  $processCondition = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::ProcessIdProperty,
+    $ProcessId
+  )
+  $controlTypeCondition = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
+    $ControlType
+  )
+  $condition = New-Object System.Windows.Automation.AndCondition($processCondition, $controlTypeCondition)
+  return [System.Windows.Automation.AutomationElement]::RootElement.FindFirst(
+    [System.Windows.Automation.TreeScope]::Descendants,
+    $condition
+  )
+}
+
 function Assert-SplayerSeekBarAutomation {
-  param([Parameter(Mandatory = $true)][System.Windows.Automation.AutomationElement]$Root)
+  param(
+    [Parameter(Mandatory = $true)][System.Windows.Automation.AutomationElement]$Root,
+    [int]$ProcessId = 0
+  )
 
   Initialize-SplayerUiAutomation
   $seekBar = Find-SplayerAutomationElementById -Root $Root -AutomationId 'SeekBar'
   if (-not $seekBar) {
     $seekBar = Find-SplayerAutomationElementByControlType -Root $Root -ControlType ([System.Windows.Automation.ControlType]::Slider)
+  }
+  if (-not $seekBar -and $ProcessId -gt 0) {
+    $seekBar = Find-SplayerAutomationElementByProcessAndId -ProcessId $ProcessId -AutomationId 'SeekBar'
+  }
+  if (-not $seekBar -and $ProcessId -gt 0) {
+    $seekBar = Find-SplayerAutomationElementByProcessAndControlType -ProcessId $ProcessId -ControlType ([System.Windows.Automation.ControlType]::Slider)
   }
   if (-not $seekBar) {
     throw 'UIA seek bar was not found. Expected AutomationId=SeekBar or ControlType.Slider.'

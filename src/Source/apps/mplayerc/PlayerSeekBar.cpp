@@ -25,6 +25,7 @@
 #include "stdafx.h"
 #include "mplayerc.h"
 #include "PlayerSeekBar.h"
+#include "PlayerSeekBarUiaProvider.h"
 #include "MainFrm.h"
 #include "..\..\svplib\svplib.h"
 #include "TimeBmpManage.h"
@@ -35,12 +36,17 @@ IMPLEMENT_DYNAMIC(CPlayerSeekBar, CDialogBar)
 
 CPlayerSeekBar::CPlayerSeekBar() : 
 	m_start(0), m_stop(100), m_pos(0), m_posreal(0), 
-	m_fEnabled(false)
+	m_fEnabled(false),
+	m_uiaProvider(NULL)
 {
 }
 
 CPlayerSeekBar::~CPlayerSeekBar()
 {
+	if (m_uiaProvider) {
+		m_uiaProvider->Release();
+		m_uiaProvider = NULL;
+	}
 }
 BOOL CPlayerSeekBar::Create(CWnd* pParentWnd)
 {
@@ -130,6 +136,21 @@ void CPlayerSeekBar::SetPosInternal(__int64 pos)
 	if(before != after) InvalidateRect(before | after);
 }
 
+bool CPlayerSeekBar::IsSeekEnabled() const
+{
+	return m_fEnabled && m_start < m_stop;
+}
+
+void CPlayerSeekBar::SetAutomationPos(__int64 pos)
+{
+	if (!IsSeekEnabled()) {
+		return;
+	}
+
+	SetPosInternal(pos);
+	AfxGetMainWnd()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
+}
+
 CRect CPlayerSeekBar::GetChannelRect()
 {
 	CRect r;
@@ -200,6 +221,7 @@ BEGIN_MESSAGE_MAP(CPlayerSeekBar, CDialogBar)
 	ON_WM_CLOSE()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_RBUTTONUP()
+	ON_MESSAGE(WM_GETOBJECT, OnGetObject)
 END_MESSAGE_MAP()
 
 BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message){
@@ -208,6 +230,19 @@ BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message){
 	return TRUE;
 	
 	//return CWnd::OnSetCursor(pWnd, 0, 0);
+}
+
+LRESULT CPlayerSeekBar::OnGetObject(WPARAM wParam, LPARAM lParam)
+{
+	if (lParam == UiaRootObjectId) {
+		if (!m_uiaProvider) {
+			m_uiaProvider = new CPlayerSeekBarUiaProvider(this);
+		}
+
+		return UiaReturnRawElementProvider(m_hWnd, wParam, lParam, m_uiaProvider);
+	}
+
+	return CDialogBar::Default();
 }
 
 // CPlayerSeekBar message handlers

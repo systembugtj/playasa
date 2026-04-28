@@ -59,6 +59,9 @@
     <ClInclude Include="CpuId.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DxvaCodecContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="DXVADecoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>

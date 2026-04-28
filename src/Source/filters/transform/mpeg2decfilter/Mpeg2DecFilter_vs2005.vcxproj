@@ -270,6 +270,7 @@
     <ClCompile Include="libmpeg2.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
+    <ClCompile Include="Mpeg2ModernDecodeAdapter.cpp" />
     <ClCompile Include="Mpeg2DecFilter.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
@@ -289,6 +290,7 @@
     <ClInclude Include="..\..\..\..\..\mpc-hc\trunk\src\filters\transform\mpeg2decfilter\attributes.h" />
     <ClInclude Include="IMpeg2DecFilter.h" />
     <ClInclude Include="libmpeg2.h" />
+    <ClInclude Include="Mpeg2ModernDecodeAdapter.h" />
     <ClInclude Include="Mpeg2DecFilter.h" />
     <ClInclude Include="Mpeg2DecSettingsWnd.h" />
     <ClInclude Include="resource.h" />
