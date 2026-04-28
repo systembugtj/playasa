@@ -2,7 +2,7 @@
 
 | 字段 | 内容 |
 | --- | --- |
-| **状态** | 阶段 2/3 已实现，modern MPEG-2 software path 受保护，默认关闭 (Modern Software Path Guarded) |
+| **状态** | 阶段 2/3 已实现，modern MPEG-2 software path 默认启用且 strict no-fallback；最终目标为 drop old `libmpeg2` |
 | **创建日期** | 2026-04-27 |
 | **负责人** | AI / Playasa |
 | **相关 RFC** | [RFC-0030](./rfc-0030-mpeg2-dxva-context-modernization.md)、[RFC-0025](./completed/rfc-0025-ffmpeg-dxva-followup.md)、[RFC-0024](./rfc-0024-ffmpeg-modern-island.md) |
@@ -166,27 +166,38 @@ IMediaSample
 新增实现：
 
 1. 新增 `Mpeg2ModernDecodeAdapter.h/.cpp`，只负责动态加载 `playasa_ffmpeg_modern_bridge.dll` 并创建 `PLAYASA_FFMPEG_MODERN_CODEC_MPEG2` session。
-2. `CMpeg2DecFilter` 新增 guarded modern MPEG-2 software decode path。
-3. modern path 只在 `PLAYASA_MPEG2_MODERN=1` 时启用，默认仍走旧 `libmpeg2`。
-4. modern decode 出错、bridge 不可用或输出格式不是 4:2:0 时，自动关闭 modern path 并回退旧 `libmpeg2`。
+2. `CMpeg2DecFilter` 新增 modern MPEG-2 software decode path，并作为默认 MPEG-2 software path 启用。
+3. 旧 `libmpeg2` 只剩临时开发回滚开关 `PLAYASA_MPEG2_LEGACY=1`；这不是完成态，RFC 完成前应删除旧源码和项目引用。
+4. modern decode 出错、bridge 不可用或输出格式不受支持时不再回退旧 `libmpeg2`；modern-only 模式下失败必须暴露为错误，避免旧路径掩盖现代实现问题。
 5. modern 解码只负责把 FFmpeg 输出帧转换进 `m_fb`，最终交付继续走既有 `CMpeg2DecFilter::Deliver(false)`，复用 legacy renderer-facing 路径。
 6. 已加入 duration 归一化：modern bridge 返回过小 duration 时回退到输入 duration、`m_AvgTimePerFrame` 或 40ms，避免 `duration=1` 造成播放抖动。
-7. `test-rfc0031-mpeg2-path-selfcheck.ps1` 新增 `-EnableModernMpeg2` 和 `-RequireModernMpeg2FirstFrame`。
-8. 新增 `test-rfc0031-mpeg2-modern-selfcheck.ps1`，将 modern MPEG-2 样本分成稳定严格验证与扩展观察验证。
+7. `test-rfc0031-mpeg2-path-selfcheck.ps1` 的 `-EnableModernMpeg2` 现在通过清除 `PLAYASA_MPEG2_LEGACY` 保证默认 modern path，不再设置已废弃的 `PLAYASA_MPEG2_MODERN`。
+8. 新增 `test-rfc0031-mpeg2-modern-selfcheck.ps1`，当前默认把 `.m2ts/.ts/.m2v/.vob/.mpg` 全部作为 strict no-fallback 验证样本。
 9. modern 输出补充 4:2:2/4:4:4 planar YUV 到 I420 的下采样，保持 renderer-facing 格式不变。
-10. 首帧之后的少量 invalid packet 改为 soft failure；renderer delivery failure 仍视为致命错误并回退旧 `libmpeg2`，避免继续输出异常画面。
+10. 首帧之后的少量 invalid packet 改为 soft failure；renderer delivery failure 仍视为 modern path 错误，但不会触发旧 `libmpeg2` fallback。
 11. modern path 对帧时间戳做单调归一化，避免 raw elementary stream 中重复/回退 PTS 影响 renderer delivery。
 12. `playasa_ffmpeg_modern_bridge.dll` 对 MPEG-2 启用 FFmpeg parser，并保留 parser 提前返回时尚未消费的输入，避免 DirectShow sample 边界和 picture 边界不一致导致丢包、花屏或 invalid packet。
 13. 撤销 early modern path 自建 output sample 的做法，避免绕过 `Deliver()` 中的 1088 裁剪、subtitle buffer、rate change、output subtype 和 type-specific flag 处理。
 14. 修复 bridge `avcodec_send_packet()` 返回 `EAGAIN` 时丢弃当前 encoded packet 的问题；现在会先输出 pending frame，再保留并重送该 packet。
-15. modern path 在 decoder flush 后的第一帧设置 output discontinuity，向 renderer 明确传递时间轴中断。
+15. `.m2v` raw elementary stream 的 `disc=1 start=0 stop=1` 标记块会在短样本尾部/renderer clock stop 后再次出现；modern path 识别该 bogus ES marker，不再把它升级为 decoder reset 或 modern fallback。
+16. 撤销 decoder 层注入 output `SetDiscontinuity(TRUE)` 的做法，继续依赖 base filter 的 `NewSegment` 传播，避免 EVR 在已停止/尾部状态拒收样本时误判 modern decoder 失败。
+17. `CMpeg2DecFilter` 的 modern path 已移除 runtime legacy fallback：`TransformModern()` 失败会直接返回错误，`StartStreaming()` 打不开 bridge 也直接失败。
+18. `PLAYASA_MPEG2_MODERN` 不再是启用条件；modern path 默认启用，只有 `PLAYASA_MPEG2_LEGACY=1` 会临时回到旧路径。
+19. seek/NewSegment/discontinuity 时，modern path 使用独立 reset：只 flush modern FFmpeg bridge、清理 modern 时间轴和 raw ES suppress 状态，不再通过旧 `libmpeg2` reset 作为 seek 主路径。
+20. 已新增 `test-rfc0031-mpeg2-seek-selfcheck.ps1` 作为 MPEG-2 seek harness 草案；当前 WM_COMMAND/UIA seek 在本机自动化环境未能可靠触发真实 seek，不能作为通过项。
+21. 重新审计后修正遗漏：默认 modern path 只接 `MEDIASUBTYPE_MPEG2_VIDEO`，MPEG-1/系统 MPEG decoder 路径不会被 MPEG-2 modern session 误接管。
+22. `StartStreaming()` 在默认 modern MPEG-2 路径不再创建并 reset `CMpeg2Dec/libmpeg2`，只在 `PLAYASA_MPEG2_LEGACY=1` 或非 MPEG-2 输入时进入 legacy 初始化。
+23. modern path 启动时从输入 media type 填充 `m_AvgTimePerFrame`，避免 duration fallback 继续依赖旧 `STATE_SEQUENCE`。
+24. `BeginFlush/NewSegment/discontinuity` 增加 post-flush/raw ES marker 状态区分：真实 flush 后仍 reset modern decoder，但 `.m2v` 尾部 `NewSegment(0)+disc(0..1)` 以及 renderer 已停止后的 `VFW_E_TYPE_NOT_ACCEPTED` 不再升级为 modern decoder failure。
+25. `framebuf::alloc()` 在重分辨率/重协商时先释放旧 buffer，modern frame copy 后检查分配结果，避免尺寸变化导致泄漏或空指针写入。
 
 待执行：
 
 1. 用更多 MPEG-2 样本验证 modern path 的 seek、interlaced、audio/video sync 和长时间播放。
-2. 根据样本覆盖情况决定是否把 `PLAYASA_MPEG2_MODERN=1` 从环境开关升级为设置项。
-3. 在 software path 稳定后，再评估 MPEG-2 DXVA 是否迁入 `CMpeg2DecFilter`。
-4. 在新实现前保持 `MPCVideoDec` 的 `DxvaMpeg2PictureContext` 不继续扩大改动范围。
+2. 删除 `CMpeg2DecFilter` 旧 `libmpeg2` decode loop、`CMpeg2Dec` wrapper、`libmpeg2` project reference、`libmpeg2.cpp/.h` 编译项和 `libmpeg2\vc++` 子项目引用。
+3. 删除 `PLAYASA_MPEG2_LEGACY=1` 临时回滚开关，完成 modern-only 收口。
+4. 在 software path 稳定后，再评估 MPEG-2 DXVA 是否迁入 `CMpeg2DecFilter`。
+5. 在新实现前保持 `MPCVideoDec` 的 `DxvaMpeg2PictureContext` 不继续扩大改动范围。
 
 ## 9. 验证计划
 
@@ -196,7 +207,13 @@ IMediaSample
 dev.ps1 buildFast: PASS
 test-rfc0031-mpeg2-path-selfcheck.ps1 -RequireKnownPath: PASS
 test-rfc0031-mpeg2-path-selfcheck.ps1 -SamplePaths out/selfcheck/sample-mpeg2-dxva.m2ts -EnableModernMpeg2 -RequireKnownPath -RequireModernMpeg2FirstFrame: PASS
-test-rfc0031-mpeg2-modern-selfcheck.ps1: PASS
+test-rfc0031-mpeg2-path-selfcheck.ps1 -SamplePaths out/selfcheck/sample-mpeg2-dxva.m2v -EnableModernMpeg2 -RequireModernMpeg2FirstFrame -RequireNoModernMpeg2Fallback: PASS
+test-rfc0031-mpeg2-modern-selfcheck.ps1 (all default samples strict no-fallback): PASS
+test-rfc0031-mpeg2-path-selfcheck.ps1 -SamplePaths m2ts,ts,m2v,vob,mpg -RequireKnownPath -RequireModernMpeg2FirstFrame -RequireNoModernMpeg2Fallback: PASS (also checks modern failure log)
+2026-04-28 re-audit:
+dev.ps1 buildFast: PASS
+test-rfc0031-mpeg2-path-selfcheck.ps1 -SamplePaths m2ts,ts,m2v,vob,mpg -RequireKnownPath -RequireModernMpeg2FirstFrame -RequireNoModernMpeg2Fallback: PASS
+test-rfc0031-mpeg2-path-selfcheck.ps1 -SamplePaths out/selfcheck/sample-mpeg-small.mpeg -RequireKnownPath: PASS (isolated run; confirms MPEG-1 is not taken by MPEG-2 modern path)
 ```
 
 modern path 关键日志：
@@ -212,18 +229,16 @@ MPEG-2 modern FFmpeg first frame ready: width=640 height=360 start=0 stop=400000
 strict no-fallback:
 out/selfcheck/sample-mpeg2-dxva.m2ts -> first frame OK, fallback False
 out/selfcheck/sample-mpeg2-dxva.ts   -> first frame OK, fallback False
+out/selfcheck/sample-mpeg2-dxva.m2v  -> first frame OK, fallback False
 out/selfcheck/sample-mpeg2-dxva.vob  -> first frame OK, fallback False
 out/selfcheck/sample-mpeg2-dxva.mpg  -> first frame OK, fallback False
-
-protected fallback:
-out/selfcheck/sample-mpeg2-dxva.m2v  -> first frame OK, fallback True after renderer delivery failure
 ```
 
-解释：MPEG-2 parser 和 `EAGAIN` packet 保留修复后，`m2ts/ts/vob/mpg` 当前样本可走 modern path 且不 fallback；`.m2v` 仍会在 discontinuity 后的 renderer delivery 阶段报错，因此按保护策略回退旧 `libmpeg2`。modern path 不再直接构造 output sample，而是复用 legacy `Deliver(false)`，这是当前避免画面错乱的正确交付路径。`PLAYASA_MPEG2_MODERN` 继续保持环境开关，不默认启用。
+解释：MPEG-2 parser 和 `EAGAIN` packet 保留修复后，`m2ts/ts/m2v/vob/mpg` 当前样本可走 modern path 且不 fallback；`.m2v` 的 raw ES splitter 会在短样本尾部送出 `disc=1 start=0 stop=1` 的 bogus marker，并且此时 EVR clock 已经 stop。modern path 现在会 suppress 该尾部 marker 之后的 stopped-renderer delivery failure，不再把它当作 decode failure。重新审计后，default modern path 不再初始化旧 `libmpeg2`、不再误接 MPEG-1 输入，并且 flush/segment/discontinuity 区分真实 seek/reset 与 raw ES 尾部 marker。modern path 不再直接构造 output sample，而是复用 legacy `Deliver(false)`，这是当前避免画面错乱的正确交付路径。modern path 已默认启用，`PLAYASA_MPEG2_LEGACY=1` 只是删除旧代码前的临时开发回滚开关；RFC 完成前必须删除旧 `libmpeg2`。
 
 仍需验证：
 
 1. `test-rfc0030-mpeg2-dxva-selfcheck.ps1`
-2. MPEG-2 样本 seek、关闭无 crash/hang
+2. MPEG-2 样本真实手动 seek、关闭无 crash/hang；当前自动 seek harness 未能可靠触发 `SeekTo begin/end`
 3. 更长 MPEG-2 样本的 A/V sync
 4. 对照 `SVPDebug.log` 确认目标 decoder 路径和 modern path gate

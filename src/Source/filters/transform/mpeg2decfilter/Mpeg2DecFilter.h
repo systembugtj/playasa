@@ -49,10 +49,12 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478")) CMpeg2DecFilter
 	REFERENCE_TIME m_AvgTimePerFrame;
 	bool m_fWaitForKeyFrame;
 	bool m_fUseModernMpeg2;
-	bool m_fModernMpeg2Failed;
 	bool m_fModernMpeg2LoggedFirstFrame;
 	bool m_fModernMpeg2EverDeliveredFrame;
-	bool m_fModernMpeg2OutputDiscontinuity;
+	bool m_fModernMpeg2SuppressRawEsMarkerFailures;
+	bool m_fModernMpeg2FlushedSinceSegment;
+	bool m_fModernMpeg2HadFrameBeforeFlush;
+	bool m_fModernMpeg2AfterFlush;
 	int m_modernMpeg2ConsecutiveFailures;
 
 	struct framebuf 
@@ -74,6 +76,7 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478")) CMpeg2DecFilter
         ~framebuf() {free();}
 		void alloc(int w, int h, int pitch)
 		{
+			free();
 			this->w = w; this->h = h; this->pitch = pitch;
 			int size = pitch*h;
 			buf_base = (BYTE*)_aligned_malloc(size*3+6*32, 32);
@@ -99,11 +102,13 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478")) CMpeg2DecFilter
 	AM_SimpleRateChange m_rate;
 
 protected:
+	void ResetModernMpeg2StateLocked(REFERENCE_TIME rtStart, LPCTSTR reason);
 	void InputTypeChanged();
 	HRESULT Transform(IMediaSample* pIn);
 	HRESULT TransformModern(IMediaSample* pIn, BYTE* pDataIn, long len, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop);
 	HRESULT DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& frameInfo, REFERENCE_TIME inputDuration);
 	bool IsModernMpeg2Enabled() const;
+	bool IsModernMpeg2InputType(const CMediaType& mtIn) const;
 	bool IsVideoInterlaced();
 
 public:

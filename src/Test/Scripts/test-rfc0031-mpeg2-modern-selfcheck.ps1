@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  Run the guarded RFC-0031 modern MPEG-2 software decode smoke test.
+  Run the RFC-0031 modern-only MPEG-2 software decode smoke test.
 #>
 [CmdletBinding()]
 param(
@@ -17,13 +17,12 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $pathSelfcheck = Join-Path $PSScriptRoot 'test-rfc0031-mpeg2-path-selfcheck.ps1'
 $defaultStableSamples = @(
   'out\selfcheck\sample-mpeg2-dxva.m2ts',
-  'out\selfcheck\sample-mpeg2-dxva.ts'
-)
-$defaultObservationSamples = @(
+  'out\selfcheck\sample-mpeg2-dxva.ts',
   'out\selfcheck\sample-mpeg2-dxva.m2v',
   'out\selfcheck\sample-mpeg2-dxva.vob',
   'out\selfcheck\sample-mpeg2-dxva.mpg'
 )
+$defaultObservationSamples = @()
 
 function ConvertTo-Rfc0031SampleList {
   param([string[]]$Paths)
@@ -54,13 +53,16 @@ $stableSampleList = ConvertTo-Rfc0031SampleList -Paths $StableSamplePaths
   -TimeoutSeconds $TimeoutSeconds `
   -SteadyStateSeconds $SteadyStateSeconds
 
-$observationSampleList = ConvertTo-Rfc0031SampleList -Paths $ObservationSamplePaths
-& $pathSelfcheck `
-  -SamplePaths $observationSampleList `
-  -EnableModernMpeg2 `
-  -RequireKnownPath `
-  -RequireModernMpeg2FirstFrame `
-  -TimeoutSeconds $TimeoutSeconds `
-  -SteadyStateSeconds $SteadyStateSeconds
+if ($ObservationSamplePaths.Count -gt 0) {
+  $observationSampleList = ConvertTo-Rfc0031SampleList -Paths $ObservationSamplePaths
+  & $pathSelfcheck `
+    -SamplePaths $observationSampleList `
+    -EnableModernMpeg2 `
+    -RequireKnownPath `
+    -RequireModernMpeg2FirstFrame `
+    -RequireNoModernMpeg2Fallback `
+    -TimeoutSeconds $TimeoutSeconds `
+    -SteadyStateSeconds $SteadyStateSeconds
+}
 
 Write-Host 'test-rfc0031-mpeg2-modern-selfcheck: OK' -ForegroundColor Green

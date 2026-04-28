@@ -47,6 +47,7 @@
 #define EPSILON 1e-4
 
 static const int kModernMpeg2MaxSoftFailures = 16;
+static const char kModernMpeg2LegacyEnvironmentVariable[] = "PLAYASA_MPEG2_LEGACY";
 
 static void ModernMpeg2SelfcheckLog(LPCTSTR format, ...)
 {
@@ -61,10 +62,10 @@ static void ModernMpeg2SelfcheckLog(LPCTSTR format, ...)
 static bool IsModernMpeg2EnvironmentEnabled()
 {
 	char value[16] = { 0 };
-	if (GetEnvironmentVariableA("PLAYASA_MPEG2_MODERN", value, sizeof(value)) == 0) {
+	if (GetEnvironmentVariableA(kModernMpeg2LegacyEnvironmentVariable, value, sizeof(value)) > 0 && value[0] == '1') {
 		return false;
 	}
-	return value[0] == '1';
+	return true;
 }
 
 static bool IsModernMpeg2SupportedPlanarYuv(int pixelFormat)
@@ -277,10 +278,12 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_AvgTimePerFrame(0)
 	, m_fWaitForKeyFrame(true)
 	, m_fUseModernMpeg2(false)
-	, m_fModernMpeg2Failed(false)
 	, m_fModernMpeg2LoggedFirstFrame(false)
 	, m_fModernMpeg2EverDeliveredFrame(false)
-	, m_fModernMpeg2OutputDiscontinuity(false)
+	, m_fModernMpeg2SuppressRawEsMarkerFailures(false)
+	, m_fModernMpeg2FlushedSinceSegment(false)
+	, m_fModernMpeg2HadFrameBeforeFlush(false)
+	, m_fModernMpeg2AfterFlush(false)
 	, m_modernMpeg2ConsecutiveFailures(0)
 {
 	delete m_pInput;
@@ -384,6 +387,18 @@ HRESULT CMpeg2DecFilter::EndOfStream()
 HRESULT CMpeg2DecFilter::BeginFlush()
 {
 	m_pClosedCaptionOutput->DeliverBeginFlush();
+	if (m_fUseModernMpeg2) {
+		CAutoLock cAutoLock(&m_csReceive);
+		if (m_modernDec) {
+			m_modernDec->Flush();
+		}
+		m_fModernMpeg2FlushedSinceSegment = true;
+		m_fModernMpeg2HadFrameBeforeFlush = m_fModernMpeg2EverDeliveredFrame;
+		m_fModernMpeg2AfterFlush = true;
+		m_fModernMpeg2SuppressRawEsMarkerFailures = false;
+		m_modernMpeg2ConsecutiveFailures = 0;
+		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg flush begin"));
+	}
 	return __super::BeginFlush();
 }
 
@@ -398,7 +413,46 @@ HRESULT CMpeg2DecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop,
 	CAutoLock cAutoLock(&m_csReceive);
 	m_pClosedCaptionOutput->DeliverNewSegment(tStart, tStop, dRate);
 	m_fDropFrames = false;
+	if (m_fUseModernMpeg2) {
+		const bool fFlushedSinceSegment = m_fModernMpeg2FlushedSinceSegment;
+		const bool fRepeatedRawEsZeroSegment =
+			m_fModernMpeg2EverDeliveredFrame
+			&& !fFlushedSinceSegment
+			&& tStart == 0
+			&& m_fb.rtStop > 0;
+		if (fRepeatedRawEsZeroSegment) {
+			m_fModernMpeg2SuppressRawEsMarkerFailures = true;
+			ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg ignored repeated raw ES zero segment: current=%I64d"), m_fb.rtStop);
+		} else {
+			ResetModernMpeg2StateLocked(tStart, _T("segment"));
+			if (!fFlushedSinceSegment) {
+				m_fModernMpeg2HadFrameBeforeFlush = false;
+				m_fModernMpeg2AfterFlush = false;
+			}
+		}
+		m_fModernMpeg2FlushedSinceSegment = false;
+	}
 	return __super::NewSegment(tStart, tStop, dRate);
+}
+
+void CMpeg2DecFilter::ResetModernMpeg2StateLocked(REFERENCE_TIME rtStart, LPCTSTR reason)
+{
+	if (m_modernDec) {
+		m_modernDec->Flush();
+	}
+	m_fModernMpeg2LoggedFirstFrame = false;
+	m_fModernMpeg2EverDeliveredFrame = false;
+	m_fModernMpeg2SuppressRawEsMarkerFailures = false;
+	m_fModernMpeg2FlushedSinceSegment = false;
+	m_modernMpeg2ConsecutiveFailures = 0;
+	m_fWaitForKeyFrame = true;
+	m_fFilm = false;
+	m_fb.flags = 0;
+	if (rtStart != _I64_MIN) {
+		m_fb.rtStart = rtStart;
+		m_fb.rtStop = rtStart;
+	}
+	ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg reset on %s: start=%I64d"), reason, rtStart);
 }
 
 void CMpeg2DecFilter::InputTypeChanged()
@@ -408,7 +462,6 @@ void CMpeg2DecFilter::InputTypeChanged()
 		m_modernDec->Flush();
 	}
 	m_fModernMpeg2LoggedFirstFrame = false;
-	m_fModernMpeg2OutputDiscontinuity = m_fUseModernMpeg2;
 	m_modernMpeg2ConsecutiveFailures = 0;
 	
 	TRACE(_T("ResetMpeg2Decoder()\n"));
@@ -516,7 +569,10 @@ void CMpeg2DecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 			{
 				// props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 
-                if(m_dec && m_dec->m_info.m_sequence && (m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE)){
+                const bool fProgressiveSequence = m_fUseModernMpeg2
+					? !!(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME)
+					: !!(m_dec && m_dec->m_info.m_sequence && (m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE));
+                if(fProgressiveSequence){
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
                 }
 
@@ -550,27 +606,49 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 
 	((CDeCSSInputPin*)m_pInput)->StripPacket(pDataIn, len);
 
-	if(pIn->IsDiscontinuity() == S_OK)
-	{
-		InputTypeChanged();
-	}
-
 	REFERENCE_TIME rtStart = _I64_MIN, rtStop = _I64_MIN;
 	hr = pIn->GetTime(&rtStart, &rtStop);
 	if(FAILED(hr)) rtStart = rtStop = _I64_MIN;
 
-	if (m_fUseModernMpeg2 && !m_fModernMpeg2Failed) {
+	if(pIn->IsDiscontinuity() == S_OK)
+	{
+		const bool fShortZeroMarker =
+			rtStart != _I64_MIN
+			&& rtStop > rtStart
+			&& rtStop - rtStart <= 10000
+			&& rtStart <= m_fb.rtStop;
+		const bool fPostFlushZeroMarker =
+			m_fModernMpeg2AfterFlush
+			&& rtStart == 0
+			&& m_fb.rtStop == 0;
+		const bool fBogusModernMpeg2EsMarker =
+			m_fUseModernMpeg2
+			&& (((m_fModernMpeg2EverDeliveredFrame || m_fModernMpeg2HadFrameBeforeFlush) && fShortZeroMarker)
+				|| fPostFlushZeroMarker);
+		if (fBogusModernMpeg2EsMarker) {
+			m_fModernMpeg2SuppressRawEsMarkerFailures = true;
+			ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg ignored raw ES discontinuity marker: start=%I64d stop=%I64d current=%I64d"),
+				rtStart, rtStop, m_fb.rtStop);
+		} else {
+			if (m_fUseModernMpeg2) {
+				CAutoLock cAutoLock(&m_csReceive);
+				m_fModernMpeg2HadFrameBeforeFlush = false;
+				m_fModernMpeg2AfterFlush = false;
+				ResetModernMpeg2StateLocked(rtStart, _T("discontinuity"));
+			} else {
+				m_fModernMpeg2SuppressRawEsMarkerFailures = false;
+				InputTypeChanged();
+			}
+		}
+	}
+
+	if (m_fUseModernMpeg2) {
 		hr = TransformModern(pIn, pDataIn, len, rtStart, rtStop);
 		if (SUCCEEDED(hr)) {
 			return hr;
 		}
-		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg fallback: hr=0x%08x error=%S"), hr, m_modernDec ? m_modernDec->LastError() : "adapter missing");
-		m_fModernMpeg2Failed = true;
-		m_fUseModernMpeg2 = false;
-		if (m_modernDec) {
-			m_modernDec->Close();
-		}
-		InputTypeChanged();
+		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg failed without legacy fallback: hr=0x%08x error=%S"), hr, m_modernDec ? m_modernDec->LastError() : "adapter missing");
+		return hr;
 	}
 
 	while(len >= 0)
@@ -665,19 +743,21 @@ HRESULT CMpeg2DecFilter::TransformModern(IMediaSample* pIn, BYTE* pDataIn, long 
 
 	const int64_t pts = rtStart == _I64_MIN ? PLAYASA_FFMPEG_MODERN_NO_PTS : rtStart;
 	const int64_t duration = (rtStart != _I64_MIN && rtStop > rtStart) ? (rtStop - rtStart) : PLAYASA_FFMPEG_MODERN_NO_PTS;
-	static LONG s_modernMpeg2InputLogCount = 0;
-	if (InterlockedIncrement(&s_modernMpeg2InputLogCount) <= 64) {
-		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg input sample: len=%d start=%I64d stop=%I64d duration=%I64d disc=%d sync=%d"),
-			len, rtStart, rtStop, duration, pIn->IsDiscontinuity() == S_OK ? 1 : 0, pIn->IsSyncPoint() == S_OK ? 1 : 0);
-	}
 	PlayasaFfmpegModernFrameInfo frameInfo = {};
 	int status = m_modernDec->Decode(pDataIn, static_cast<size_t>(len), pts, duration, &frameInfo);
 	while (status == PLAYASA_FFMPEG_MODERN_STATUS_FRAME_READY) {
 		HRESULT hr = DeliverModernFrame(frameInfo, duration);
 		if (FAILED(hr)) {
+			if (m_fModernMpeg2SuppressRawEsMarkerFailures || m_fModernMpeg2AfterFlush) {
+				ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg skipped post-flush/raw ES marker frame after downstream stop: hr=0x%08x"), hr);
+				return S_OK;
+			}
 			return hr;
 		} else {
 			m_modernMpeg2ConsecutiveFailures = 0;
+			m_fModernMpeg2SuppressRawEsMarkerFailures = false;
+			m_fModernMpeg2HadFrameBeforeFlush = false;
+			m_fModernMpeg2AfterFlush = false;
 		}
 		status = m_modernDec->ReceivePending(&frameInfo);
 	}
@@ -711,6 +791,9 @@ HRESULT CMpeg2DecFilter::DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& 
 	const int pitch = (width + 31) & ~31;
 	if (m_fb.w != width || m_fb.h != height || m_fb.pitch != pitch) {
 		m_fb.alloc(width, height, pitch);
+	}
+	if (!m_fb.buf[0] || !m_fb.buf[1] || !m_fb.buf[2]) {
+		return E_OUTOFMEMORY;
 	}
 
 	CopyModernMpeg2Plane(m_fb.buf[0], pitch, frameInfo.data[0], frameInfo.linesize[0], width, height);
@@ -752,8 +835,6 @@ HRESULT CMpeg2DecFilter::DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& 
 	}
 	m_fModernMpeg2EverDeliveredFrame = true;
 	m_fWaitForKeyFrame = false;
-	ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg deliver frame: width=%d height=%d start=%I64d stop=%I64d disc=%d"),
-		width, height, rtStart, rtStop, m_fModernMpeg2OutputDiscontinuity ? 1 : 0);
 
 	HRESULT hr = Deliver(false);
 	if (FAILED(hr)) {
@@ -767,6 +848,15 @@ HRESULT CMpeg2DecFilter::DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& 
 bool CMpeg2DecFilter::IsModernMpeg2Enabled() const
 {
 	return IsModernMpeg2EnvironmentEnabled();
+}
+
+bool CMpeg2DecFilter::IsModernMpeg2InputType(const CMediaType& mtIn) const
+{
+	return mtIn.subtype == MEDIASUBTYPE_MPEG2_VIDEO
+		&& (mtIn.majortype == MEDIATYPE_DVD_ENCRYPTED_PACK
+			|| mtIn.majortype == MEDIATYPE_MPEG2_PACK
+			|| mtIn.majortype == MEDIATYPE_MPEG2_PES
+			|| mtIn.majortype == MEDIATYPE_Video);
 }
 
 bool CMpeg2DecFilter::IsVideoInterlaced()
@@ -892,10 +982,6 @@ HRESULT CMpeg2DecFilter::DeliverFast()
 
 	pOut->SetTime(&rtStart, &rtStop);
 	pOut->SetMediaTime(NULL, NULL);
-	if (m_fModernMpeg2OutputDiscontinuity) {
-		pOut->SetDiscontinuity(TRUE);
-		m_fModernMpeg2OutputDiscontinuity = false;
-	}
 
 	//
 
@@ -1123,10 +1209,6 @@ HRESULT CMpeg2DecFilter::Deliver(bool fRepeatLast)
 
 	pOut->SetTime(&rtStart, &rtStop);
 	pOut->SetMediaTime(NULL, NULL);
-	if (m_fModernMpeg2OutputDiscontinuity) {
-		pOut->SetDiscontinuity(TRUE);
-		m_fModernMpeg2OutputDiscontinuity = false;
-	}
 
 	//
 
@@ -1221,24 +1303,37 @@ HRESULT CMpeg2DecFilter::StartStreaming()
 	HRESULT hr = __super::StartStreaming();
 	if(FAILED(hr)) return hr;
 
-	m_dec.Attach(new CMpeg2Dec());
-	if(!m_dec) return E_OUTOFMEMORY;
-
-	InputTypeChanged();
 	m_fUseModernMpeg2 = false;
-	m_fModernMpeg2Failed = false;
 	m_fModernMpeg2LoggedFirstFrame = false;
 	m_fModernMpeg2EverDeliveredFrame = false;
-	m_fModernMpeg2OutputDiscontinuity = false;
+	m_fModernMpeg2SuppressRawEsMarkerFailures = false;
+	m_fModernMpeg2FlushedSinceSegment = false;
 	m_modernMpeg2ConsecutiveFailures = 0;
-	if (IsModernMpeg2Enabled()) {
+
+	const CMediaType& mtIn = m_pInput->CurrentMediaType();
+	if (mtIn.formattype == FORMAT_MPEGVideo && mtIn.Format()) {
+		m_AvgTimePerFrame = ((MPEG1VIDEOINFO*)mtIn.Format())->hdr.AvgTimePerFrame;
+	} else if (mtIn.formattype == FORMAT_MPEG2_VIDEO && mtIn.Format()) {
+		m_AvgTimePerFrame = ((MPEG2VIDEOINFO*)mtIn.Format())->hdr.AvgTimePerFrame;
+	}
+
+	if (IsModernMpeg2Enabled() && IsModernMpeg2InputType(mtIn)) {
 		m_modernDec.Attach(new CMpeg2ModernDecodeAdapter());
 		if (!m_modernDec) {
 			return E_OUTOFMEMORY;
 		}
 		m_fUseModernMpeg2 = m_modernDec->Open();
 		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg open %s: %S"), m_fUseModernMpeg2 ? _T("OK") : _T("failed"), m_modernDec->LastError());
+		if (!m_fUseModernMpeg2) {
+			return E_FAIL;
+		}
+		return S_OK;
 	}
+
+	m_dec.Attach(new CMpeg2Dec());
+	if(!m_dec) return E_OUTOFMEMORY;
+
+	InputTypeChanged();
 
 //	g_clock = clock();
 

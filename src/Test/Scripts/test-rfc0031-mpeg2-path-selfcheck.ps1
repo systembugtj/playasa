@@ -21,7 +21,7 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'TestSupport\SplayerTestSupport.psm1') -Force
 
 $repoRoot = Get-SplayerRepoRoot
-$previousModernMpeg2 = $env:PLAYASA_MPEG2_MODERN
+$previousLegacyMpeg2 = $env:PLAYASA_MPEG2_LEGACY
 $defaultSamplePaths = @(
   'out\selfcheck\sample-mpeg2-dxva.m2ts',
   'out\selfcheck\sample-mpeg2-dxva.ts',
@@ -90,7 +90,7 @@ function Invoke-Rfc0031SampleRun {
   Stop-SplayerProcesses
   Clear-SplayerLog
   if ($EnableModernMpeg2) {
-    $env:PLAYASA_MPEG2_MODERN = '1'
+    Remove-Item Env:\PLAYASA_MPEG2_LEGACY -ErrorAction SilentlyContinue
   }
   $process = Start-SplayerForSample -SamplePath $SamplePath
   try {
@@ -113,18 +113,27 @@ function Invoke-Rfc0031SampleRun {
     $decoderName = Get-Rfc0031DecoderName -GraphLines $graphLines
     $modernFirstFrame = $logText -match 'MPEG-2 modern FFmpeg first frame ready'
     $modernFallback = $logText -match 'MPEG-2 modern FFmpeg fallback'
+    $modernFailure = $logText -match 'MPEG-2 modern FFmpeg failed without legacy fallback'
+    if ($decoderName -eq 'Unknown' -and $modernFirstFrame) {
+      $decoderName = 'CMpeg2DecFilter'
+    }
 
     [PSCustomObject]@{
       Sample = $SamplePath
       Decoder = $decoderName
       ModernFirstFrame = $modernFirstFrame
       ModernFallback = $modernFallback
+      ModernFailure = $modernFailure
       GraphLines = $graphLines
     }
   } finally {
     Get-Process -Id $process.Id -ErrorAction SilentlyContinue | Stop-Process -Force
     if ($EnableModernMpeg2) {
-      $env:PLAYASA_MPEG2_MODERN = $previousModernMpeg2
+      if ($null -eq $previousLegacyMpeg2) {
+        Remove-Item Env:\PLAYASA_MPEG2_LEGACY -ErrorAction SilentlyContinue
+      } else {
+        $env:PLAYASA_MPEG2_LEGACY = $previousLegacyMpeg2
+      }
     }
   }
 }
@@ -143,6 +152,7 @@ foreach ($result in $results) {
   Write-Host "RFC-0031 decoder: $($result.Decoder)"
   Write-Host "RFC-0031 modern first frame: $($result.ModernFirstFrame)"
   Write-Host "RFC-0031 modern fallback: $($result.ModernFallback)"
+  Write-Host "RFC-0031 modern failure: $($result.ModernFailure)"
   $result.GraphLines | Select-Object -Last 12 | ForEach-Object { Write-Host $_ }
 }
 
@@ -156,6 +166,10 @@ if ($RequireModernMpeg2FirstFrame -and @($results | Where-Object { -not $_.Moder
 
 if ($RequireNoModernMpeg2Fallback -and @($results | Where-Object { $_.ModernFallback }).Count -gt 0) {
   throw "RFC-0031 modern MPEG-2 fallback was observed. Inspect $(Get-SplayerLogPath)"
+}
+
+if (@($results | Where-Object { $_.ModernFailure }).Count -gt 0) {
+  throw "RFC-0031 modern MPEG-2 failure was observed. Inspect $(Get-SplayerLogPath)"
 }
 
 Write-Host 'test-rfc0031-mpeg2-path-selfcheck: OK' -ForegroundColor Green
