@@ -62,6 +62,9 @@ private:
     DecodeStatus SendPacket(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo);
     DecodeStatus SendParsedPacket(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo);
     DecodeStatus SendH264Packet(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo);
+    DecodeStatus SendStoredPendingPacket(DecodedFrameInfo* frameInfo);
+    void SaveParsedPendingInput(const uint8_t* data, int dataSize, int64_t pts, int64_t duration);
+    void SavePendingPacket(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration);
     void SetError(const char* message);
     void SetAvError(const char* operation, int errorCode);
 
@@ -70,6 +73,12 @@ private:
     void* parser_;
     void* packet_;
     void* frame_;
+    std::vector<uint8_t> parsedPendingInput_;
+    int64_t parsedPendingPts_;
+    int64_t parsedPendingDuration_;
+    std::vector<uint8_t> pendingPacket_;
+    int64_t pendingPacketPts_;
+    int64_t pendingPacketDuration_;
     int h264NalLengthSize_;
     std::vector<uint8_t> h264AnnexBExtraData_;
     std::vector<uint8_t> h264PendingAccessUnit_;

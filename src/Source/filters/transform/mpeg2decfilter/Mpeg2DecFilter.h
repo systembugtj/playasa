@@ -51,6 +51,9 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478")) CMpeg2DecFilter
 	bool m_fUseModernMpeg2;
 	bool m_fModernMpeg2Failed;
 	bool m_fModernMpeg2LoggedFirstFrame;
+	bool m_fModernMpeg2EverDeliveredFrame;
+	bool m_fModernMpeg2OutputDiscontinuity;
+	int m_modernMpeg2ConsecutiveFailures;
 
 	struct framebuf 
 	{

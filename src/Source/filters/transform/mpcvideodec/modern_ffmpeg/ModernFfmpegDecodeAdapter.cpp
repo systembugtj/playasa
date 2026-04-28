@@ -397,6 +397,10 @@ DecodeSession::DecodeSession(DecodeCodec codec)
     , parser_(0)
     , packet_(0)
     , frame_(0)
+    , parsedPendingPts_(kNoPts)
+    , parsedPendingDuration_(kNoPts)
+    , pendingPacketPts_(kNoPts)
+    , pendingPacketDuration_(kNoPts)
     , h264NalLengthSize_(kUnknownH264NalLengthSize)
     , h264PendingPts_(0)
     , h264ExtraDataPrepended_(false)
@@ -424,6 +428,12 @@ DecodeSession::~DecodeSession()
     parser_ = 0;
     packet_ = 0;
     frame_ = 0;
+    parsedPendingInput_.clear();
+    parsedPendingPts_ = kNoPts;
+    parsedPendingDuration_ = kNoPts;
+    pendingPacket_.clear();
+    pendingPacketPts_ = kNoPts;
+    pendingPacketDuration_ = kNoPts;
     h264NalLengthSize_ = kUnknownH264NalLengthSize;
     h264AnnexBExtraData_.clear();
     h264PendingAccessUnit_.clear();
@@ -500,7 +510,7 @@ bool DecodeSession::OpenWithH264NalLengthSize(const uint8_t* extraData, size_t e
     }
 
     AVCodecParserContext* parser = 0;
-    if (codec_ == kDecodeCodecH264 || codec_ == kDecodeCodecVc1 || codec_ == kDecodeCodecWmv3) {
+    if (codec_ == kDecodeCodecH264 || codec_ == kDecodeCodecMpeg2 || codec_ == kDecodeCodecVc1 || codec_ == kDecodeCodecWmv3) {
         parser = av_parser_init(codec->id);
     }
 
@@ -525,6 +535,12 @@ bool DecodeSession::OpenWithH264NalLengthSize(const uint8_t* extraData, size_t e
     parser_ = parser;
     packet_ = packet;
     frame_ = frame;
+    parsedPendingInput_.clear();
+    parsedPendingPts_ = kNoPts;
+    parsedPendingDuration_ = kNoPts;
+    pendingPacket_.clear();
+    pendingPacketPts_ = kNoPts;
+    pendingPacketDuration_ = kNoPts;
     h264NalLengthSize_ = kUnknownH264NalLengthSize;
     h264AnnexBExtraData_.clear();
     h264PendingAccessUnit_.clear();
@@ -577,6 +593,10 @@ DecodeStatus DecodeSession::DecodeWithTiming(const uint8_t* data, size_t dataSiz
         SetError("Decode input is too large");
         return kDecodeStatusFailure;
     }
+	if (!pendingPacket_.empty()) {
+		SaveParsedPendingInput(data, static_cast<int>(dataSize), pts, duration);
+		return SendStoredPendingPacket(frameInfo);
+	}
 
     if (codec_ == kDecodeCodecH264) {
         return SendH264Packet(data, dataSize, pts, duration, frameInfo);
@@ -610,10 +630,12 @@ DecodeStatus DecodeSession::SendPacket(const uint8_t* data, size_t dataSize, int
     packet->dts = AV_NOPTS_VALUE;
     packet->duration = duration > 0 ? duration : 0;
     const int sendResult = avcodec_send_packet(context, packet);
-    av_packet_unref(packet);
     if (sendResult == AVERROR(EAGAIN)) {
+		SavePendingPacket(data, dataSize, pts, duration);
+		av_packet_unref(packet);
         return ReceiveFrame(frameInfo);
     }
+	av_packet_unref(packet);
     if (sendResult < 0) {
         if (codec_ == kDecodeCodecH264 && !hasDecodedFrame_ && sendResult == AVERROR_INVALIDDATA) {
             SetAvError("avcodec_send_packet", sendResult);
@@ -624,6 +646,21 @@ DecodeStatus DecodeSession::SendPacket(const uint8_t* data, size_t dataSize, int
     }
 
     return ReceiveFrame(frameInfo);
+}
+
+DecodeStatus DecodeSession::SendStoredPendingPacket(DecodedFrameInfo* frameInfo)
+{
+	if (pendingPacket_.empty()) {
+		return kDecodeStatusNeedMoreInput;
+	}
+
+	std::vector<uint8_t> packet;
+	packet.swap(pendingPacket_);
+	const int64_t pts = pendingPacketPts_;
+	const int64_t duration = pendingPacketDuration_;
+	pendingPacketPts_ = kNoPts;
+	pendingPacketDuration_ = kNoPts;
+	return SendPacket(&packet[0], packet.size(), pts, duration, frameInfo);
 }
 
 DecodeStatus DecodeSession::SendParsedPacket(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo)
@@ -638,8 +675,21 @@ DecodeStatus DecodeSession::SendParsedPacket(const uint8_t* data, size_t dataSiz
         return kDecodeStatusFailure;
     }
 
+    std::vector<uint8_t> combinedInput;
     const uint8_t* input = data;
     int inputSize = static_cast<int>(dataSize);
+    if (!parsedPendingInput_.empty()) {
+        combinedInput = parsedPendingInput_;
+        combinedInput.insert(combinedInput.end(), data, data + dataSize);
+        input = &combinedInput[0];
+        inputSize = static_cast<int>(combinedInput.size());
+        pts = parsedPendingPts_;
+        duration = parsedPendingDuration_;
+        parsedPendingInput_.clear();
+        parsedPendingPts_ = kNoPts;
+        parsedPendingDuration_ = kNoPts;
+    }
+
     bool sentPacket = false;
     while (inputSize > 0) {
         uint8_t* parsedData = 0;
@@ -656,6 +706,7 @@ DecodeStatus DecodeSession::SendParsedPacket(const uint8_t* data, size_t dataSiz
             sentPacket = true;
             const DecodeStatus status = SendPacket(parsedData, static_cast<size_t>(parsedSize), pts, duration, frameInfo);
             if (status == kDecodeStatusFrameReady || status == kDecodeStatusFailure) {
+                SaveParsedPendingInput(input, inputSize, pts, duration);
                 return status;
             }
         }
@@ -682,6 +733,28 @@ DecodeStatus DecodeSession::SendParsedPacket(const uint8_t* data, size_t dataSiz
     }
 
     return sentPacket ? ReceiveFrame(frameInfo) : kDecodeStatusNeedMoreInput;
+}
+
+void DecodeSession::SaveParsedPendingInput(const uint8_t* data, int dataSize, int64_t pts, int64_t duration)
+{
+    if (!data || dataSize <= 0) {
+        return;
+    }
+
+    parsedPendingInput_.assign(data, data + dataSize);
+    parsedPendingPts_ = pts;
+    parsedPendingDuration_ = duration;
+}
+
+void DecodeSession::SavePendingPacket(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration)
+{
+	if (!data || dataSize == 0) {
+		return;
+	}
+
+	pendingPacket_.assign(data, data + dataSize);
+	pendingPacketPts_ = pts;
+	pendingPacketDuration_ = duration;
 }
 
 DecodeStatus DecodeSession::SendH264Packet(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo)
@@ -772,6 +845,12 @@ void DecodeSession::Flush()
     if (context) {
         avcodec_flush_buffers(context);
     }
+    parsedPendingInput_.clear();
+    parsedPendingPts_ = kNoPts;
+    parsedPendingDuration_ = kNoPts;
+	pendingPacket_.clear();
+	pendingPacketPts_ = kNoPts;
+	pendingPacketDuration_ = kNoPts;
     h264PendingAccessUnit_.clear();
     h264PendingPts_ = 0;
     h264PendingDuration_ = kNoPts;

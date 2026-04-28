@@ -46,6 +46,8 @@
 
 #define EPSILON 1e-4
 
+static const int kModernMpeg2MaxSoftFailures = 16;
+
 static void ModernMpeg2SelfcheckLog(LPCTSTR format, ...)
 {
 	CString message;
@@ -63,6 +65,55 @@ static bool IsModernMpeg2EnvironmentEnabled()
 		return false;
 	}
 	return value[0] == '1';
+}
+
+static bool IsModernMpeg2SupportedPlanarYuv(int pixelFormat)
+{
+	return pixelFormat == PLAYASA_FFMPEG_MODERN_PIXFMT_YUV420P
+		|| pixelFormat == PLAYASA_FFMPEG_MODERN_PIXFMT_YUVJ420P
+		|| pixelFormat == PLAYASA_FFMPEG_MODERN_PIXFMT_YUV422P
+		|| pixelFormat == PLAYASA_FFMPEG_MODERN_PIXFMT_YUVJ422P
+		|| pixelFormat == PLAYASA_FFMPEG_MODERN_PIXFMT_YUV444P
+		|| pixelFormat == PLAYASA_FFMPEG_MODERN_PIXFMT_YUVJ444P;
+}
+
+static void CopyModernMpeg2Plane(BYTE* dst, int dstPitch, const BYTE* src, int srcPitch, int width, int height)
+{
+	for (int y = 0; y < height; ++y) {
+		memcpy(dst + y * dstPitch, src + y * srcPitch, width);
+	}
+}
+
+static void CopyModernMpeg2Chroma420(BYTE* dst, int dstPitch, const BYTE* src, int srcPitch, int width, int height)
+{
+	for (int y = 0; y < height; ++y) {
+		memcpy(dst + y * dstPitch, src + y * srcPitch, width);
+	}
+}
+
+static void CopyModernMpeg2Chroma422To420(BYTE* dst, int dstPitch, const BYTE* src, int srcPitch, int width, int height)
+{
+	for (int y = 0; y < height; ++y) {
+		const BYTE* top = src + (y * 2) * srcPitch;
+		const BYTE* bottom = top + srcPitch;
+		BYTE* row = dst + y * dstPitch;
+		for (int x = 0; x < width; ++x) {
+			row[x] = static_cast<BYTE>((static_cast<int>(top[x]) + static_cast<int>(bottom[x]) + 1) / 2);
+		}
+	}
+}
+
+static void CopyModernMpeg2Chroma444To420(BYTE* dst, int dstPitch, const BYTE* src, int srcPitch, int width, int height)
+{
+	for (int y = 0; y < height; ++y) {
+		const BYTE* top = src + (y * 2) * srcPitch;
+		const BYTE* bottom = top + srcPitch;
+		BYTE* row = dst + y * dstPitch;
+		for (int x = 0; x < width; ++x) {
+			const int sx = x * 2;
+			row[x] = static_cast<BYTE>((static_cast<int>(top[sx]) + static_cast<int>(top[sx + 1]) + static_cast<int>(bottom[sx]) + static_cast<int>(bottom[sx + 1]) + 2) / 4);
+		}
+	}
 }
 
 #ifdef REGISTER_FILTER
@@ -228,6 +279,9 @@ CMpeg2DecFilter::CMpeg2DecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_fUseModernMpeg2(false)
 	, m_fModernMpeg2Failed(false)
 	, m_fModernMpeg2LoggedFirstFrame(false)
+	, m_fModernMpeg2EverDeliveredFrame(false)
+	, m_fModernMpeg2OutputDiscontinuity(false)
+	, m_modernMpeg2ConsecutiveFailures(0)
 {
 	delete m_pInput;
 //	delete m_pOutput;
@@ -354,6 +408,8 @@ void CMpeg2DecFilter::InputTypeChanged()
 		m_modernDec->Flush();
 	}
 	m_fModernMpeg2LoggedFirstFrame = false;
+	m_fModernMpeg2OutputDiscontinuity = m_fUseModernMpeg2;
+	m_modernMpeg2ConsecutiveFailures = 0;
 	
 	TRACE(_T("ResetMpeg2Decoder()\n"));
 
@@ -460,7 +516,7 @@ void CMpeg2DecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 			{
 				// props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 
-                if(m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE){
+                if(m_dec && m_dec->m_info.m_sequence && (m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE)){
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
                 }
 
@@ -615,20 +671,33 @@ HRESULT CMpeg2DecFilter::TransformModern(IMediaSample* pIn, BYTE* pDataIn, long 
 		HRESULT hr = DeliverModernFrame(frameInfo, duration);
 		if (FAILED(hr)) {
 			return hr;
+		} else {
+			m_modernMpeg2ConsecutiveFailures = 0;
 		}
 		status = m_modernDec->ReceivePending(&frameInfo);
 	}
 
-	return status == PLAYASA_FFMPEG_MODERN_STATUS_FAILURE ? E_FAIL : S_OK;
+	if (status == PLAYASA_FFMPEG_MODERN_STATUS_FAILURE) {
+		if (m_fModernMpeg2EverDeliveredFrame && ++m_modernMpeg2ConsecutiveFailures < kModernMpeg2MaxSoftFailures) {
+			ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg skipped invalid packet: count=%d error=%S"), m_modernMpeg2ConsecutiveFailures, m_modernDec->LastError());
+			return S_OK;
+		}
+		return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 HRESULT CMpeg2DecFilter::DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& frameInfo, REFERENCE_TIME inputDuration)
 {
-	if (frameInfo.pixel_format != PLAYASA_FFMPEG_MODERN_PIXFMT_YUV420P
-		&& frameInfo.pixel_format != PLAYASA_FFMPEG_MODERN_PIXFMT_YUVJ420P) {
+	if (!IsModernMpeg2SupportedPlanarYuv(frameInfo.pixel_format)) {
+		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg unsupported pixel format: %d"), frameInfo.pixel_format);
 		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 	if (!frameInfo.data[0] || !frameInfo.data[1] || !frameInfo.data[2] || frameInfo.width <= 0 || frameInfo.height <= 0) {
+		return E_INVALIDARG;
+	}
+	if (frameInfo.linesize[0] <= 0 || frameInfo.linesize[1] <= 0 || frameInfo.linesize[2] <= 0) {
 		return E_INVALIDARG;
 	}
 
@@ -639,26 +708,22 @@ HRESULT CMpeg2DecFilter::DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& 
 		m_fb.alloc(width, height, pitch);
 	}
 
-	for (int y = 0; y < height; ++y) {
-		memcpy(m_fb.buf[0] + y * pitch, frameInfo.data[0] + y * frameInfo.linesize[0], width);
-	}
-	for (int y = 0; y < height / 2; ++y) {
-		memcpy(m_fb.buf[1] + y * (pitch / 2), frameInfo.data[1] + y * frameInfo.linesize[1], width / 2);
-		memcpy(m_fb.buf[2] + y * (pitch / 2), frameInfo.data[2] + y * frameInfo.linesize[2], width / 2);
+	CopyModernMpeg2Plane(m_fb.buf[0], pitch, frameInfo.data[0], frameInfo.linesize[0], width, height);
+	const int chromaWidth = width / 2;
+	const int chromaHeight = height / 2;
+	if (frameInfo.pixel_format == PLAYASA_FFMPEG_MODERN_PIXFMT_YUV420P
+		|| frameInfo.pixel_format == PLAYASA_FFMPEG_MODERN_PIXFMT_YUVJ420P) {
+		CopyModernMpeg2Chroma420(m_fb.buf[1], pitch / 2, frameInfo.data[1], frameInfo.linesize[1], chromaWidth, chromaHeight);
+		CopyModernMpeg2Chroma420(m_fb.buf[2], pitch / 2, frameInfo.data[2], frameInfo.linesize[2], chromaWidth, chromaHeight);
+	} else if (frameInfo.pixel_format == PLAYASA_FFMPEG_MODERN_PIXFMT_YUV422P
+		|| frameInfo.pixel_format == PLAYASA_FFMPEG_MODERN_PIXFMT_YUVJ422P) {
+		CopyModernMpeg2Chroma422To420(m_fb.buf[1], pitch / 2, frameInfo.data[1], frameInfo.linesize[1], chromaWidth, chromaHeight);
+		CopyModernMpeg2Chroma422To420(m_fb.buf[2], pitch / 2, frameInfo.data[2], frameInfo.linesize[2], chromaWidth, chromaHeight);
+	} else {
+		CopyModernMpeg2Chroma444To420(m_fb.buf[1], pitch / 2, frameInfo.data[1], frameInfo.linesize[1], chromaWidth, chromaHeight);
+		CopyModernMpeg2Chroma444To420(m_fb.buf[2], pitch / 2, frameInfo.data[2], frameInfo.linesize[2], chromaWidth, chromaHeight);
 	}
 	m_fb.flags = PIC_FLAG_PROGRESSIVE_FRAME;
-
-	CComPtr<IMediaSample> pOut;
-	BYTE* pDataOut = NULL;
-	HRESULT hr = GetDeliveryBuffer(width, height, &pOut);
-	if (FAILED(hr) || FAILED(hr = pOut->GetPointer(&pDataOut))) {
-		return hr;
-	}
-
-	hr = CopyBuffer(pDataOut, m_fb.buf, width, height, pitch, MEDIASUBTYPE_I420, false);
-	if (FAILED(hr)) {
-		return hr;
-	}
 
 	REFERENCE_TIME rtStart = frameInfo.pts == PLAYASA_FFMPEG_MODERN_NO_PTS ? m_fb.rtStop : frameInfo.pts;
 	REFERENCE_TIME duration = frameInfo.duration == PLAYASA_FFMPEG_MODERN_NO_PTS ? inputDuration : frameInfo.duration;
@@ -668,21 +733,22 @@ HRESULT CMpeg2DecFilter::DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& 
 	if (duration == PLAYASA_FFMPEG_MODERN_NO_PTS || duration <= 10000) {
 		duration = m_AvgTimePerFrame > 0 ? m_AvgTimePerFrame : 400000;
 	}
+	if (m_fModernMpeg2EverDeliveredFrame && rtStart < m_fb.rtStop) {
+		rtStart = m_fb.rtStop;
+	}
 	REFERENCE_TIME rtStop = rtStart + duration;
 	m_fb.rtStart = rtStart;
 	m_fb.rtStop = rtStop;
-
-	pOut->SetTime(&rtStart, &rtStop);
-	pOut->SetMediaTime(NULL, NULL);
-	SetTypeSpecificFlags(pOut);
 
 	if (!m_fModernMpeg2LoggedFirstFrame) {
 		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg first frame ready: width=%d height=%d start=%I64d stop=%I64d duration=%I64d"),
 			width, height, rtStart, rtStop, rtStop - rtStart);
 		m_fModernMpeg2LoggedFirstFrame = true;
 	}
+	m_fModernMpeg2EverDeliveredFrame = true;
+	m_fWaitForKeyFrame = false;
 
-	return m_pOutput->Deliver(pOut);
+	return Deliver(false);
 }
 
 bool CMpeg2DecFilter::IsModernMpeg2Enabled() const
@@ -813,6 +879,10 @@ HRESULT CMpeg2DecFilter::DeliverFast()
 
 	pOut->SetTime(&rtStart, &rtStop);
 	pOut->SetMediaTime(NULL, NULL);
+	if (m_fModernMpeg2OutputDiscontinuity) {
+		pOut->SetDiscontinuity(TRUE);
+		m_fModernMpeg2OutputDiscontinuity = false;
+	}
 
 	//
 
@@ -1040,6 +1110,10 @@ HRESULT CMpeg2DecFilter::Deliver(bool fRepeatLast)
 
 	pOut->SetTime(&rtStart, &rtStop);
 	pOut->SetMediaTime(NULL, NULL);
+	if (m_fModernMpeg2OutputDiscontinuity) {
+		pOut->SetDiscontinuity(TRUE);
+		m_fModernMpeg2OutputDiscontinuity = false;
+	}
 
 	//
 
@@ -1141,6 +1215,9 @@ HRESULT CMpeg2DecFilter::StartStreaming()
 	m_fUseModernMpeg2 = false;
 	m_fModernMpeg2Failed = false;
 	m_fModernMpeg2LoggedFirstFrame = false;
+	m_fModernMpeg2EverDeliveredFrame = false;
+	m_fModernMpeg2OutputDiscontinuity = false;
+	m_modernMpeg2ConsecutiveFailures = 0;
 	if (IsModernMpeg2Enabled()) {
 		m_modernDec.Attach(new CMpeg2ModernDecodeAdapter());
 		if (!m_modernDec) {
