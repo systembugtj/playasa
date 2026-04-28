@@ -665,6 +665,11 @@ HRESULT CMpeg2DecFilter::TransformModern(IMediaSample* pIn, BYTE* pDataIn, long 
 
 	const int64_t pts = rtStart == _I64_MIN ? PLAYASA_FFMPEG_MODERN_NO_PTS : rtStart;
 	const int64_t duration = (rtStart != _I64_MIN && rtStop > rtStart) ? (rtStop - rtStart) : PLAYASA_FFMPEG_MODERN_NO_PTS;
+	static LONG s_modernMpeg2InputLogCount = 0;
+	if (InterlockedIncrement(&s_modernMpeg2InputLogCount) <= 64) {
+		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg input sample: len=%d start=%I64d stop=%I64d duration=%I64d disc=%d sync=%d"),
+			len, rtStart, rtStop, duration, pIn->IsDiscontinuity() == S_OK ? 1 : 0, pIn->IsSyncPoint() == S_OK ? 1 : 0);
+	}
 	PlayasaFfmpegModernFrameInfo frameInfo = {};
 	int status = m_modernDec->Decode(pDataIn, static_cast<size_t>(len), pts, duration, &frameInfo);
 	while (status == PLAYASA_FFMPEG_MODERN_STATUS_FRAME_READY) {
@@ -747,8 +752,16 @@ HRESULT CMpeg2DecFilter::DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& 
 	}
 	m_fModernMpeg2EverDeliveredFrame = true;
 	m_fWaitForKeyFrame = false;
+	ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg deliver frame: width=%d height=%d start=%I64d stop=%I64d disc=%d"),
+		width, height, rtStart, rtStop, m_fModernMpeg2OutputDiscontinuity ? 1 : 0);
 
-	return Deliver(false);
+	HRESULT hr = Deliver(false);
+	if (FAILED(hr)) {
+		const CMediaType& mt = m_pOutput->CurrentMediaType();
+		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg deliver failed: hr=0x%08x subtype=%s fb=%dx%d pitch=%d rate=%d rateStart=%I64d"),
+			hr, CStringFromGUID(mt.subtype), m_fb.w, m_fb.h, m_fb.pitch, m_rate.Rate, m_rate.StartTime);
+	}
+	return hr;
 }
 
 bool CMpeg2DecFilter::IsModernMpeg2Enabled() const
