@@ -24,7 +24,7 @@ if ([string]::IsNullOrWhiteSpace($SamplePath)) {
 }
 
 $firstFrameNeedle = 'MPEG-2 modern FFmpeg first frame ready'
-$decodeFailureNeedle = 'MPEG-2 modern FFmpeg failed without legacy fallback'
+$decodeFailureNeedle = 'MPEG-2 modern FFmpeg failed'
 $seekBeginNeedle = 'SeekTo begin'
 $seekEndNeedle = 'SeekTo end'
 $modernResetNeedle = 'MPEG-2 modern FFmpeg reset on segment'

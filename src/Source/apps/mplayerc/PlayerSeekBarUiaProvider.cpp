@@ -74,6 +74,7 @@ CPlayerSeekBarUiaProvider::CPlayerSeekBarUiaProvider(CPlayerSeekBar* seekBar)
 	, seekBar_(seekBar)
 	, parent_(NULL)
 	, root_(NULL)
+	, previousSibling_(NULL)
 {
 }
 
@@ -86,9 +87,9 @@ void CPlayerSeekBarUiaProvider::SetFragmentParent(IRawElementProviderFragment* p
 	parent_ = parent;
 }
 
-void CPlayerSeekBarUiaProvider::SetFragmentRoot(IRawElementProviderFragmentRoot* root)
+void CPlayerSeekBarUiaProvider::SetPreviousSibling(IRawElementProviderFragment* previousSibling)
 {
-	root_ = root;
+	previousSibling_ = previousSibling;
 }
 
 ULONG STDMETHODCALLTYPE CPlayerSeekBarUiaProvider::AddRef()
@@ -208,6 +209,9 @@ HRESULT STDMETHODCALLTYPE CPlayerSeekBarUiaProvider::Navigate(NavigateDirection 
 	if (direction == NavigateDirection_Parent && parent_) {
 		*provider = parent_;
 		parent_->AddRef();
+	} else if (direction == NavigateDirection_PreviousSibling && previousSibling_) {
+		*provider = previousSibling_;
+		previousSibling_->AddRef();
 	}
 	return S_OK;
 }

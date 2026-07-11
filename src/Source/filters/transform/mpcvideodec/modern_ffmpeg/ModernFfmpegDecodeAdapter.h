@@ -17,7 +17,12 @@ enum DecodeCodec {
     kDecodeCodecH264,
     kDecodeCodecMpeg2,
     kDecodeCodecWmv3,
-    kDecodeCodecVc1
+    kDecodeCodecVc1,
+    kDecodeCodecRv10,
+    kDecodeCodecRv20,
+    kDecodeCodecRv30,
+    kDecodeCodecRv40,
+    kDecodeCodecMpeg1
 };
 
 enum DecodeStatus {

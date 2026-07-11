@@ -14,6 +14,7 @@ public:
 	explicit CPlayerSeekBarUiaProvider(CPlayerSeekBar* seekBar);
 	void SetFragmentParent(IRawElementProviderFragment* parent);
 	void SetFragmentRoot(IRawElementProviderFragmentRoot* root);
+	void SetPreviousSibling(IRawElementProviderFragment* previousSibling);
 
 	ULONG STDMETHODCALLTYPE AddRef();
 	ULONG STDMETHODCALLTYPE Release();
@@ -52,4 +53,6 @@ private:
 	CPlayerSeekBar* seekBar_;
 	IRawElementProviderFragment* parent_;
 	IRawElementProviderFragmentRoot* root_;
+	IRawElementProviderFragment* previousSibling_;
 };
+

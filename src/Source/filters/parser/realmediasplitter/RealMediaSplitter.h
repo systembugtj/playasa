@@ -25,9 +25,10 @@
 #include <atlcoll.h>
 #include "..\BaseSplitter\BaseSplitter.h"
 #include "..\..\transform\BaseVideoFilter\BaseVideoFilter.h"
+#include "..\..\..\..\Thirdparty\pkg\ffmpeg_modern_bridge.h"
 
 
-//#define RV_FFMPEG
+// RFC-0032: RealVideo software decode is modern-bridge-only (no RV_FFMPEG / libmpeg2-style legacy).
 #define RA_FFMPEG
 
 #pragma pack(push, 1)
@@ -180,6 +181,7 @@ public:
 	CRealMediaSplitterOutputPin(CAtlArray<CMediaType>& mts, LPCWSTR pName, CBaseFilter* pFilter, CCritSec* pLock, HRESULT* phr);
 	virtual ~CRealMediaSplitterOutputPin();
 
+	HRESULT DeliverBeginFlush();
 	HRESULT DeliverEndFlush();
 };
 
@@ -229,56 +231,47 @@ public:
 };
 
 ////////////
-#include "..\..\transform\mpcvideodec\TlibavcodecExt.h"
-
-struct AVCodec;
-struct AVCodecContext;
-struct AVFrame;
+#include "..\..\transform\mpcvideodec\modern_ffmpeg\RealVideoExtradata.h"
+#include "..\..\transform\mpcvideodec\modern_ffmpeg\RealVideoPresentationTiming.h"
 
 class __declspec(uuid("238D0F23-5DC9-45A6-9BE2-666160C324DD")) CRealVideoDecoder : public CBaseVideoFilter
-	, public TlibavcodecExt
 {
-	typedef HRESULT (WINAPI *PRVCustomMessage)(void*, DWORD);
-	typedef HRESULT (WINAPI *PRVFree)(DWORD);
-	typedef HRESULT (WINAPI *PRVHiveMessage)(void*, DWORD);
-	typedef HRESULT (WINAPI *PRVInit)(void*, DWORD* dwCookie);
-	typedef HRESULT (WINAPI *PRVTransform)(BYTE*, BYTE*, void*, void*, DWORD);
+	typedef int (*PModernCodecFromFourcc)(uint32_t, uint32_t*);
+	typedef int (*PModernCreate)(uint32_t, PlayasaFfmpegModernSession*);
+	typedef int (*PModernOpen)(PlayasaFfmpegModernSession, const uint8_t*, size_t);
+	typedef int (*PModernDecodeWithTiming)(PlayasaFfmpegModernSession, const uint8_t*, size_t, int64_t, int64_t, PlayasaFfmpegModernFrameInfo*);
+	typedef int (*PModernReceivePending)(PlayasaFfmpegModernSession, PlayasaFfmpegModernFrameInfo*);
+	typedef void (*PModernFlush)(PlayasaFfmpegModernSession);
+	typedef const char* (*PModernLastError)(PlayasaFfmpegModernSession);
+	typedef void (*PModernDestroy)(PlayasaFfmpegModernSession);
 
-	PRVCustomMessage RVCustomMessage;
-	PRVFree RVFree;
-	PRVHiveMessage RVHiveMessage;
-	PRVInit RVInit;
-	PRVTransform RVTransform;
+	HMODULE m_hModernBridge;
+	PlayasaFfmpegModernSession m_modernSession;
+	PModernCodecFromFourcc m_modernCodecFromFourcc;
+	PModernCreate m_modernCreate;
+	PModernOpen m_modernOpen;
+	PModernDecodeWithTiming m_modernDecodeWithTiming;
+	PModernReceivePending m_modernReceivePending;
+	PModernFlush m_modernFlush;
+	PModernLastError m_modernLastError;
+	PModernDestroy m_modernDestroy;
+	char m_modernLastErrorText[256];
 
-	HMODULE m_hDrvDll;
-	DWORD m_dwCookie;
-
-	int m_lastBuffSizeDim;
 	HRESULT InitRV(const CMediaType* pmt);
 	void FreeRV();
-
-    static void		LogLibAVCodec(void* par,int level,const char *fmt,va_list valist);
-    virtual void	OnGetBuffer(AVFrame *pic);
-    void				SetTypeSpecificFlags(IMediaSample* pMS);
+	HRESULT OpenModernRV(const CMediaType* pmt);
+	bool LoadModernBridge();
+	FARPROC LoadModernProc(const char* name);
+	void SetModernError(const char* message);
+	const char* GetModernError() const;
+	HRESULT DeliverModernFrame(IMediaSample* pIn, PlayasaFfmpegModernFrameInfo& frameInfo, REFERENCE_TIME inputDuration, REFERENCE_TIME& rtStart, DWORD realvideo_in_timestamp);
 
 	REFERENCE_TIME m_tStart;
-
-	void Resize(BYTE* pIn, DWORD wi, DWORD hi, BYTE* pOut, DWORD wo, DWORD ho);
-	void ResizeWidth(BYTE* pIn, DWORD wi, DWORD hi, BYTE* pOut, DWORD wo, DWORD ho);
-	void ResizeHeight(BYTE* pIn, DWORD wi, DWORD hi, BYTE* pOut, DWORD wo, DWORD ho);
-	void ResizeRow(BYTE* pIn, DWORD wi, DWORD dpi, BYTE* pOut, DWORD wo, DWORD dpo);
-
-	CAutoVectorPtr<BYTE> m_pI420, m_pI420Tmp;
-	
-	HRESULT Real_RVTransform(BYTE* pDataIn, BYTE* pI420, void* transform_in, void* transform_out, DWORD dwCookie);
-protected:
-	// === FFMpeg variables
-	AVCodec*								m_pAVCodec;
-	AVCodecContext*							m_pAVCtx;
-	AVFrame*								m_pFrame;
-	enum CodecID							m_nCodecID;
-	BYTE*									m_pFFBuffer;
-	int										m_nFFBufferSize;
+	REFERENCE_TIME m_rtAvrTimePerFrame;
+	REFERENCE_TIME m_rtRVStart;
+	DWORD m_last_shown_timestamp;
+	int m_rv_leap_frames;
+	int m_rv_time_for_each_leap;
 
 public:
 	CRealVideoDecoder(LPUNKNOWN lpunk, HRESULT* phr);
@@ -291,6 +284,7 @@ public:
 	HRESULT StartStreaming();
 	HRESULT StopStreaming();
 
+	HRESULT BeginFlush();
 	HRESULT NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
 	DWORD m_timestamp;
@@ -298,6 +292,9 @@ public:
 	HRESULT AlterQuality(Quality q);
 };
 
+
+struct AVCodec;
+struct AVCodecContext;
 
 class __declspec(uuid("941A4793-A705-4312-8DFC-C11CA05F397E")) CRealAudioDecoder : public CTransformFilter
 {

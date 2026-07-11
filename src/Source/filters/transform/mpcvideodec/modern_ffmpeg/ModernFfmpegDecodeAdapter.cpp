@@ -68,6 +68,18 @@ const uint32_t kFourccWMV3 = 'W' | ('M' << 8) | ('V' << 16) | ('3' << 24);
 const uint32_t kFourccwmv3 = 'w' | ('m' << 8) | ('v' << 16) | ('3' << 24);
 const uint32_t kFourccWVC1 = 'W' | ('V' << 8) | ('C' << 16) | ('1' << 24);
 const uint32_t kFourccwvc1 = 'w' | ('v' << 8) | ('c' << 16) | ('1' << 24);
+const uint32_t kFourccRV10 = 'R' | ('V' << 8) | ('1' << 16) | ('0' << 24);
+const uint32_t kFourccrv10 = 'r' | ('v' << 8) | ('1' << 16) | ('0' << 24);
+const uint32_t kFourccRV20 = 'R' | ('V' << 8) | ('2' << 16) | ('0' << 24);
+const uint32_t kFourccrv20 = 'r' | ('v' << 8) | ('2' << 16) | ('0' << 24);
+const uint32_t kFourccRV30 = 'R' | ('V' << 8) | ('3' << 16) | ('0' << 24);
+const uint32_t kFourccrv30 = 'r' | ('v' << 8) | ('3' << 16) | ('0' << 24);
+const uint32_t kFourccRV40 = 'R' | ('V' << 8) | ('4' << 16) | ('0' << 24);
+const uint32_t kFourccrv40 = 'r' | ('v' << 8) | ('4' << 16) | ('0' << 24);
+const uint32_t kFourccMPG1 = 'M' | ('P' << 8) | ('G' << 16) | ('1' << 24);
+const uint32_t kFourccmpg1 = 'm' | ('p' << 8) | ('g' << 16) | ('1' << 24);
+const uint32_t kFourccMPEG = 'M' | ('P' << 8) | ('G' << 16) | ('E' << 24);
+const uint32_t kFourccmpeg = 'm' | ('p' << 8) | ('g' << 16) | ('e' << 24);
 
 enum AVCodecID ToAvCodecId(DecodeCodec codec)
 {
@@ -94,6 +106,16 @@ enum AVCodecID ToAvCodecId(DecodeCodec codec)
         return AV_CODEC_ID_WMV3;
     case kDecodeCodecVc1:
         return AV_CODEC_ID_VC1;
+    case kDecodeCodecRv10:
+        return AV_CODEC_ID_RV10;
+    case kDecodeCodecRv20:
+        return AV_CODEC_ID_RV20;
+    case kDecodeCodecRv30:
+        return AV_CODEC_ID_RV30;
+    case kDecodeCodecRv40:
+        return AV_CODEC_ID_RV40;
+    case kDecodeCodecMpeg1:
+        return AV_CODEC_ID_MPEG1VIDEO;
     default:
         return AV_CODEC_ID_NONE;
     }
@@ -981,6 +1003,28 @@ bool DecodeCodecFromFourcc(uint32_t fourcc, DecodeCodec* codec)
     case kFourccwvc1:
         *codec = kDecodeCodecVc1;
         return true;
+    case kFourccRV10:
+    case kFourccrv10:
+        *codec = kDecodeCodecRv10;
+        return true;
+    case kFourccRV20:
+    case kFourccrv20:
+        *codec = kDecodeCodecRv20;
+        return true;
+    case kFourccRV30:
+    case kFourccrv30:
+        *codec = kDecodeCodecRv30;
+        return true;
+    case kFourccRV40:
+    case kFourccrv40:
+        *codec = kDecodeCodecRv40;
+        return true;
+    case kFourccMPG1:
+    case kFourccmpg1:
+    case kFourccMPEG:
+    case kFourccmpeg:
+        *codec = kDecodeCodecMpeg1;
+        return true;
     default:
         return false;
     }
@@ -1026,6 +1070,21 @@ bool DecodeCodecFromModernAvCodecId(int codecId, DecodeCodec* codec)
     case AV_CODEC_ID_VC1:
         *codec = kDecodeCodecVc1;
         return true;
+    case AV_CODEC_ID_RV10:
+        *codec = kDecodeCodecRv10;
+        return true;
+    case AV_CODEC_ID_RV20:
+        *codec = kDecodeCodecRv20;
+        return true;
+    case AV_CODEC_ID_RV30:
+        *codec = kDecodeCodecRv30;
+        return true;
+    case AV_CODEC_ID_RV40:
+        *codec = kDecodeCodecRv40;
+        return true;
+    case AV_CODEC_ID_MPEG1VIDEO:
+        *codec = kDecodeCodecMpeg1;
+        return true;
     default:
         return false;
     }
@@ -1045,6 +1104,11 @@ bool IsFirstWaveSoftwareCodec(DecodeCodec codec)
     case kDecodeCodecMpeg2:
     case kDecodeCodecWmv3:
     case kDecodeCodecVc1:
+    case kDecodeCodecRv10:
+    case kDecodeCodecRv20:
+    case kDecodeCodecRv30:
+    case kDecodeCodecRv40:
+    case kDecodeCodecMpeg1:
         return true;
     default:
         return false;

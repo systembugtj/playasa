@@ -32,17 +32,17 @@ CMpeg2ModernDecodeAdapter::~CMpeg2ModernDecodeAdapter()
 	}
 }
 
-bool CMpeg2ModernDecodeAdapter::Open()
+bool CMpeg2ModernDecodeAdapter::Open(uint32_t codec, const unsigned char* extraData, size_t extraDataSize)
 {
 	Close();
 	if (!LoadBridge()) {
 		return false;
 	}
-	if (!m_create(PLAYASA_FFMPEG_MODERN_CODEC_MPEG2, &m_session) || !m_session) {
-		SetError("Failed to create MPEG-2 FFmpeg modern bridge session");
+	if (!m_create(codec, &m_session) || !m_session) {
+		SetError("Failed to create MPEG FFmpeg modern bridge session");
 		return false;
 	}
-	if (!m_open(m_session, NULL, 0)) {
+	if (!m_open(m_session, extraData, extraDataSize)) {
 		SetError(m_lastError(m_session));
 		Close();
 		return false;

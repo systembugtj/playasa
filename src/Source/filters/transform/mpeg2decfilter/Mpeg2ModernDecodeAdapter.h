@@ -10,7 +10,7 @@ public:
 	CMpeg2ModernDecodeAdapter();
 	~CMpeg2ModernDecodeAdapter();
 
-	bool Open();
+	bool Open(uint32_t codec, const unsigned char* extraData = NULL, size_t extraDataSize = 0);
 	int Decode(const unsigned char* data, size_t dataSize, int64_t pts, int64_t duration, PlayasaFfmpegModernFrameInfo* frameInfo);
 	int ReceivePending(PlayasaFfmpegModernFrameInfo* frameInfo);
 	void Flush();

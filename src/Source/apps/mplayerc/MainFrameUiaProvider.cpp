@@ -3,6 +3,7 @@
 
 #include "MainFrm.h"
 #include "PlayerSeekBarUiaProvider.h"
+#include "PlayerVideoViewUiaProvider.h"
 
 namespace {
 
@@ -50,13 +51,21 @@ HRESULT ReturnFragment(IRawElementProviderFragment* fragment, IRawElementProvide
 CMainFrameUiaProvider::CMainFrameUiaProvider(CMainFrame* frame)
 	: refCount_(1)
 	, frame_(frame)
+	, videoViewProvider_(NULL)
 	, seekBarProvider_(NULL)
 {
-	if (frame_) {
-		seekBarProvider_ = new CPlayerSeekBarUiaProvider(frame_->GetSeekBar());
-		seekBarProvider_->SetFragmentParent(static_cast<IRawElementProviderFragment*>(this));
-		seekBarProvider_->SetFragmentRoot(static_cast<IRawElementProviderFragmentRoot*>(this));
+	if (!frame_) {
+		return;
 	}
+
+	videoViewProvider_ = new CPlayerVideoViewUiaProvider(frame_->GetVideoView());
+	seekBarProvider_ = new CPlayerSeekBarUiaProvider(frame_->GetSeekBar());
+	videoViewProvider_->SetFragmentParent(static_cast<IRawElementProviderFragment*>(this));
+	videoViewProvider_->SetFragmentRoot(static_cast<IRawElementProviderFragmentRoot*>(this));
+	seekBarProvider_->SetFragmentParent(static_cast<IRawElementProviderFragment*>(this));
+	seekBarProvider_->SetFragmentRoot(static_cast<IRawElementProviderFragmentRoot*>(this));
+	videoViewProvider_->SetNextSibling(static_cast<IRawElementProviderFragment*>(seekBarProvider_));
+	seekBarProvider_->SetPreviousSibling(static_cast<IRawElementProviderFragment*>(videoViewProvider_));
 }
 
 CMainFrameUiaProvider::~CMainFrameUiaProvider()
@@ -64,6 +73,10 @@ CMainFrameUiaProvider::~CMainFrameUiaProvider()
 	if (seekBarProvider_) {
 		seekBarProvider_->Release();
 		seekBarProvider_ = NULL;
+	}
+	if (videoViewProvider_) {
+		videoViewProvider_->Release();
+		videoViewProvider_ = NULL;
 	}
 }
 

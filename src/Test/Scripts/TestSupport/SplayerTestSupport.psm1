@@ -44,7 +44,22 @@ function Start-SplayerForSample {
 function Get-SplayerLogText {
   $logPath = Get-SplayerLogPath
   if (Test-Path -LiteralPath $logPath) {
-    return Get-Content -LiteralPath $logPath -Raw
+    $stream = $null
+    try {
+      $stream = [System.IO.File]::Open($logPath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::ReadWrite)
+    } catch {
+      return ''
+    }
+    try {
+      $reader = New-Object System.IO.StreamReader($stream, [System.Text.Encoding]::UTF8, $true)
+      try {
+        return $reader.ReadToEnd()
+      } finally {
+        $reader.Dispose()
+      }
+    } finally {
+      $stream.Dispose()
+    }
   }
   return ''
 }

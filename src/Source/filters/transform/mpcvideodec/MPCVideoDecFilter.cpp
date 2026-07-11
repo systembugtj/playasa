@@ -1,4 +1,4 @@
-﻿/* 
+/* 
  * $Id: MPCVideoDecFilter.cpp 1147 2009-02-15 15:57:23Z casimir666 $
  *
  * (C) 2006-2007 see AUTHORS
@@ -662,6 +662,14 @@ bool IsModernFfmpegBridgeFourcc(int fourcc)
 	case MAKEFOURCC('w','m','v','3'):
 	case MAKEFOURCC('W','V','C','1'):
 	case MAKEFOURCC('w','v','c','1'):
+	case MAKEFOURCC('R','V','1','0'):
+	case MAKEFOURCC('r','v','1','0'):
+	case MAKEFOURCC('R','V','2','0'):
+	case MAKEFOURCC('r','v','2','0'):
+	case MAKEFOURCC('R','V','3','0'):
+	case MAKEFOURCC('r','v','3','0'):
+	case MAKEFOURCC('R','V','4','0'):
+	case MAKEFOURCC('r','v','4','0'):
 		return true;
 	default:
 		return false;
@@ -682,6 +690,10 @@ bool IsModernFfmpegBridgeCodec(enum CodecID codec, int fourcc)
 	case CODEC_ID_H264:
 	case CODEC_ID_MPEG2VIDEO:
 	case CODEC_ID_VC1:
+	case CODEC_ID_RV10:
+	case CODEC_ID_RV20:
+	case CODEC_ID_RV30:
+	case CODEC_ID_RV40:
 		return IsModernFfmpegBridgeFourcc(fourcc);
 	default:
 		return false;
@@ -1318,19 +1330,12 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 
 				{ 
                     if(IS_REALVIDEO(m_pAVCodec->id)){
-                        int extra_data_len = pmt->FormatLength() - sizeof(VIDEOINFOHEADER) ;
-                       if( extra_data_len > 0 )
-                        {
-                            if(extra_data_len > 26)
-                                extra_data_len -= 26;
-
-                            SVP_LogMsg5(L" CODEC_ID_RV30 extra_data_len %d ", extra_data_len);
-                            m_pAVCtx->extradata = (uint8_t *)calloc( 1, extra_data_len);
-                            if(m_pAVCtx->extradata){
-                                m_pAVCtx->extradata_size = extra_data_len;
-                                const uint8_t *p_pal = pmt->Format() + sizeof(VIDEOINFOHEADER) + 26;
-                                memcpy((void*)(m_pAVCtx->extradata),p_pal, extra_data_len);
-                            }
+                        uint8_t* extradata = NULL;
+                        int extradata_size = 0;
+                        if (PlayasaBuildRealVideoExtradataFromVideoInfo(pmt->Format(), pmt->FormatLength(), &extradata, &extradata_size)) {
+                            m_pAVCtx->extradata = extradata;
+                            m_pAVCtx->extradata_size = extradata_size;
+                            SVP_LogMsg5(L" CODEC_ID_RV30 extra_data_len %d ", extradata_size);
                         }
                     }else if( m_pAVCtx->bits_per_coded_sample > 0 && (m_pAVCodec->id == CODEC_ID_HUFFYUV ) )//|| m_pAVCodec->id == CODEC_ID_MJPEG
 					{
@@ -1466,7 +1471,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 					m_modernFfmpegDecodeLogCount = 0;
 					m_modernFfmpegLoggedFirstFrame = false;
 					ModernFfmpegSelfcheckLog(_T("Modern FFmpeg bridge open OK: codec=%d fourcc=0x%08x"), ffCodecs[m_nCodecNb].nFFCodec, ffCodecs[m_nCodecNb].fourcc);
-					if (ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_H264 || ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_MPEG2VIDEO || ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_VC1) {
+					if (ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_H264 || ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_MPEG2VIDEO || ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_VC1 || IS_REALVIDEO(ffCodecs[m_nCodecNb].nFFCodec)) {
 						m_bUseDXVA = false;
 						m_bDXVACompatible = false;
 					}
@@ -1872,13 +1877,27 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 	if (m_pAVCtx && !m_bUseModernFfmpegBridge)
 		avcodec_flush_buffers (m_pAVCtx);
 	if (m_bUseModernFfmpegBridge) {
-		ModernFfmpegSelfcheckLog(_T("Modern FFmpeg bridge flush on segment: start=%I64d stop=%I64d"), rtStart, rtStop);
-		m_modernFfmpegBridge.Flush();
+		if (m_pAVCtx && IS_REALVIDEO(m_pAVCtx->codec_id)) {
+			ModernFfmpegSelfcheckLog(_T("Modern FFmpeg bridge keep RealVideo decoder on segment: start=%I64d stop=%I64d"), rtStart, rtStop);
+		} else {
+			ModernFfmpegSelfcheckLog(_T("Modern FFmpeg bridge flush on segment: start=%I64d stop=%I64d"), rtStart, rtStop);
+			m_modernFfmpegBridge.Flush();
+		}
 	}
 
 	if (m_pDXVADecoder)
 		m_pDXVADecoder->Flush();
 	return __super::NewSegment (rtStart, rtStop, dRate);
+}
+
+HRESULT CMPCVideoDecFilter::BeginFlush()
+{
+	if (m_bUseModernFfmpegBridge) {
+		ModernFfmpegSelfcheckLog(_T("Modern FFmpeg bridge flush on BeginFlush"));
+		m_modernFfmpegBridge.Flush();
+	}
+
+	return __super::BeginFlush();
 }
 
 
@@ -2030,7 +2049,7 @@ void GetRealFlags(unsigned char* p,
 
 }
 
-HRESULT CMPCVideoDecFilter::DeliverModernFfmpegFrame(IMediaSample* pIn, PlayasaFfmpegModernFrameInfo& frameInfo, REFERENCE_TIME inputDuration, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop)
+HRESULT CMPCVideoDecFilter::DeliverModernFfmpegFrame(IMediaSample* pIn, PlayasaFfmpegModernFrameInfo& frameInfo, REFERENCE_TIME inputDuration, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, DWORD realvideo_in_timestamp)
 {
 	if (!m_modernFfmpegLoggedFirstFrame) {
 		ModernFfmpegSelfcheckLog(_T("Modern FFmpeg bridge first frame ready: %dx%d pixfmt=%d pts=%I64d duration=%I64d"), frameInfo.width, frameInfo.height, frameInfo.pixel_format, frameInfo.pts, frameInfo.duration);
@@ -2054,11 +2073,16 @@ HRESULT CMPCVideoDecFilter::DeliverModernFfmpegFrame(IMediaSample* pIn, PlayasaF
 		return hr;
 	}
 
-	if (frameInfo.pts != PLAYASA_FFMPEG_MODERN_NO_PTS) {
-		rtStart = frameInfo.pts;
+	if (realvideo_in_timestamp != kPlayasaRealVideoNoInputTimestamp) {
+		rtStart = PlayasaApplyRealVideoOutputRtStart(m_rtRVStart, realvideo_in_timestamp, m_tStart, m_rtAvrTimePerFrame);
+		rtStop = rtStart + 1;
+	} else {
+		if (frameInfo.pts != PLAYASA_FFMPEG_MODERN_NO_PTS) {
+			rtStart = frameInfo.pts;
+		}
+		const REFERENCE_TIME frameDuration = NormalizeModernFfmpegFrameDuration(frameInfo.duration, inputDuration, m_rtAvrTimePerFrame);
+		rtStop = rtStart + frameDuration;
 	}
-	const REFERENCE_TIME frameDuration = NormalizeModernFfmpegFrameDuration(frameInfo.duration, inputDuration, m_rtAvrTimePerFrame);
-	rtStop = rtStart + frameDuration;
 	pOut->SetTime(&rtStart, &rtStop);
 	pOut->SetMediaTime(NULL, NULL);
 
@@ -2079,6 +2103,29 @@ HRESULT CMPCVideoDecFilter::ModernFfmpegBridgeDecode(IMediaSample* pIn, BYTE* pD
 		return VFW_E_INVALIDMEDIATYPE;
 	}
 
+	const bool is_realvideo = m_pAVCtx && IS_REALVIDEO(m_pAVCtx->codec_id);
+	DWORD rv_in_timestamp = kPlayasaRealVideoNoInputTimestamp;
+	if (is_realvideo) {
+		bool real_interlaced = false;
+		m_real_interlaced = -1;
+		m_real_top_field_first = false;
+		m_real_repeat_field = false;
+		GetRealFlags(pDataIn, &real_interlaced, &m_real_top_field_first, &m_real_repeat_field);
+		m_real_interlaced = real_interlaced ? 1 : 0;
+
+		if (PlayasaApplyRealVideoInputTiming(
+			m_timestamp,
+			m_last_shown_timestamp,
+			m_fDropFrames,
+			m_rv_leap_frames,
+			m_rv_time_for_each_leap,
+			rtStart,
+			m_rtAvrTimePerFrame,
+			rv_in_timestamp)) {
+			return S_OK;
+		}
+	}
+
 	PlayasaFfmpegModernFrameInfo frameInfo = {};
 	const REFERENCE_TIME inputDuration = (rtStart != _I64_MIN && rtStop > rtStart) ? (rtStop - rtStart) : PLAYASA_FFMPEG_MODERN_NO_PTS;
 	int status = m_modernFfmpegBridge.Decode(pDataIn, nSize, rtStart, inputDuration, &frameInfo);
@@ -2090,7 +2137,7 @@ HRESULT CMPCVideoDecFilter::ModernFfmpegBridgeDecode(IMediaSample* pIn, BYTE* pD
 		return S_OK;
 	}
 
-	HRESULT hr = DeliverModernFfmpegFrame(pIn, frameInfo, inputDuration, rtStart, rtStop);
+	HRESULT hr = DeliverModernFfmpegFrame(pIn, frameInfo, inputDuration, rtStart, rtStop, rv_in_timestamp);
 	if (FAILED(hr)) {
 		return hr;
 	}
@@ -2106,7 +2153,7 @@ HRESULT CMPCVideoDecFilter::ModernFfmpegBridgeDecode(IMediaSample* pIn, BYTE* pD
 			break;
 		}
 
-		hr = DeliverModernFfmpegFrame(pIn, pendingFrameInfo, PLAYASA_FFMPEG_MODERN_NO_PTS, rtStart, rtStop);
+		hr = DeliverModernFfmpegFrame(pIn, pendingFrameInfo, PLAYASA_FFMPEG_MODERN_NO_PTS, rtStart, rtStop, rv_in_timestamp);
 		if (FAILED(hr)) {
 			return hr;
 		}
@@ -2126,7 +2173,7 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
 		return ModernFfmpegBridgeDecode(pIn, pDataIn, nSize, rtStart, rtStop);
 	}
 
-    DWORD in_timestamp;
+    DWORD in_timestamp = 0;
     m_real_interlaced = -1; m_real_top_field_first = false; m_real_repeat_field = false;
     if( IS_REALVIDEO(m_pAVCtx->codec_id) ){
         bool real_interlaced = false;
@@ -2136,35 +2183,18 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
         else
             m_real_interlaced = 0;
 
-        if(m_rv_time_for_each_leap == 0){
-            m_rv_time_for_each_leap = m_rtAvrTimePerFrame/10000;
+        if (PlayasaApplyRealVideoInputTiming(
+            m_timestamp,
+            m_last_shown_timestamp,
+            m_fDropFrames,
+            m_rv_leap_frames,
+            m_rv_time_for_each_leap,
+            rtStart,
+            m_rtAvrTimePerFrame,
+            in_timestamp)) {
+            SVP_LogMsg5(L" CRealVideoDecoder::Transform4 Drop" );
+            return S_OK;
         }
-        in_timestamp = rtStart/10000;
-        if( m_timestamp+1 == in_timestamp)
-        {
-           if(m_fDropFrames){
-                SVP_LogMsg5(L" CRealVideoDecoder::Transform4 Drop" );
-                return S_OK;
-            }else{
-                m_rv_leap_frames++;
-                m_timestamp = in_timestamp;
-                in_timestamp = m_last_shown_timestamp + m_rv_time_for_each_leap;
-                
-            }
-        }else{
-            if(m_rv_leap_frames){
-                //SVP_LogMsg6("m_rv_time_for_each_leap %d %d %d", m_rv_time_for_each_leap , (in_timestamp - m_timestamp ), m_rv_leap_frames );
-                m_rv_time_for_each_leap = (in_timestamp - m_timestamp + m_rv_leap_frames)/(m_rv_leap_frames+1);
-            }
-           
-            m_timestamp = in_timestamp;
-            m_rv_leap_frames = 0;
-        }
-        //while(in_timestamp <= m_last_shown_timestamp){
-        //    in_timestamp += m_rv_time_for_each_leap/2;
-        //}
-        m_last_shown_timestamp = in_timestamp;
-        
     }
 	//TRACE5(L"SoftwareDecode");
 /*	if (m_pAVCtx->has_b_frames)
@@ -2234,24 +2264,8 @@ HRESULT CMPCVideoDecFilter::SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int
         SVP_LogMsg5(L"Dec6  (%10I64d) %d (%10I64d)  (%10I64d)  ", rtStart , in_timestamp, m_tStart , m_rtRVStart);
 
         if( IS_REALVIDEO(m_pAVCtx->codec_id) ){
-            
-            //m_rtAvrTimePerFrame = 2000000i64/3;
-            
-            rtStart = 10000i64* (in_timestamp ) - m_tStart;
-            m_rtRVStart += m_rtAvrTimePerFrame;
-            if(rtStart > m_rtRVStart){
-                rtStart = m_rtRVStart + ( rtStart - m_rtRVStart ) /8;
-            }else{
-                rtStart = m_rtRVStart -  ( m_rtRVStart - rtStart  ) /10;
-            }
-            m_rtRVStart = rtStart;
-            //if(_abs64( m_rtRVStart - rtStart) > m_rtAvrTimePerFrame * 5){
-            //    TRACE ("Deliver1 : %10I64d - %10I64d   (%10I64d)  \n", rtStart, rtStop, rtStop - rtStart);
-            //   m_rtRVStart =  rtStart;
-            //}else 
-             //    rtStart = m_rtRVStart;
-            //rtStart = 10000i64* in_timestamp - m_rtAvrTimePerFrame - m_tStart;
-            rtStop = rtStart+1;//m_rtAvrTimePerFrame;
+            rtStart = PlayasaApplyRealVideoOutputRtStart(m_rtRVStart, in_timestamp, m_tStart, m_rtAvrTimePerFrame);
+            rtStop = rtStart + 1;
             
 
 /*

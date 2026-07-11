@@ -24,7 +24,7 @@
 #include <atlbase.h>
 #include <ks.h>
 #include <ksmedia.h>
-#include "libmpeg2.h"
+#include "MpegPictureFlags.h"
 #include "Mpeg2DecFilter.h"
 #include "Mpeg2ModernDecodeAdapter.h"
 
@@ -47,8 +47,6 @@
 #define EPSILON 1e-4
 
 static const int kModernMpeg2MaxSoftFailures = 16;
-static const char kModernMpeg2LegacyEnvironmentVariable[] = "PLAYASA_MPEG2_LEGACY";
-
 static void ModernMpeg2SelfcheckLog(LPCTSTR format, ...)
 {
 	CString message;
@@ -57,15 +55,6 @@ static void ModernMpeg2SelfcheckLog(LPCTSTR format, ...)
 	message.FormatV(format, args);
 	va_end(args);
 	SVP_LogMsg(message);
-}
-
-static bool IsModernMpeg2EnvironmentEnabled()
-{
-	char value[16] = { 0 };
-	if (GetEnvironmentVariableA(kModernMpeg2LegacyEnvironmentVariable, value, sizeof(value)) > 0 && value[0] == '1') {
-		return false;
-	}
-	return true;
 }
 
 static bool IsModernMpeg2SupportedPlanarYuv(int pixelFormat)
@@ -114,6 +103,30 @@ static void CopyModernMpeg2Chroma444To420(BYTE* dst, int dstPitch, const BYTE* s
 			const int sx = x * 2;
 			row[x] = static_cast<BYTE>((static_cast<int>(top[sx]) + static_cast<int>(top[sx + 1]) + static_cast<int>(bottom[sx]) + static_cast<int>(bottom[sx + 1]) + 2) / 4);
 		}
+	}
+}
+
+static uint32_t ModernMpegCodecFromInputType(const CMediaType& mtIn)
+{
+	if (mtIn.subtype == MEDIASUBTYPE_MPEG2_VIDEO) {
+		return PLAYASA_FFMPEG_MODERN_CODEC_MPEG2;
+	}
+	return PLAYASA_FFMPEG_MODERN_CODEC_MPEG1;
+}
+
+static void GetMpegSequenceHeader(const CMediaType& mt, BYTE** sequenceHeader, DWORD* sequenceHeaderSize)
+{
+	*sequenceHeader = NULL;
+	*sequenceHeaderSize = 0;
+	if (!mt.Format()) {
+		return;
+	}
+	if (mt.formattype == FORMAT_MPEGVideo) {
+		*sequenceHeader = ((MPEG1VIDEOINFO*)mt.Format())->bSequenceHeader;
+		*sequenceHeaderSize = ((MPEG1VIDEOINFO*)mt.Format())->cbSequenceHeader;
+	} else if (mt.formattype == FORMAT_MPEG2_VIDEO) {
+		*sequenceHeader = (BYTE*)((MPEG2VIDEOINFO*)mt.Format())->dwSequenceHeader;
+		*sequenceHeaderSize = ((MPEG2VIDEOINFO*)mt.Format())->cbSequenceHeader;
 	}
 }
 
@@ -463,96 +476,9 @@ void CMpeg2DecFilter::InputTypeChanged()
 	}
 	m_fModernMpeg2LoggedFirstFrame = false;
 	m_modernMpeg2ConsecutiveFailures = 0;
-	
-	TRACE(_T("ResetMpeg2Decoder()\n"));
-
-	for(int i = 0; i < 4 /*countof(m_dec->m_pictures)*/; i++)
-	{
-		m_dec->m_pictures[i].rtStart = m_dec->m_pictures[i].rtStop = _I64_MIN+1;
-		m_dec->m_pictures[i].fDelivered = false;
-		m_dec->m_pictures[i].flags &= ~PIC_MASK_CODING_TYPE;
-	}
-
-	const CMediaType& mt = m_pInput->CurrentMediaType();
-
-	BYTE* pSequenceHeader = NULL;
-	DWORD cbSequenceHeader = 0;
-
-	if(mt.formattype == FORMAT_MPEGVideo)
-	{
-		pSequenceHeader = ((MPEG1VIDEOINFO*)mt.Format())->bSequenceHeader;
-		cbSequenceHeader = ((MPEG1VIDEOINFO*)mt.Format())->cbSequenceHeader;
-	}
-	else if(mt.formattype == FORMAT_MPEG2_VIDEO)
-	{
-		pSequenceHeader = (BYTE*)((MPEG2VIDEOINFO*)mt.Format())->dwSequenceHeader;
-		cbSequenceHeader = ((MPEG2VIDEOINFO*)mt.Format())->cbSequenceHeader;
-	}
-
-	m_dec->mpeg2_close();
-	m_dec->mpeg2_init();
-
-	m_dec->mpeg2_buffer(pSequenceHeader, pSequenceHeader + cbSequenceHeader);
-
 	m_fWaitForKeyFrame = true;
-
 	m_fFilm = false;
 	m_fb.flags = 0;
-}
-
-void CMpeg2DecFilter::SetDeinterlaceMethod()
-{
-	ASSERT(m_dec->m_info.m_sequence);
-	ASSERT(m_dec->m_info.m_display_picture);
-
-	DWORD seqflags = m_dec->m_info.m_sequence->flags;
-	DWORD oldflags = m_fb.flags;
-	DWORD newflags = m_dec->m_info.m_display_picture->flags;
-
-	if(!(seqflags & SEQ_FLAG_PROGRESSIVE_SEQUENCE) 
-	&& !(oldflags & PIC_FLAG_REPEAT_FIRST_FIELD)
-	&& (newflags & PIC_FLAG_PROGRESSIVE_FRAME))
-	{
-		if(!m_fFilm && (newflags & PIC_FLAG_REPEAT_FIRST_FIELD))
-		{
-			TRACE(_T("m_fFilm = true\n"));
-			m_fFilm = true;
-		}
-		else if(m_fFilm && !(newflags & PIC_FLAG_REPEAT_FIRST_FIELD))
-		{
-			TRACE(_T("m_fFilm = false\n"));
-			m_fFilm = false;
-		}
-	}
-
-	const CMediaType& mt = m_pOutput->CurrentMediaType();
-
-	if(mt.formattype == FORMAT_VideoInfo2 && (((VIDEOINFOHEADER2*)mt.pbFormat)->dwInterlaceFlags & AMINTERLACE_IsInterlaced))
-	{
-		m_fb.di = DIWeave;
-	}
-	else
-	{
-		m_fb.di = GetDeinterlaceMethod();
-
-		if(m_fb.di == DIAuto || m_fb.di != DIWeave && m_fb.di != DIBlend && m_fb.di != DIBob && m_fb.di != DIFieldShift)
-		{
-			if(seqflags & SEQ_FLAG_PROGRESSIVE_SEQUENCE)
-				m_fb.di = DIWeave; // hurray!
-			else if(m_fFilm)
-				m_fb.di = DIWeave; // we are lucky
-			else if(!(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME))
-				m_fb.di = DIBlend; // ok, clear thing
-			else
-				// big trouble here, the progressive_frame bit is not reliable :'(
-				// frames without temporal field diffs can be only detected when ntsc 
-				// uses the repeat field flag (signaled with m_fFilm), if it's not set 
-				// or we have pal then we might end up blending the fields unnecessarily...
-				m_fb.di = DIBlend;
-		}
-	}
-
-	m_fb.flags = newflags;
 }
 
 void CMpeg2DecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
@@ -569,9 +495,7 @@ void CMpeg2DecFilter::SetTypeSpecificFlags(IMediaSample* pMS)
 			{
 				// props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
 
-                const bool fProgressiveSequence = m_fUseModernMpeg2
-					? !!(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME)
-					: !!(m_dec && m_dec->m_info.m_sequence && (m_dec->m_info.m_sequence->flags & SEQ_FLAG_PROGRESSIVE_SEQUENCE));
+                const bool fProgressiveSequence = !!(m_fb.flags & PIC_FLAG_PROGRESSIVE_FRAME);
                 if(fProgressiveSequence){
 					props.dwTypeSpecificFlags |= AM_VIDEO_FLAG_WEAVE;
                 }
@@ -622,114 +546,26 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 			&& rtStart == 0
 			&& m_fb.rtStop == 0;
 		const bool fBogusModernMpeg2EsMarker =
-			m_fUseModernMpeg2
-			&& (((m_fModernMpeg2EverDeliveredFrame || m_fModernMpeg2HadFrameBeforeFlush) && fShortZeroMarker)
-				|| fPostFlushZeroMarker);
+			((m_fModernMpeg2EverDeliveredFrame || m_fModernMpeg2HadFrameBeforeFlush) && fShortZeroMarker)
+				|| fPostFlushZeroMarker;
 		if (fBogusModernMpeg2EsMarker) {
 			m_fModernMpeg2SuppressRawEsMarkerFailures = true;
 			ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg ignored raw ES discontinuity marker: start=%I64d stop=%I64d current=%I64d"),
 				rtStart, rtStop, m_fb.rtStop);
 		} else {
-			if (m_fUseModernMpeg2) {
-				CAutoLock cAutoLock(&m_csReceive);
-				m_fModernMpeg2HadFrameBeforeFlush = false;
-				m_fModernMpeg2AfterFlush = false;
-				ResetModernMpeg2StateLocked(rtStart, _T("discontinuity"));
-			} else {
-				m_fModernMpeg2SuppressRawEsMarkerFailures = false;
-				InputTypeChanged();
-			}
+			CAutoLock cAutoLock(&m_csReceive);
+			m_fModernMpeg2HadFrameBeforeFlush = false;
+			m_fModernMpeg2AfterFlush = false;
+			ResetModernMpeg2StateLocked(rtStart, _T("discontinuity"));
 		}
 	}
 
-	if (m_fUseModernMpeg2) {
-		hr = TransformModern(pIn, pDataIn, len, rtStart, rtStop);
-		if (SUCCEEDED(hr)) {
-			return hr;
-		}
-		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg failed without legacy fallback: hr=0x%08x error=%S"), hr, m_modernDec ? m_modernDec->LastError() : "adapter missing");
+	hr = TransformModern(pIn, pDataIn, len, rtStart, rtStop);
+	if (SUCCEEDED(hr)) {
 		return hr;
 	}
-
-	while(len >= 0)
-	{
-        SVP_LogMsg6("mpeg2_parse");
-		mpeg2_state_t state = m_dec->mpeg2_parse(m_allow_unbound_mpeg2_in_ts);
-#ifndef _WIN64
-		__asm emms; // this one is missing somewhere in the precompiled mmx obj files
-#endif
-        SVP_LogMsg6("state %d",state);
-		switch(state)
-		{
-		case STATE_BUFFER:
-			if(len > 0) {m_dec->mpeg2_buffer(pDataIn, pDataIn + len); len = 0;}
-			else len = -1;
-			break;
-		
-		case STATE_GOP:
-			m_pClosedCaptionOutput->Deliver(m_dec->m_info.m_user_data, m_dec->m_info.m_user_data_len);
-			break;
-		case STATE_SEQUENCE:
-			m_AvgTimePerFrame = m_dec->m_info.m_sequence->frame_period 
-				? 10i64 * m_dec->m_info.m_sequence->frame_period / 27
-				: ((VIDEOINFOHEADER*)m_pInput->CurrentMediaType().Format())->AvgTimePerFrame;
-			break;
-		case STATE_PICTURE:
-			m_dec->m_picture->rtStart = rtStart; rtStart = _I64_MIN;
-			m_dec->m_picture->fDelivered = false;
-			m_dec->mpeg2_skip(m_fDropFrames && (m_dec->m_picture->flags&PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B);
-            break;
-        case STATE_INVALID:
-            TRACE(_T("*** STATE_INVALID\n"));
-        //    break;
-        case STATE_SLICE:
-		case STATE_END:
-            {
-				mpeg2_picture_t* picture = m_dec->m_info.m_display_picture;
-				mpeg2_fbuf_t* fbuf = m_dec->m_info.m_display_fbuf;
-
-				if(picture && !(picture->flags&PIC_FLAG_SKIP) && fbuf)
-				{
-					ASSERT(!picture->fDelivered);
-
-					picture->fDelivered = true;
-
-					// frame buffer
-
-					int w = m_dec->m_info.m_sequence->picture_width;
-					int h = m_dec->m_info.m_sequence->picture_height;
-					int pitch = (m_dec->m_info.m_sequence->width + 31) & ~31;
-
-					if(m_fb.w != w || m_fb.h != h || m_fb.pitch != pitch)
-						m_fb.alloc(w, h, pitch);
-
-					// start - end
-
-					m_fb.rtStart = picture->rtStart;
-					if(m_fb.rtStart == _I64_MIN) m_fb.rtStart = m_fb.rtStop;
-					m_fb.rtStop = m_fb.rtStart + m_AvgTimePerFrame * picture->nb_fields / (m_dec->m_info.m_display_picture_2nd ? 1 : 2);
-
-					REFERENCE_TIME rtStart = m_fb.rtStart;
-					REFERENCE_TIME rtStop = m_fb.rtStop;
-
-					
-                    
-					SetDeinterlaceMethod();
-
-                    int l_color_space = GetColorSpace();
-
-					if(S_OK != (hr = DeliverFast()) 
-					&& S_OK != (hr = DeliverNormal()))
-						return hr;
-				}
-			}
-			break;
-		default:
-		    break;
-		}
-    }
-    SVP_LogMsg6("Return");
-	return S_OK;
+	ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg failed: hr=0x%08x error=%S"), hr, m_modernDec ? m_modernDec->LastError() : "adapter missing");
+	return hr;
 }
 
 HRESULT CMpeg2DecFilter::TransformModern(IMediaSample* pIn, BYTE* pDataIn, long len, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
@@ -847,306 +683,34 @@ HRESULT CMpeg2DecFilter::DeliverModernFrame(const PlayasaFfmpegModernFrameInfo& 
 
 bool CMpeg2DecFilter::IsModernMpeg2Enabled() const
 {
-	return IsModernMpeg2EnvironmentEnabled();
+	return true;
 }
 
 bool CMpeg2DecFilter::IsModernMpeg2InputType(const CMediaType& mtIn) const
 {
-	return mtIn.subtype == MEDIASUBTYPE_MPEG2_VIDEO
-		&& (mtIn.majortype == MEDIATYPE_DVD_ENCRYPTED_PACK
-			|| mtIn.majortype == MEDIATYPE_MPEG2_PACK
-			|| mtIn.majortype == MEDIATYPE_MPEG2_PES
-			|| mtIn.majortype == MEDIATYPE_Video);
+	if (mtIn.formattype == FORMAT_MPEG2_VIDEO && mtIn.pbFormat) {
+		MPEG2VIDEOINFO* vih = (MPEG2VIDEOINFO*)mtIn.pbFormat;
+		if (vih->cbSequenceHeader > 0 && (vih->dwSequenceHeader[0] & 0x00ffffff) != 0x00010000) {
+			return false;
+		}
+	}
+
+	return mtIn.majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn.subtype == MEDIASUBTYPE_MPEG2_VIDEO
+		|| mtIn.majortype == MEDIATYPE_MPEG2_PACK && mtIn.subtype == MEDIASUBTYPE_MPEG2_VIDEO
+		|| mtIn.majortype == MEDIATYPE_MPEG2_PES && mtIn.subtype == MEDIASUBTYPE_MPEG2_VIDEO
+		|| mtIn.majortype == MEDIATYPE_Video && mtIn.subtype == MEDIASUBTYPE_MPEG2_VIDEO
+		|| mtIn.majortype == MEDIATYPE_Video && mtIn.subtype == MEDIASUBTYPE_MPEG1Packet
+		|| mtIn.majortype == MEDIATYPE_Video && mtIn.subtype == MEDIASUBTYPE_MPEG1Video
+		|| mtIn.majortype == MEDIATYPE_Video && mtIn.subtype == MEDIASUBTYPE_MPEG1VideoCD
+		|| mtIn.majortype == MEDIATYPE_Video && mtIn.subtype == MEDIASUBTYPE_MPEG1Payload
+		|| mtIn.majortype == MEDIATYPE_Video && mtIn.subtype == MEDIASUBTYPE_MMES
+		|| mtIn.majortype == MEDIATYPE_Video && mtIn.subtype == MEDIASUBTYPE_MPEG;
 }
 
 bool CMpeg2DecFilter::IsVideoInterlaced()
 {
 	return IsInterlacedEnabled();
 }
-
-HRESULT CMpeg2DecFilter::DeliverFast()
-{
-    return S_FALSE;
-    //TODO: the sse2 deinterlace is broken under core2?? fix it plz
-#if 0
-	HRESULT hr;
-    SVP_LogMsg6("DeliverFast");
-
-	CAutoLock cAutoLock(&m_csReceive);
-
-	mpeg2_fbuf_t* fbuf = m_dec->m_info.m_display_fbuf;
-	if(!fbuf) return S_FALSE;
-
-	{
-
-	CAutoLock cAutoLock2(&m_csProps);
-
-	if(GetCLSID(m_pInput->GetConnected()) == CLSID_DVDNavigator
-	|| m_pSubpicInput->HasAnythingToRender(m_fb.rtStart)
-	|| fabs(m_bright) > EPSILON || fabs(m_cont-1.0) > EPSILON
-    || fabs(m_hue) > EPSILON || fabs(m_sat-1.0) > EPSILON){
-        SVP_LogMsg6("DeliverFast1");
-		return S_FALSE;
-        }
-	}
-
-	if((m_fb.flags & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_I)
-		m_fWaitForKeyFrame = false;
-
-	if(m_fb.rtStart < 0 || m_fWaitForKeyFrame)
-    {
-        SVP_LogMsg6("DeliverFast2");
-        return S_OK;
-    }
-	const CMediaType& mt = m_pOutput->CurrentMediaType();
-	
-    if(mt.subtype != MEDIASUBTYPE_I420 && mt.subtype != MEDIASUBTYPE_IYUV && mt.subtype != MEDIASUBTYPE_YV12){
-        SVP_LogMsg5(L"DeliverFast3 %s", CStringFromGUID( mt.subtype));	
-        return S_FALSE;
-    }
-
-	CComPtr<IMediaSample> pOut;
-	BYTE* pDataOut = NULL;
-	if(FAILED(hr = GetDeliveryBuffer(m_fb.w, m_fb.h, &pOut))
-        || FAILED(hr = pOut->GetPointer(&pDataOut))) {
-            SVP_LogMsg6("DeliverFast4");	
-		return hr;
-    }
-
-    if(mt.subtype != MEDIASUBTYPE_I420 && mt.subtype != MEDIASUBTYPE_IYUV && mt.subtype != MEDIASUBTYPE_YV12){
-        SVP_LogMsg6("DeliverFast5");	
-		return S_FALSE;
-    }
-
-	BITMAPINFOHEADER bihOut;
-	ExtractBIH(&mt, &bihOut);
-
-	int w = bihOut.biWidth;
-	int h = abs(bihOut.biHeight);
-	int srcpitch = m_dec->m_info.m_sequence->width; // TODO (..+7)&~7; ?
-	int dstpitch = bihOut.biWidth;
-
-	BYTE* y = pDataOut;
-	BYTE* u = y + dstpitch*h;
-	BYTE* v = y + dstpitch*h*5/4;
-
-	if(bihOut.biCompression == '21VY') {BYTE* tmp = u; u = v; v = tmp;}
-    
-   
-
-	if(m_fb.di == DIWeave)
-	{
-        SVP_LogMsg6("DIWeave Fast");
-        BitBltFromI420ToI420(w, h, y, u, v, dstpitch, buf_y, buf_u, buf_v, srcpitch);
-        
-	}
-	else if(m_fb.di == DIBlend)
-	{
-        SVP_LogMsg6("DIBlend Fast");
-		DeinterlaceBlend(y, buf_y, w, h, dstpitch, srcpitch);
-        DeinterlaceBlend(u, buf_u, w/2, h, dstpitch/2, srcpitch/2);
-        DeinterlaceBlend(v, buf_v, w/2, h, dstpitch/2, srcpitch/2);
-        SVP_LogMsg6("DIBlend Fast End");
-		
-	}
-	else // TODO
-	{
-        SVP_LogMsg6("DeliverFast6");	
-
-		return S_FALSE;
-	}
-
-	if(h == 1088)
-	{
-		memset(y + dstpitch*(h-8), 0xff, dstpitch*8);
-		memset(u + dstpitch*(h-8)/4, 0x80, dstpitch*8/4);
-		memset(v + dstpitch*(h-8)/4, 0x80, dstpitch*8/4);
-	}
-
-	if(CMpeg2DecInputPin* pPin = dynamic_cast<CMpeg2DecInputPin*>(m_pInput))
-	{
-		CAutoLock cAutoLock(&pPin->m_csRateLock);
-
-		if(m_rate.Rate != pPin->m_ratechange.Rate)
-		{
-			m_rate.Rate = pPin->m_ratechange.Rate;
-			m_rate.StartTime = m_fb.rtStart;
-		}
-	}
-
-	REFERENCE_TIME rtStart = m_fb.rtStart;
-	REFERENCE_TIME rtStop = m_fb.rtStop;
-
-	rtStart = m_rate.StartTime + (rtStart - m_rate.StartTime) * m_rate.Rate / 10000;
-	rtStop = m_rate.StartTime + (rtStop - m_rate.StartTime) * m_rate.Rate / 10000;
-
-	pOut->SetTime(&rtStart, &rtStop);
-	pOut->SetMediaTime(NULL, NULL);
-
-	//
-
-	SetTypeSpecificFlags(pOut);
-
-	//
-    SVP_LogMsg6("DeliverFast Delivered");	
-
-	return m_pOutput->Deliver(pOut);
-#endif
-}
-int CMpeg2DecFilter::GetColorSpace(){
-    CAutoLock cAutoLock(&m_csReceive);
-    //0 = 420 1 = 422 2 = 444
-    int c_w = m_dec->m_info.m_sequence->chroma_width;
-    int c_h = m_dec->m_info.m_sequence->chroma_height;
-    int v_w = m_dec->m_info.m_sequence->width;
-    int v_h = m_dec->m_info.m_sequence->height;
-    int l_color_space =  ( c_w == v_w )
-        + ( c_h == v_h );
-    
-    mpeg2_fbuf_t* fbuf = m_dec->m_info.m_display_fbuf;
-    if(!fbuf)
-        return 0;
-    
-    
-    buf_y = fbuf->buf[0];
-    buf_u = fbuf->buf[1];
-    buf_v = fbuf->buf[2];
-
-    BYTE* buf_u_dst = buf_u;
-    BYTE* buf_u_src = buf_u_dst;
-    BYTE* buf_v_dst = buf_v;
-    BYTE* buf_v_src = buf_v_dst ;
-
-    SVP_LogMsg6( "%d %d %d %d", c_w , c_h , v_w, v_h);
-    if( l_color_space > 0 ){
-        if(m_buff_u.GetCount() < c_h/2*c_w)
-            m_buff_u.SetCount( c_h/2*c_w);
-
-        if(m_buff_v.GetCount() < c_h/2*c_w)
-            m_buff_v.SetCount( c_h/2*c_w);
-
-        buf_u = m_buff_u.GetData();
-        buf_v = m_buff_v.GetData();
-
-        buf_u_dst = buf_u;
-        buf_v_dst = buf_v;
-        
-        if(l_color_space == 1){
-           
-            for(int i = 0; i < c_h/2  ; i++){
-                if(buf_u_dst != buf_u)
-                   memcpy(buf_u_dst, buf_u_src, c_w);
-
-                if(buf_v_dst != buf_v)
-                   memcpy(buf_v_dst, buf_v_src, c_w);
-
-                buf_v_dst+= c_w;
-                buf_v_src+= c_w*2;
-                buf_u_dst+= c_w;
-                buf_u_src+= c_w*2;
-            }
-
-        }else if(l_color_space == 2){
-
-        }
-        
-    }
-    return l_color_space;
-
-}
-HRESULT CMpeg2DecFilter::DeliverNormal()
-{
-	HRESULT hr;
-
-	CAutoLock cAutoLock(&m_csReceive);
-
-    SVP_LogMsg6("DeliverNormal");
-
-	mpeg2_fbuf_t* fbuf = m_dec->m_info.m_display_fbuf;
-	if(!fbuf) return S_FALSE;
-
-	int w = m_fb.w;
-	int h = m_fb.h;
-	int spitch = m_dec->m_info.m_sequence->width; // TODO (..+7)&~7; ?
-	int dpitch = m_fb.pitch;
-
-	REFERENCE_TIME rtStart = m_fb.rtStart;
-	REFERENCE_TIME rtStop = m_fb.rtStop;
-
-	bool tff = !!(m_fb.flags&PIC_FLAG_TOP_FIELD_FIRST);
-
-	// deinterlace
-   
-
-	if(m_fb.di == DIWeave )
-	{
-		BitBltFromI420ToI420(w, h, m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], dpitch, buf_y, buf_u, buf_v, spitch);
-	}
-	else if(m_fb.di == DIBlend)
-	{
-		DeinterlaceBlend(m_fb.buf[0], buf_y, w, h, dpitch, spitch);
-        
-        DeinterlaceBlend(m_fb.buf[1], buf_u, w/2, h/2, dpitch/2, spitch/2);
-        DeinterlaceBlend(m_fb.buf[2], buf_v, w/2, h/2, dpitch/2, spitch/2);
-        
-	}
-	else if(m_fb.di == DIBob)
-	{
-		DeinterlaceBob(m_fb.buf[0], buf_y, w, h, dpitch, spitch, tff);
-		DeinterlaceBob(m_fb.buf[1], buf_u, w/2, h/2, dpitch/2, spitch/2, tff);
-		DeinterlaceBob(m_fb.buf[2], buf_v, w/2, h/2, dpitch/2, spitch/2, tff);
-
-		m_fb.rtStart = rtStart;
-		m_fb.rtStop = (rtStart + rtStop) / 2;
-	}
-	else if(m_fb.di == DIFieldShift)
-	{
-		int soffset = tff ? 0 : spitch;
-		int doffset = tff ? 0 : dpitch;
-		BitBltFromRGBToRGB(w, h/2, m_fb.buf[0] + doffset, dpitch*2, 8, buf_y + soffset, spitch*2, 8);
-		BitBltFromRGBToRGB(w/2, h/4, m_fb.buf[1] + doffset/2, dpitch, 8, buf_u + soffset/2, spitch, 8);
-		BitBltFromRGBToRGB(w/2, h/4, m_fb.buf[2] + doffset/2, dpitch, 8, buf_v + soffset/2, spitch, 8);
-	}
-
-	// postproc
-
-	ApplyBrContHueSat(m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], w, h, dpitch);
-
-	// deliver
-
-	if(FAILED(hr = Deliver(false)))
-		return hr;
-
-	if(m_fb.di == DIBob)
-	{
-		DeinterlaceBob(m_fb.buf[0], buf_y, w, h, dpitch, spitch, !tff);
-		DeinterlaceBob(m_fb.buf[1], buf_u, w/2, h/2, dpitch/2, spitch/2, !tff);
-		DeinterlaceBob(m_fb.buf[2], buf_v, w/2, h/2, dpitch/2, spitch/2, !tff);
-
-		m_fb.rtStart = (rtStart + rtStop) / 2;
-		m_fb.rtStop = rtStop;
-
-		// postproc
-
-		ApplyBrContHueSat(m_fb.buf[0], m_fb.buf[1], m_fb.buf[2], w, h, dpitch);
-
-		// deliver
-
-		if(FAILED(hr = Deliver(false)))
-			return hr;
-	}
-	else if(m_fb.di == DIFieldShift)
-	{
-		int soffset = !tff ? 0 : spitch;
-		int doffset = !tff ? 0 : dpitch;
-		BitBltFromRGBToRGB(w, h/2, m_fb.buf[0] + doffset, dpitch*2, 8, buf_y + soffset, spitch*2, 8);
-		BitBltFromRGBToRGB(w/2, h/4, m_fb.buf[1] + doffset/2, dpitch, 8, buf_u + soffset/2, spitch, 8);
-		BitBltFromRGBToRGB(w/2, h/4, m_fb.buf[2] + doffset/2, dpitch, 8, buf_v + soffset/2, spitch, 8);
-	}
-
-	return S_OK;
-}
-
 
 HRESULT CMpeg2DecFilter::Deliver(bool fRepeatLast)
 {
@@ -1267,8 +831,6 @@ HRESULT CMpeg2DecFilter::CheckInputType(const CMediaType* mtIn)
 		if(vih->cbSequenceHeader > 0 && (vih->dwSequenceHeader[0] & 0x00ffffff) != 0x00010000)
 			return VFW_E_TYPE_NOT_ACCEPTED;
 	}
-    m_allow_unbound_mpeg2_in_ts = (mtIn->majortype == MEDIATYPE_MPEG2_PES && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO);
-
 	return (mtIn->majortype == MEDIATYPE_DVD_ENCRYPTED_PACK && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
 			|| mtIn->majortype == MEDIATYPE_MPEG2_PACK && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
 			|| mtIn->majortype == MEDIATYPE_MPEG2_PES && mtIn->subtype == MEDIASUBTYPE_MPEG2_VIDEO
@@ -1317,25 +879,28 @@ HRESULT CMpeg2DecFilter::StartStreaming()
 		m_AvgTimePerFrame = ((MPEG2VIDEOINFO*)mtIn.Format())->hdr.AvgTimePerFrame;
 	}
 
-	if (IsModernMpeg2Enabled() && IsModernMpeg2InputType(mtIn)) {
-		m_modernDec.Attach(new CMpeg2ModernDecodeAdapter());
-		if (!m_modernDec) {
-			return E_OUTOFMEMORY;
-		}
-		m_fUseModernMpeg2 = m_modernDec->Open();
-		ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg open %s: %S"), m_fUseModernMpeg2 ? _T("OK") : _T("failed"), m_modernDec->LastError());
-		if (!m_fUseModernMpeg2) {
-			return E_FAIL;
-		}
-		return S_OK;
+	if (!IsModernMpeg2InputType(mtIn)) {
+		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
 
-	m_dec.Attach(new CMpeg2Dec());
-	if(!m_dec) return E_OUTOFMEMORY;
+	m_modernDec.Attach(new CMpeg2ModernDecodeAdapter());
+	if (!m_modernDec) {
+		return E_OUTOFMEMORY;
+	}
 
-	InputTypeChanged();
-
-//	g_clock = clock();
+	BYTE* sequenceHeader = NULL;
+	DWORD sequenceHeaderSize = 0;
+	GetMpegSequenceHeader(mtIn, &sequenceHeader, &sequenceHeaderSize);
+	const uint32_t codec = ModernMpegCodecFromInputType(mtIn);
+	m_fUseModernMpeg2 = m_modernDec->Open(codec, sequenceHeader, sequenceHeaderSize);
+	ModernMpeg2SelfcheckLog(_T("MPEG modern FFmpeg open %s: codec=%u extradata=%u %S"),
+		m_fUseModernMpeg2 ? _T("OK") : _T("failed"),
+		codec,
+		sequenceHeaderSize,
+		m_modernDec->LastError());
+	if (!m_fUseModernMpeg2) {
+		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -1352,7 +917,6 @@ HRESULT CMpeg2DecFilter::StopStreaming()
 		m_modernDec.Free();
 	}
 	m_fUseModernMpeg2 = false;
-	m_dec.Free();
 
 	return __super::StopStreaming();
 }

@@ -2,17 +2,15 @@
 
 #include <UIAutomation.h>
 
-class CMainFrame;
-class CPlayerSeekBarUiaProvider;
-class CPlayerVideoViewUiaProvider;
+class CChildView;
 
-class CMainFrameUiaProvider :
+// RFC-0028: virtual UIA fragment for the video presentation area (AutomationId=VideoView).
+class CPlayerVideoViewUiaProvider :
 	public IRawElementProviderSimple,
-	public IRawElementProviderFragment,
-	public IRawElementProviderFragmentRoot
+	public IRawElementProviderFragment
 {
 public:
-	explicit CMainFrameUiaProvider(CMainFrame* frame);
+	explicit CPlayerVideoViewUiaProvider(CChildView* videoView);
 
 	ULONG STDMETHODCALLTYPE AddRef();
 	ULONG STDMETHODCALLTYPE Release();
@@ -30,16 +28,19 @@ public:
 	HRESULT STDMETHODCALLTYPE SetFocus();
 	HRESULT STDMETHODCALLTYPE get_FragmentRoot(IRawElementProviderFragmentRoot** root);
 
-	HRESULT STDMETHODCALLTYPE ElementProviderFromPoint(double x, double y, IRawElementProviderFragment** provider);
-	HRESULT STDMETHODCALLTYPE GetFocus(IRawElementProviderFragment** provider);
+	void SetFragmentParent(IRawElementProviderFragment* parent);
+	void SetFragmentRoot(IRawElementProviderFragmentRoot* root);
+	void SetNextSibling(IRawElementProviderFragment* nextSibling);
 
 private:
-	~CMainFrameUiaProvider();
+	~CPlayerVideoViewUiaProvider();
 
 	bool IsWindowUsable() const;
+	bool GetVideoScreenRect(CRect& screenRect) const;
 
 	volatile LONG refCount_;
-	CMainFrame* frame_;
-	CPlayerVideoViewUiaProvider* videoViewProvider_;
-	CPlayerSeekBarUiaProvider* seekBarProvider_;
+	CChildView* videoView_;
+	IRawElementProviderFragment* parent_;
+	IRawElementProviderFragmentRoot* root_;
+	IRawElementProviderFragment* nextSibling_;
 };

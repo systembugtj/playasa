@@ -245,6 +245,7 @@ $configureOptions = @(
   '--enable-decoder=wmv3',
   '--enable-decoder=h264',
   '--enable-decoder=mpeg2video',
+  '--enable-decoder=mpeg1video',
   '--enable-decoder=vc1',
   '--enable-demuxer=avi',
   '--enable-demuxer=flv',

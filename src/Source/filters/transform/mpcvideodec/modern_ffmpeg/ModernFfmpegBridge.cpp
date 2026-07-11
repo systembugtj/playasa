@@ -34,6 +34,16 @@ ModernFfmpeg::DecodeCodec ToAdapterCodec(uint32_t codec)
         return ModernFfmpeg::kDecodeCodecWmv3;
     case PLAYASA_FFMPEG_MODERN_CODEC_VC1:
         return ModernFfmpeg::kDecodeCodecVc1;
+    case PLAYASA_FFMPEG_MODERN_CODEC_RV10:
+        return ModernFfmpeg::kDecodeCodecRv10;
+    case PLAYASA_FFMPEG_MODERN_CODEC_RV20:
+        return ModernFfmpeg::kDecodeCodecRv20;
+    case PLAYASA_FFMPEG_MODERN_CODEC_RV30:
+        return ModernFfmpeg::kDecodeCodecRv30;
+    case PLAYASA_FFMPEG_MODERN_CODEC_RV40:
+        return ModernFfmpeg::kDecodeCodecRv40;
+    case PLAYASA_FFMPEG_MODERN_CODEC_MPEG1:
+        return ModernFfmpeg::kDecodeCodecMpeg1;
     default:
         return ModernFfmpeg::kDecodeCodecMpeg4;
     }
@@ -53,6 +63,11 @@ bool IsValidCodec(uint32_t codec)
     case PLAYASA_FFMPEG_MODERN_CODEC_MPEG2:
     case PLAYASA_FFMPEG_MODERN_CODEC_WMV3:
     case PLAYASA_FFMPEG_MODERN_CODEC_VC1:
+    case PLAYASA_FFMPEG_MODERN_CODEC_RV10:
+    case PLAYASA_FFMPEG_MODERN_CODEC_RV20:
+    case PLAYASA_FFMPEG_MODERN_CODEC_RV30:
+    case PLAYASA_FFMPEG_MODERN_CODEC_RV40:
+    case PLAYASA_FFMPEG_MODERN_CODEC_MPEG1:
         return true;
     default:
         return false;
@@ -151,6 +166,16 @@ uint32_t ToBridgeCodec(ModernFfmpeg::DecodeCodec codec)
         return PLAYASA_FFMPEG_MODERN_CODEC_WMV3;
     case ModernFfmpeg::kDecodeCodecVc1:
         return PLAYASA_FFMPEG_MODERN_CODEC_VC1;
+    case ModernFfmpeg::kDecodeCodecRv10:
+        return PLAYASA_FFMPEG_MODERN_CODEC_RV10;
+    case ModernFfmpeg::kDecodeCodecRv20:
+        return PLAYASA_FFMPEG_MODERN_CODEC_RV20;
+    case ModernFfmpeg::kDecodeCodecRv30:
+        return PLAYASA_FFMPEG_MODERN_CODEC_RV30;
+    case ModernFfmpeg::kDecodeCodecRv40:
+        return PLAYASA_FFMPEG_MODERN_CODEC_RV40;
+    case ModernFfmpeg::kDecodeCodecMpeg1:
+        return PLAYASA_FFMPEG_MODERN_CODEC_MPEG1;
     default:
         return PLAYASA_FFMPEG_MODERN_CODEC_MPEG4;
     }

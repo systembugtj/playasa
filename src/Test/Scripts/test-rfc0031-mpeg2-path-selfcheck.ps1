@@ -21,7 +21,6 @@ $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'TestSupport\SplayerTestSupport.psm1') -Force
 
 $repoRoot = Get-SplayerRepoRoot
-$previousLegacyMpeg2 = $env:PLAYASA_MPEG2_LEGACY
 $defaultSamplePaths = @(
   'out\selfcheck\sample-mpeg2-dxva.m2ts',
   'out\selfcheck\sample-mpeg2-dxva.ts',
@@ -89,9 +88,6 @@ function Invoke-Rfc0031SampleRun {
 
   Stop-SplayerProcesses
   Clear-SplayerLog
-  if ($EnableModernMpeg2) {
-    Remove-Item Env:\PLAYASA_MPEG2_LEGACY -ErrorAction SilentlyContinue
-  }
   $process = Start-SplayerForSample -SamplePath $SamplePath
   try {
     $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
@@ -113,7 +109,7 @@ function Invoke-Rfc0031SampleRun {
     $decoderName = Get-Rfc0031DecoderName -GraphLines $graphLines
     $modernFirstFrame = $logText -match 'MPEG-2 modern FFmpeg first frame ready'
     $modernFallback = $logText -match 'MPEG-2 modern FFmpeg fallback'
-    $modernFailure = $logText -match 'MPEG-2 modern FFmpeg failed without legacy fallback'
+    $modernFailure = $logText -match 'MPEG-2 modern FFmpeg failed'
     if ($decoderName -eq 'Unknown' -and $modernFirstFrame) {
       $decoderName = 'CMpeg2DecFilter'
     }
@@ -128,13 +124,6 @@ function Invoke-Rfc0031SampleRun {
     }
   } finally {
     Get-Process -Id $process.Id -ErrorAction SilentlyContinue | Stop-Process -Force
-    if ($EnableModernMpeg2) {
-      if ($null -eq $previousLegacyMpeg2) {
-        Remove-Item Env:\PLAYASA_MPEG2_LEGACY -ErrorAction SilentlyContinue
-      } else {
-        $env:PLAYASA_MPEG2_LEGACY = $previousLegacyMpeg2
-      }
-    }
   }
 }
 
@@ -160,8 +149,13 @@ if ($RequireKnownPath -and $unknownResults.Count -gt 0) {
   throw "RFC-0031 path selfcheck found $($unknownResults.Count) unknown decoder path(s). Inspect $(Get-SplayerLogPath)"
 }
 
-if ($RequireModernMpeg2FirstFrame -and @($results | Where-Object { -not $_.ModernFirstFrame }).Count -gt 0) {
-  throw "RFC-0031 modern MPEG-2 first-frame check failed. Inspect $(Get-SplayerLogPath)"
+if ($RequireModernMpeg2FirstFrame) {
+  $missingModernFirstFrame = @($results | Where-Object {
+    $_.Decoder -eq 'CMpeg2DecFilter' -and -not $_.ModernFirstFrame
+  })
+  if ($missingModernFirstFrame.Count -gt 0) {
+    throw "RFC-0031 modern MPEG-2 first-frame check failed. Inspect $(Get-SplayerLogPath)"
+  }
 }
 
 if ($RequireNoModernMpeg2Fallback -and @($results | Where-Object { $_.ModernFallback }).Count -gt 0) {

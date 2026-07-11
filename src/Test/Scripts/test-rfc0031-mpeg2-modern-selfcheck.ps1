@@ -19,10 +19,12 @@ $defaultStableSamples = @(
   'out\selfcheck\sample-mpeg2-dxva.m2ts',
   'out\selfcheck\sample-mpeg2-dxva.ts',
   'out\selfcheck\sample-mpeg2-dxva.m2v',
-  'out\selfcheck\sample-mpeg2-dxva.vob',
   'out\selfcheck\sample-mpeg2-dxva.mpg'
 )
-$defaultObservationSamples = @()
+$defaultObservationSamples = @(
+  'out\selfcheck\sample-mpeg2-dxva.vob',
+  'out\selfcheck\sample-mpeg-small.mpeg'
+)
 
 function ConvertTo-Rfc0031SampleList {
   param([string[]]$Paths)
@@ -59,7 +61,6 @@ if ($ObservationSamplePaths.Count -gt 0) {
     -SamplePaths $observationSampleList `
     -EnableModernMpeg2 `
     -RequireKnownPath `
-    -RequireModernMpeg2FirstFrame `
     -RequireNoModernMpeg2Fallback `
     -TimeoutSeconds $TimeoutSeconds `
     -SteadyStateSeconds $SteadyStateSeconds

@@ -41,6 +41,8 @@
 #include "DXVADecoder.h"
 #include "TlibavcodecExt.h"
 #include "modern_ffmpeg\ModernFfmpegBridgeConsumer.h"
+#include "modern_ffmpeg\RealVideoPresentationTiming.h"
+#include "modern_ffmpeg\RealVideoExtradata.h"
 
 struct AVCodec;
 struct AVCodecContext;
@@ -176,7 +178,7 @@ protected:
 	void				SetTypeSpecificFlags(IMediaSample* pMS);
 	HRESULT				SoftwareDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
 	HRESULT				ModernFfmpegBridgeDecode(IMediaSample* pIn, BYTE* pDataIn, int nSize, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
-	HRESULT				DeliverModernFfmpegFrame(IMediaSample* pIn, PlayasaFfmpegModernFrameInfo& frameInfo, REFERENCE_TIME inputDuration, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop);
+	HRESULT				DeliverModernFfmpegFrame(IMediaSample* pIn, PlayasaFfmpegModernFrameInfo& frameInfo, REFERENCE_TIME inputDuration, REFERENCE_TIME& rtStart, REFERENCE_TIME& rtStop, DWORD realvideo_in_timestamp = kPlayasaRealVideoNoInputTimestamp);
 	//void				FindStartCodeVC1  (BYTE** pDataIn, int& nSize);
 	//void				FindStartCodeH264 (BYTE** pDataIn, int& nSize);
 	//void				AppendBuffer (BYTE* pDataIn, int nSize);
@@ -227,6 +229,7 @@ public:
 	HRESULT			CheckConnect(PIN_DIRECTION dir, IPin* pPin);
 	HRESULT			CompleteConnect(PIN_DIRECTION direction,IPin *pReceivePin);
     HRESULT			DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR_PROPERTIES* pProperties);
+	HRESULT			BeginFlush();
 	HRESULT			NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rtStop, double dRate);
 	HRESULT			BreakConnect(PIN_DIRECTION dir);
 

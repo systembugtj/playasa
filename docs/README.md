@@ -15,7 +15,7 @@
 
 - 工程布局与 MSBuild 路径契约以 [RFC-0011](../.spec/rfc/completed/rfc-0011-windows-repository-layout.md) 为准。
 - 第三方库升级路线以 [RFC-0012](../.spec/rfc/completed/rfc-0012-thirdparty-library-upgrades.md) 为准。
-- 后续 RFC 和历史 RFC 见 [RFC 索引](rfc/README.md) 与 [`.spec/rfc/`](../.spec/rfc/)。
+- 活跃 RFC 索引与推荐顺序见 [ROADMAP.md](../ROADMAP.md)；RFC 正文在 [`.spec/rfc/`](../.spec/rfc/)。
 
 ## 已合并的旧文档
 

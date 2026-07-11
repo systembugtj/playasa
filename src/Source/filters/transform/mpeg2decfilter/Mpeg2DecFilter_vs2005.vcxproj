@@ -144,7 +144,7 @@
     <EmbedManifest>false</EmbedManifest>
     <TargetExt>.ax</TargetExt>
     <IncludePath>$(SolutionDir)Source\filters\BaseClasses;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\out\lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)lib\detours\;$(SolutionDir)Source\filters\transform\mpeg2decfilter\libmpeg2\vc++</LibraryPath>
+    <LibraryPath>$(SolutionDir)..\out\lib\$(Platform);$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)lib\detours\</LibraryPath>
     <OutDir>$(SolutionDir)..\out\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\out\obj\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -162,7 +162,7 @@
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>idct_mmx.obj;motion_comp_mmx.obj;decssD.lib;dsutilD.lib;strmbaseD.lib;basevideofilterD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>decssD.lib;dsutilD.lib;strmbaseD.lib;basevideofilterD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).ax</OutputFile>
       <AdditionalLibraryDirectories>../../../../lib;../../../../lib/detours;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>Mpeg2DecFilter.def</ModuleDefinitionFile>
@@ -177,7 +177,7 @@
       <PreprocessorDefinitions>REGISTER_FILTER;WIN32;NDEBUG;_USRDLL;MPEG2ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>idct_mmx.obj;motion_comp_mmx.obj;decssR.lib;dsutilR.lib;strmbaseR.lib;basevideofilterR.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>decssR.lib;dsutilR.lib;strmbaseR.lib;basevideofilterR.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).ax</OutputFile>
       <AdditionalLibraryDirectories>../../../../lib;../../../../lib/detours;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -194,7 +194,7 @@
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>idct_mmx.obj;motion_comp_mmx.obj;decssDU.lib;sharedlibDU.lib;dsutilDU.lib;foundation.lib;strmbaseDU.lib;basevideofilterDU.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>decssDU.lib;sharedlibDU.lib;dsutilDU.lib;foundation.lib;strmbaseDU.lib;basevideofilterDU.lib;detours.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
@@ -211,7 +211,7 @@
       <PreprocessorDefinitions>REGISTER_FILTER;WIN32;NDEBUG;_USRDLL;MPEG2ONLY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>idct_mmx.obj;motion_comp_mmx.obj;decssRU.lib;dsutilRU.lib;strmbaseRU.lib;basevideofilterRU.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>decssRU.lib;dsutilRU.lib;strmbaseRU.lib;basevideofilterRU.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).ax</OutputFile>
       <AdditionalLibraryDirectories>../../../../lib;../../../../lib/detours;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -227,7 +227,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>basevideofilterD.lib;idct_mmx.obj;motion_comp_mmx.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basevideofilterD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../../../lib/$(ProjectName)D.lib</OutputFile>
       <AdditionalLibraryDirectories>../../../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
@@ -238,7 +238,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>basevideofilterDU.lib;idct_mmx.obj;motion_comp_mmx.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basevideofilterDU.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../../../lib/$(ProjectName)DU.lib</OutputFile>
       <AdditionalLibraryDirectories>../../../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
@@ -248,7 +248,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>basevideofilterR.lib;idct_mmx.obj;motion_comp_mmx.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basevideofilterR.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>../../../../lib/$(ProjectName)R.lib</OutputFile>
       <AdditionalLibraryDirectories>../../../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
@@ -262,14 +262,11 @@
       <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>$(SolutionDir)..\out\bin\Win32\Release\libmpeg2.lib;$(SolutionDir)..\out\bin\Win32\Release Unicode lib\basevideofilter.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\Win32\Release;$(SolutionDir)..\out\bin\Win32\Release Unicode lib;../../../../lib;./libmpeg2/vc++;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(SolutionDir)..\out\bin\Win32\Release Unicode lib\basevideofilter.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\Win32\Release Unicode lib;../../../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="libmpeg2.cpp">
-      <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">AssemblyAndSourceCode</AssemblerOutput>
-    </ClCompile>
     <ClCompile Include="Mpeg2ModernDecodeAdapter.cpp" />
     <ClCompile Include="Mpeg2DecFilter.cpp">
       <AssemblerOutput Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">AssemblyAndSourceCode</AssemblerOutput>
@@ -289,7 +286,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\mpc-hc\trunk\src\filters\transform\mpeg2decfilter\attributes.h" />
     <ClInclude Include="IMpeg2DecFilter.h" />
-    <ClInclude Include="libmpeg2.h" />
+    <ClInclude Include="MpegPictureFlags.h" />
     <ClInclude Include="Mpeg2ModernDecodeAdapter.h" />
     <ClInclude Include="Mpeg2DecFilter.h" />
     <ClInclude Include="Mpeg2DecSettingsWnd.h" />
@@ -311,10 +308,6 @@
     </ProjectReference>
     <ProjectReference Include="..\basevideofilter\basevideofilter_vs2005.vcxproj">
       <Project>{54dda60f-e528-4d07-a152-960a1e818680}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="libmpeg2\vc++\libmpeg2.vcxproj">
-      <Project>{4d545fe6-f065-4fde-8712-46ce5581adec}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>

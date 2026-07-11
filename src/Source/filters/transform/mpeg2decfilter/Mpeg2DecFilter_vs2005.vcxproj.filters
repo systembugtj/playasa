@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="libmpeg2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Mpeg2DecFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -38,7 +35,7 @@
     <ClInclude Include="IMpeg2DecFilter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libmpeg2.h">
+    <ClInclude Include="MpegPictureFlags.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Mpeg2DecFilter.h">

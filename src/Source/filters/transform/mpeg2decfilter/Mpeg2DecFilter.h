@@ -31,7 +31,6 @@
 
 class CSubpicInputPin;
 class CClosedCaptionOutputPin;
-class CMpeg2Dec;
 class CMpeg2ModernDecodeAdapter;
 
 
@@ -43,7 +42,6 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478")) CMpeg2DecFilter
 	CSubpicInputPin* m_pSubpicInput;
 	CClosedCaptionOutputPin* m_pClosedCaptionOutput;
 
-	CAutoPtr<CMpeg2Dec> m_dec;
 	CAutoPtr<CMpeg2ModernDecodeAdapter> m_modernDec;
 
 	REFERENCE_TIME m_AvgTimePerFrame;
@@ -96,7 +94,6 @@ class __declspec(uuid("39F498AF-1A09-4275-B193-673B0BA3D478")) CMpeg2DecFilter
 	} m_fb;
 
 	bool m_fFilm;
-	void SetDeinterlaceMethod();
 	void SetTypeSpecificFlags(IMediaSample* pMS);
 
 	AM_SimpleRateChange m_rate;
@@ -118,26 +115,16 @@ public:
 	DECLARE_IUNKNOWN
     STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
 
-    int GetColorSpace();
-    BYTE* buf_y;
-    BYTE* buf_u;
-    BYTE* buf_v;
-    CAtlArray<BYTE> m_buff_u;
-    CAtlArray<BYTE> m_buff_v;
-    CAtlArray<BYTE> m_buff_y;
-	HRESULT DeliverFast();
-	HRESULT DeliverNormal();
 	HRESULT Deliver(bool fRepeatLast);
 
 	int GetPinCount();
-	CBasePin* GetPin(int n);
+    CBasePin* GetPin(int n);
 
     HRESULT EndOfStream();
 	HRESULT BeginFlush();
 	HRESULT EndFlush();
     HRESULT NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, double dRate);
 
-    bool m_allow_unbound_mpeg2_in_ts;
 	HRESULT CheckConnect(PIN_DIRECTION dir, IPin* pPin);
     HRESULT CheckInputType(const CMediaType* mtIn);
 	HRESULT CheckTransform(const CMediaType* mtIn, const CMediaType* mtOut);

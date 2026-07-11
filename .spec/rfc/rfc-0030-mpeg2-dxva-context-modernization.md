@@ -4,7 +4,7 @@
 |------|------|
 | **状态** | 阶段 1/2 已实现，真实播放路径验证受阻 (Implemented, Runtime Path Blocked) |
 | **适用范围** | `FfmpegContext.c` MPEG-2 reader、`DXVADecoderMpeg2.cpp`、MPEG-2 DXVA picture parameters、旧 FFmpeg 私有字段隔离 |
-| **相关 RFC** | [RFC-0025](./completed/rfc-0025-ffmpeg-dxva-followup.md)、[RFC-0024](./rfc-0024-ffmpeg-modern-island.md)、[RFC-0031](./rfc-0031-mpeg2-playback-path-modernization.md) |
+| **相关 RFC** | [RFC-0025](./completed/rfc-0025-ffmpeg-dxva-followup.md)、[RFC-0024](./rfc-0024-ffmpeg-modern-island.md)、[RFC-0031](./completed/rfc-0031-mpeg2-playback-path-modernization.md) |
 | **创建日期** | 2026-04-27 |
 | **最后更新** | 2026-04-28 |
 
@@ -143,7 +143,7 @@ GPU: Intel(R) HD Graphics 4600 driver=20.19.15.4624; NVIDIA GeForce GTX 860M dri
 graph: FGM: Connecting 'MPEG-2 Video Decoder' {39F498AF-1A09-4275-B193-673B0BA3D478}
 ```
 
-结论：默认 MPEG-2 playback graph 使用的是 `CMpeg2DecFilter`，不是 `MPCVideoDec`。因此本 RFC 修改的 `MPCVideoDec` MPEG-2 DXVA context path 已能构建，但普通 MPEG-2 播放样本无法实际覆盖该路径。真实播放路径归属和后续迁移由 [RFC-0031](./rfc-0031-mpeg2-playback-path-modernization.md) 跟踪。
+结论：默认 MPEG-2 playback graph 使用的是 `CMpeg2DecFilter`，不是 `MPCVideoDec`。因此本 RFC 修改的 `MPCVideoDec` MPEG-2 DXVA context path 已能构建，但普通 MPEG-2 播放样本无法实际覆盖该路径。真实播放路径归属和后续迁移由 [RFC-0031](./completed/rfc-0031-mpeg2-playback-path-modernization.md)（已完成）跟踪。
 
 仍待完成：
 

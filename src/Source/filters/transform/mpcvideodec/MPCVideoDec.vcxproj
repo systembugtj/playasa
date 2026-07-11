@@ -291,6 +291,8 @@
     <ClCompile Include="MPCVideoDecFilter.cpp" />
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
     <ClCompile Include="modern_ffmpeg\ModernFfmpegBridgeConsumer.cpp" />
+    <ClCompile Include="modern_ffmpeg\RealVideoPresentationTiming.cpp" />
+    <ClCompile Include="modern_ffmpeg\RealVideoExtradata.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Unicode lib|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Unicode lib|x64'">Create</PrecompiledHeader>
@@ -319,6 +321,8 @@
     <ClInclude Include="MPCVideoDecFilter.h" />
     <ClInclude Include="MPCVideoDecSettingsWnd.h" />
     <ClInclude Include="modern_ffmpeg\ModernFfmpegBridgeConsumer.h" />
+    <ClInclude Include="modern_ffmpeg\RealVideoPresentationTiming.h" />
+    <ClInclude Include="modern_ffmpeg\RealVideoExtradata.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TlibavcodecExt.h" />
