@@ -177,7 +177,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode lib|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;$(SolutionDir)Source\filters\BaseClasses;..\..\transform\mpcvideodec\ffmpeg;..\..\transform\mpcvideodec\ffmpeg\libavcodec;..\..\transform\mpcvideodec\ffmpeg\libavutil;..\..\transform\mpcvideodec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\..\Thirdparty\pkg;$(SolutionDir)Source\filters\BaseClasses;..\..\transform\mpcvideodec\ffmpeg;..\..\transform\mpcvideodec\ffmpeg\libavcodec;..\..\transform\mpcvideodec\ffmpeg\libavutil;..\..\transform\mpcvideodec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Lib>
@@ -188,7 +188,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode lib|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;$(SolutionDir)Source\filters\BaseClasses;..\..\transform\mpcvideodec\ffmpeg;..\..\transform\mpcvideodec\ffmpeg\libavcodec;..\..\transform\mpcvideodec\ffmpeg\libavutil;..\..\transform\mpcvideodec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\..\Thirdparty\pkg;$(SolutionDir)Source\filters\BaseClasses;..\..\transform\mpcvideodec\ffmpeg;..\..\transform\mpcvideodec\ffmpeg\libavcodec;..\..\transform\mpcvideodec\ffmpeg\libavutil;..\..\transform\mpcvideodec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -265,6 +265,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\transform\mpcvideodec\modern_ffmpeg\RealAudioExtradata.cpp" />
+    <ClCompile Include="..\..\transform\mpcvideodec\modern_ffmpeg\RealAudioModernDecodeAdapter.cpp" />
     <ClCompile Include="RealMediaSplitter.cpp">
       <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">false</PreprocessToFile>
       <PreprocessSuppressLineNumbers Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">false</PreprocessSuppressLineNumbers>

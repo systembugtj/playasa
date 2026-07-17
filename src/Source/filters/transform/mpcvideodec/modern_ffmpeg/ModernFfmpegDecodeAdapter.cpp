@@ -7,9 +7,11 @@
 
 extern "C" {
 #include "libavcodec/avcodec.h"
+#include "libavutil/channel_layout.h"
 #include "libavutil/error.h"
 #include "libavutil/frame.h"
 #include "libavutil/mem.h"
+#include "libavutil/samplefmt.h"
 }
 
 namespace ModernFfmpeg {
@@ -116,6 +118,12 @@ enum AVCodecID ToAvCodecId(DecodeCodec codec)
         return AV_CODEC_ID_RV40;
     case kDecodeCodecMpeg1:
         return AV_CODEC_ID_MPEG1VIDEO;
+    case kDecodeCodecCook:
+        return AV_CODEC_ID_COOK;
+    case kDecodeCodecSipr:
+        return AV_CODEC_ID_SIPR;
+    case kDecodeCodecAtrac3:
+        return AV_CODEC_ID_ATRAC3;
     default:
         return AV_CODEC_ID_NONE;
     }
@@ -475,6 +483,86 @@ bool DecodeSession::Open()
 bool DecodeSession::OpenWithExtradata(const uint8_t* extraData, size_t extraDataSize)
 {
     return OpenWithH264NalLengthSize(extraData, extraDataSize, kUnknownH264NalLengthSize);
+}
+
+bool DecodeSession::IsAudioCodec() const
+{
+    return IsRealAudioCodec(codec_);
+}
+
+bool DecodeSession::OpenWithAudioParams(const AudioOpenParams& params)
+{
+    if (!IsAudioCodec()) {
+        SetError("OpenWithAudioParams requires an audio codec");
+        return false;
+    }
+
+    const AVCodec* codec = avcodec_find_decoder(ToAvCodecId(codec_));
+    if (!codec) {
+        SetError("FFmpeg audio decoder is not available");
+        return false;
+    }
+
+    AVCodecContext* context = avcodec_alloc_context3(codec);
+    if (!context) {
+        SetError("Failed to allocate AVCodecContext for audio");
+        return false;
+    }
+
+    if (params.extraData && params.extraDataSize > 0) {
+        if (params.extraDataSize > static_cast<size_t>(INT_MAX)) {
+            avcodec_free_context(&context);
+            SetError("Audio codec extradata is too large");
+            return false;
+        }
+        context->extradata = static_cast<uint8_t*>(av_mallocz(params.extraDataSize + AV_INPUT_BUFFER_PADDING_SIZE));
+        if (!context->extradata) {
+            avcodec_free_context(&context);
+            SetError("Failed to allocate audio codec extradata");
+            return false;
+        }
+        memcpy(context->extradata, params.extraData, params.extraDataSize);
+        context->extradata_size = static_cast<int>(params.extraDataSize);
+    }
+
+    context->sample_rate = params.sampleRate > 0 ? params.sampleRate : 0;
+    context->ch_layout.nb_channels = params.channels > 0 ? params.channels : 0;
+    if (params.channels > 0) {
+        av_channel_layout_default(&context->ch_layout, params.channels);
+    }
+    context->bit_rate = params.bitRate > 0 ? params.bitRate : 0;
+    context->bits_per_coded_sample = params.bitsPerCodedSample > 0 ? params.bitsPerCodedSample : 0;
+    context->block_align = params.blockAlign > 0 ? params.blockAlign : 0;
+    context->pkt_timebase = kDirectShowTimeBase;
+
+    const int openResult = avcodec_open2(context, codec, 0);
+    if (openResult < 0) {
+        avcodec_free_context(&context);
+        SetAvError("avcodec_open2(audio)", openResult);
+        return false;
+    }
+
+    AVPacket* packet = av_packet_alloc();
+    if (!packet) {
+        avcodec_free_context(&context);
+        SetError("Failed to allocate AVPacket for audio");
+        return false;
+    }
+
+    AVFrame* frame = av_frame_alloc();
+    if (!frame) {
+        av_packet_free(&packet);
+        avcodec_free_context(&context);
+        SetError("Failed to allocate AVFrame for audio");
+        return false;
+    }
+
+    codecContext_ = context;
+    packet_ = packet;
+    frame_ = frame;
+    parser_ = 0;
+    lastError_[0] = '\0';
+    return true;
 }
 
 bool DecodeSession::OpenWithH264NalLengthSize(const uint8_t* extraData, size_t extraDataSize, int h264NalLengthSize)
@@ -913,6 +1001,140 @@ DecodeStatus DecodeSession::ReceiveFrame(DecodedFrameInfo* frameInfo)
     return kDecodeStatusFailure;
 }
 
+namespace {
+
+int16_t ClampFloatToS16(float sample)
+{
+    if (sample > 1.0f) {
+        sample = 1.0f;
+    } else if (sample < -1.0f) {
+        sample = -1.0f;
+    }
+    return static_cast<int16_t>(sample * 32767.0f);
+}
+
+} // namespace
+
+bool DecodeSession::PackAudioFrameToS16(const void* rawFrame, DecodedAudioFrameInfo* frameInfo)
+{
+    const AVFrame* frame = static_cast<const AVFrame*>(rawFrame);
+    if (!frame || !frameInfo) {
+        SetError("Invalid audio frame");
+        return false;
+    }
+
+    const int channels = frame->ch_layout.nb_channels;
+    if (channels <= 0 || frame->nb_samples <= 0) {
+        SetError("Audio frame has no samples");
+        return false;
+    }
+
+    const size_t sampleCount = static_cast<size_t>(frame->nb_samples) * static_cast<size_t>(channels);
+    audioPcmBuffer_.resize(sampleCount * sizeof(int16_t));
+    int16_t* output = reinterpret_cast<int16_t*>(&audioPcmBuffer_[0]);
+
+    if (frame->format == AV_SAMPLE_FMT_S16) {
+        memcpy(output, frame->data[0], sampleCount * sizeof(int16_t));
+    } else if (frame->format == AV_SAMPLE_FMT_FLT) {
+        const float* input = reinterpret_cast<const float*>(frame->data[0]);
+        for (size_t i = 0; i < sampleCount; ++i) {
+            output[i] = ClampFloatToS16(input[i]);
+        }
+    } else if (frame->format == AV_SAMPLE_FMT_FLTP) {
+        for (int sampleIndex = 0; sampleIndex < frame->nb_samples; ++sampleIndex) {
+            for (int channel = 0; channel < channels; ++channel) {
+                const float* plane = reinterpret_cast<const float*>(frame->extended_data[channel]);
+                output[static_cast<size_t>(sampleIndex) * static_cast<size_t>(channels) + static_cast<size_t>(channel)] =
+                    ClampFloatToS16(plane[sampleIndex]);
+            }
+        }
+    } else if (frame->format == AV_SAMPLE_FMT_S16P) {
+        for (int sampleIndex = 0; sampleIndex < frame->nb_samples; ++sampleIndex) {
+            for (int channel = 0; channel < channels; ++channel) {
+                const int16_t* plane = reinterpret_cast<const int16_t*>(frame->extended_data[channel]);
+                output[static_cast<size_t>(sampleIndex) * static_cast<size_t>(channels) + static_cast<size_t>(channel)] =
+                    plane[sampleIndex];
+            }
+        }
+    } else {
+        SetError("Unsupported audio sample format");
+        return false;
+    }
+
+    frameInfo->sampleRate = frame->sample_rate;
+    frameInfo->channels = channels;
+    frameInfo->sampleFormat = kSampleFormatS16;
+    frameInfo->nbSamples = frame->nb_samples;
+    frameInfo->pts = frame->pts;
+    frameInfo->data = &audioPcmBuffer_[0];
+    frameInfo->dataSize = static_cast<int>(audioPcmBuffer_.size());
+    return true;
+}
+
+DecodeStatus DecodeSession::ReceiveAudioFrame(DecodedAudioFrameInfo* frameInfo)
+{
+    AVCodecContext* context = AsContext(codecContext_);
+    AVFrame* frame = AsFrame(frame_);
+    if (!context || !frame) {
+        SetError("DecodeSession is not open");
+        return kDecodeStatusFailure;
+    }
+
+    av_frame_unref(frame);
+    const int receiveResult = avcodec_receive_frame(context, frame);
+    if (receiveResult == 0) {
+        hasDecodedFrame_ = true;
+        if (!PackAudioFrameToS16(frame, frameInfo)) {
+            return kDecodeStatusFailure;
+        }
+        return kDecodeStatusFrameReady;
+    }
+    if (receiveResult == AVERROR(EAGAIN)) {
+        return kDecodeStatusNeedMoreInput;
+    }
+    if (receiveResult == AVERROR_EOF) {
+        return kDecodeStatusEndOfStream;
+    }
+
+    SetAvError("avcodec_receive_frame(audio)", receiveResult);
+    return kDecodeStatusFailure;
+}
+
+DecodeStatus DecodeSession::DecodeAudio(const uint8_t* data, size_t dataSize, int64_t pts, DecodedAudioFrameInfo* frameInfo)
+{
+    AVCodecContext* context = AsContext(codecContext_);
+    AVPacket* packet = AsPacket(packet_);
+    if (!context || !packet || !IsAudioCodec()) {
+        SetError("DecodeAudio requires an open audio session");
+        return kDecodeStatusFailure;
+    }
+
+    av_packet_unref(packet);
+    if (data && dataSize > 0) {
+        if (av_new_packet(packet, static_cast<int>(dataSize)) < 0) {
+            SetError("Failed to allocate audio packet");
+            return kDecodeStatusFailure;
+        }
+        memcpy(packet->data, data, dataSize);
+        packet->pts = pts;
+        packet->dts = pts;
+    }
+
+    const int sendResult = avcodec_send_packet(context, (data && dataSize > 0) ? packet : 0);
+    av_packet_unref(packet);
+    if (sendResult < 0 && sendResult != AVERROR(EAGAIN)) {
+        SetAvError("avcodec_send_packet(audio)", sendResult);
+        return kDecodeStatusFailure;
+    }
+
+    return ReceiveAudioFrame(frameInfo);
+}
+
+DecodeStatus DecodeSession::ReceiveAudio(DecodedAudioFrameInfo* frameInfo)
+{
+    return ReceiveAudioFrame(frameInfo);
+}
+
 void DecodeSession::SetError(const char* message)
 {
     if (!message) {
@@ -1085,6 +1307,15 @@ bool DecodeCodecFromModernAvCodecId(int codecId, DecodeCodec* codec)
     case AV_CODEC_ID_MPEG1VIDEO:
         *codec = kDecodeCodecMpeg1;
         return true;
+    case AV_CODEC_ID_COOK:
+        *codec = kDecodeCodecCook;
+        return true;
+    case AV_CODEC_ID_SIPR:
+        *codec = kDecodeCodecSipr;
+        return true;
+    case AV_CODEC_ID_ATRAC3:
+        *codec = kDecodeCodecAtrac3;
+        return true;
     default:
         return false;
     }
@@ -1109,6 +1340,18 @@ bool IsFirstWaveSoftwareCodec(DecodeCodec codec)
     case kDecodeCodecRv30:
     case kDecodeCodecRv40:
     case kDecodeCodecMpeg1:
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool IsRealAudioCodec(DecodeCodec codec)
+{
+    switch (codec) {
+    case kDecodeCodecCook:
+    case kDecodeCodecSipr:
+    case kDecodeCodecAtrac3:
         return true;
     default:
         return false;

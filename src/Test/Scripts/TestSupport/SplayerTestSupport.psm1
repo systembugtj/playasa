@@ -25,6 +25,7 @@ function Assert-SplayerFileExists {
 
 function Stop-SplayerProcesses {
   Get-Process -Name splayer -ErrorAction SilentlyContinue | Stop-Process -Force
+  Start-Sleep -Milliseconds 1500
 }
 
 function Clear-SplayerLog {
@@ -94,11 +95,17 @@ function Wait-SplayerLogNeedle {
 }
 
 function Get-SplayerLogMatchCount {
-  param([Parameter(Mandatory = $true)][string]$Needle)
+  param(
+    [Parameter(Mandatory = $true)][string]$Needle,
+    [switch]$PatternIsRegex
+  )
 
   $logText = Get-SplayerLogText
-  $matches = [regex]::Matches($logText, [regex]::Escape($Needle))
-  return $matches.Count
+  if ($PatternIsRegex) {
+    return [regex]::Matches($logText, $Needle).Count
+  }
+
+  return [regex]::Matches($logText, [regex]::Escape($Needle)).Count
 }
 
 function Wait-SplayerLogMatchCount {
@@ -108,7 +115,8 @@ function Wait-SplayerLogMatchCount {
     [Parameter(Mandatory = $true)][int]$MinimumCount,
     [Parameter(Mandatory = $true)][datetime]$Deadline,
     [Parameter(Mandatory = $true)][string]$TimeoutMessage,
-    [string[]]$FailureNeedles = @()
+    [string[]]$FailureNeedles = @(),
+    [switch]$PatternIsRegex
   )
 
   while ((Get-Date) -lt $Deadline) {
@@ -124,8 +132,12 @@ function Wait-SplayerLogMatchCount {
       }
     }
 
-    $matches = [regex]::Matches($logText, [regex]::Escape($Needle))
-    if ($matches.Count -ge $MinimumCount) {
+    $matchCount = if ($PatternIsRegex) {
+      [regex]::Matches($logText, $Needle).Count
+    } else {
+      [regex]::Matches($logText, [regex]::Escape($Needle)).Count
+    }
+    if ($matchCount -ge $MinimumCount) {
       return
     }
   }
@@ -186,8 +198,58 @@ public static class SplayerWin32Interop {
 
     [DllImport("user32.dll")]
     public static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")]
+    public static extern bool EnumChildWindows(IntPtr hWndParent, EnumWindowsProc lpEnumFunc, IntPtr lParam);
 }
 '@
+}
+
+function Find-SplayerSeekBarElementFromWindowHandle {
+  param(
+    [IntPtr]$MainWindowHandle = [IntPtr]::Zero,
+    [int]$ProcessId = 0
+  )
+
+  Initialize-SplayerUiAutomation
+  Initialize-SplayerWin32Interop
+  $script:splayerSeekBarElement = $null
+  $script:splayerSeekBarEnumProcessId = $ProcessId
+  $callback = {
+    param([IntPtr]$hWnd, [IntPtr]$lParam)
+
+    if ($script:splayerSeekBarEnumProcessId -gt 0) {
+      [uint32]$windowProcessId = 0
+      [SplayerWin32Interop]::GetWindowThreadProcessId($hWnd, [ref]$windowProcessId) | Out-Null
+      if ($windowProcessId -ne $script:splayerSeekBarEnumProcessId) {
+        return $true
+      }
+    }
+
+    try {
+      $element = [System.Windows.Automation.AutomationElement]::FromHandle($hWnd)
+      if (-not $element) {
+        return $true
+      }
+
+      if ($element.Current.AutomationId -eq 'SeekBar') {
+        $script:splayerSeekBarElement = $element
+        return $false
+      }
+
+      $rangeValuePattern = $null
+      if ($element.TryGetCurrentPattern([System.Windows.Automation.RangeValuePattern]::Pattern, [ref]$rangeValuePattern)) {
+        $script:splayerSeekBarElement = $element
+        return $false
+      }
+    } catch {
+      # Popup seek bar HWND may not expose a stable UIA provider yet.
+    }
+
+    return $true
+  }
+
+  [SplayerWin32Interop]::EnumWindows($callback, [IntPtr]::Zero) | Out-Null
+  return $script:splayerSeekBarElement
 }
 
 function Get-SplayerMainWindowHandle {
@@ -195,12 +257,13 @@ function Get-SplayerMainWindowHandle {
 
   Initialize-SplayerWin32Interop
   $script:splayerWindowHandle = [IntPtr]::Zero
+  $script:splayerMainWindowEnumProcessId = $ProcessId
   $callback = {
     param([IntPtr]$hWnd, [IntPtr]$lParam)
 
     [uint32]$windowProcessId = 0
     [SplayerWin32Interop]::GetWindowThreadProcessId($hWnd, [ref]$windowProcessId) | Out-Null
-    if ($windowProcessId -eq $ProcessId -and [SplayerWin32Interop]::IsWindowVisible($hWnd)) {
+    if ($windowProcessId -eq $script:splayerMainWindowEnumProcessId -and [SplayerWin32Interop]::IsWindowVisible($hWnd)) {
       $script:splayerWindowHandle = $hWnd
       return $false
     }
@@ -230,6 +293,66 @@ function Wait-SplayerMainWindowHandle {
   }
 
   throw 'Could not find splayer main window'
+}
+
+function Wait-SplayerUiaPlaybackReady {
+  param(
+    [Parameter(Mandatory = $true)][System.Diagnostics.Process]$Process,
+    [Parameter(Mandatory = $true)][datetime]$Deadline,
+    [Parameter(Mandatory = $true)][string]$TimeoutMessage,
+    [string]$FirstFrameNeedle = 'Modern FFmpeg bridge first frame ready',
+    [string[]]$FailureNeedles = @('Modern FFmpeg bridge decode failed'),
+    [switch]$RequireSeekBar,
+    [switch]$RequireVideoView
+  )
+
+  Wait-SplayerLogNeedle `
+    -Process $Process `
+    -Needle $FirstFrameNeedle `
+    -Deadline $Deadline `
+    -FailureNeedles $FailureNeedles `
+    -TimeoutMessage $TimeoutMessage
+
+  $uiDeadline = (Get-Date).AddSeconds([Math]::Max(45, ($Deadline - (Get-Date)).TotalSeconds))
+  $windowHandle = Wait-SplayerMainWindowHandle -Process $Process -Deadline $uiDeadline
+  Start-Sleep -Milliseconds 500
+  $automationRoot = Get-SplayerAutomationRoot -WindowHandle $windowHandle
+  $seekBar = $null
+  if ($RequireSeekBar) {
+    $seekBar = Assert-SplayerSeekBarAutomation -Root $automationRoot -ProcessId $Process.Id
+  }
+
+  if ($RequireVideoView) {
+    Assert-SplayerVideoViewAutomation -Root $automationRoot -ProcessId $Process.Id | Out-Null
+  }
+
+  return [PSCustomObject]@{
+    WindowHandle = $windowHandle
+    AutomationRoot = $automationRoot
+    SeekBar = $seekBar
+  }
+}
+
+function Wait-SplayerSeekBarRangeReady {
+  param(
+    [Parameter(Mandatory = $true)][System.Windows.Automation.AutomationElement]$Root,
+    [Parameter(Mandatory = $true)][int]$ProcessId,
+    [Parameter(Mandatory = $true)][datetime]$Deadline,
+    [System.Windows.Automation.AutomationElement]$SeekBar = $null
+  )
+
+  Initialize-SplayerUiAutomation
+  while ((Get-Date) -lt $Deadline) {
+    try {
+      $resolved = Resolve-SplayerSeekBarForSeek -Root $Root -ProcessId $ProcessId -SeekBar $SeekBar
+      return $resolved
+    } catch {
+      $SeekBar = $null
+      Start-Sleep -Milliseconds 250
+    }
+  }
+
+  throw 'UIA seek bar did not become ready for RangeValue seek; inspect UIA tree and playback state.'
 }
 
 function Send-SplayerCommand {
@@ -327,33 +450,283 @@ function Find-SplayerAutomationElementByProcessAndControlType {
   )
 }
 
+function Get-SplayerMainWindowAutomationElement {
+  param(
+    [Parameter(Mandatory = $true)][System.Windows.Automation.AutomationElement]$Root,
+    [int]$ProcessId = 0
+  )
+
+  $mainWindow = Find-SplayerAutomationElementById -Root $Root -AutomationId 'MainWindow'
+  if ($mainWindow) {
+    return $mainWindow
+  }
+
+  if ($ProcessId -gt 0) {
+    $mainWindow = Find-SplayerAutomationElementByProcessAndId -ProcessId $ProcessId -AutomationId 'MainWindow'
+    if ($mainWindow) {
+      return $mainWindow
+    }
+  }
+
+  return $Root
+}
+
+function Find-SplayerAutomationElementByTreeWalk {
+  param(
+    [Parameter(Mandatory = $true)][System.Windows.Automation.AutomationElement]$Root,
+    [Parameter(Mandatory = $true)][string]$AutomationId
+  )
+
+  Initialize-SplayerUiAutomation
+  try {
+    $walker = [System.Windows.Automation.TreeWalker]::RawViewWalker
+    $node = $walker.GetFirstChild($Root)
+    while ($node) {
+      try {
+        if ($node.Current.AutomationId -eq $AutomationId) {
+          return $node
+        }
+
+        $descendant = Find-SplayerAutomationElementByTreeWalk -Root $node -AutomationId $AutomationId
+        if ($descendant) {
+          return $descendant
+        }
+      } catch {
+        # Fragment children can become stale while playback is starting.
+      }
+
+      try {
+        $node = $walker.GetNextSibling($node)
+      } catch {
+        break
+      }
+    }
+  } catch {
+    return $null
+  }
+
+  return $null
+}
+
+function Add-SplayerSeekBarCandidate {
+  param(
+    [Parameter(Mandatory = $true)][System.Collections.Generic.Dictionary[string, System.Windows.Automation.AutomationElement]]$Candidates,
+    [System.Windows.Automation.AutomationElement]$Element
+  )
+
+  if (-not $Element) {
+    return
+  }
+
+  try {
+    $runtimeId = $Element.GetRuntimeId()
+    $runtimeKey = ($runtimeId | ForEach-Object { $_.ToString() }) -join '.'
+    if (-not $Candidates.ContainsKey($runtimeKey)) {
+      $Candidates.Add($runtimeKey, $Element)
+    }
+  } catch {
+    $fallbackKey = "handle:$($Element.Current.NativeWindowHandle)"
+    if (-not $Candidates.ContainsKey($fallbackKey)) {
+      $Candidates.Add($fallbackKey, $Element)
+    }
+  }
+}
+
+function Get-SplayerSeekBarCandidates {
+  param(
+    [System.Windows.Automation.AutomationElement]$Root = $null,
+    [int]$ProcessId = 0
+  )
+
+  Initialize-SplayerUiAutomation
+  $candidates = New-Object 'System.Collections.Generic.Dictionary[string, System.Windows.Automation.AutomationElement]'
+  if ($Root) {
+    $searchRoot = Get-SplayerMainWindowAutomationElement -Root $Root -ProcessId $ProcessId
+    Add-SplayerSeekBarCandidate -Candidates $candidates -Element (Find-SplayerAutomationElementById -Root $searchRoot -AutomationId 'SeekBar')
+    Add-SplayerSeekBarCandidate -Candidates $candidates -Element (Find-SplayerAutomationElementByTreeWalk -Root $searchRoot -AutomationId 'SeekBar')
+  }
+
+  if ($ProcessId -gt 0) {
+    Add-SplayerSeekBarCandidate -Candidates $candidates -Element (Find-SplayerAutomationElementByProcessAndId -ProcessId $ProcessId -AutomationId 'SeekBar')
+    Add-SplayerSeekBarCandidate -Candidates $candidates -Element (Find-SplayerSeekBarElementFromWindowHandle -ProcessId $ProcessId)
+  }
+
+  $candidateList = @()
+  foreach ($candidate in $candidates.Values) {
+    if ($null -ne $candidate) {
+      $candidateList += $candidate
+    }
+  }
+  return $candidateList
+}
+
+function Resolve-SplayerSeekBarForSeek {
+  param(
+    [System.Windows.Automation.AutomationElement]$Root = $null,
+    [int]$ProcessId = 0,
+    [System.Windows.Automation.AutomationElement]$SeekBar = $null
+  )
+
+  Initialize-SplayerUiAutomation
+  $candidateList = New-Object System.Collections.Generic.List[System.Windows.Automation.AutomationElement]
+  if ($SeekBar) {
+    [void]$candidateList.Add($SeekBar)
+  }
+  foreach ($candidate in (Get-SplayerSeekBarCandidates -Root $Root -ProcessId $ProcessId)) {
+    if ($null -ne $candidate) {
+      [void]$candidateList.Add($candidate)
+    }
+  }
+
+  $lastError = $null
+  foreach ($candidate in $candidateList) {
+    try {
+      if (-not $candidate.Current.IsEnabled) {
+        throw 'UIA seek bar is not enabled.'
+      }
+
+      $rangeValuePattern = $null
+      if (-not $candidate.TryGetCurrentPattern([System.Windows.Automation.RangeValuePattern]::Pattern, [ref]$rangeValuePattern)) {
+        throw 'UIA seek bar does not expose RangeValuePattern.'
+      }
+
+      $minimum = $rangeValuePattern.Current.Minimum
+      $maximum = $rangeValuePattern.Current.Maximum
+      if ($maximum -le $minimum) {
+        throw "UIA seek bar range is not ready: minimum=$minimum maximum=$maximum"
+      }
+
+      return [PSCustomObject]@{
+        SeekBar = $candidate
+        RangeValuePattern = $rangeValuePattern
+        Minimum = $minimum
+        Maximum = $maximum
+      }
+    } catch {
+      $lastError = $_
+    }
+  }
+
+  if ($lastError) {
+    throw $lastError
+  }
+
+  throw 'UIA seek bar was not found. Expected virtual provider AutomationId=SeekBar.'
+}
+
 function Assert-SplayerSeekBarAutomation {
+  param(
+    [Parameter(Mandatory = $true)][System.Windows.Automation.AutomationElement]$Root,
+    [int]$ProcessId = 0,
+    [int]$MaxAttempts = 40,
+    [int]$RetryDelayMilliseconds = 500
+  )
+
+  Initialize-SplayerUiAutomation
+  $lastError = $null
+  for ($attempt = 0; $attempt -lt $MaxAttempts; $attempt++) {
+    try {
+      $resolved = Resolve-SplayerSeekBarForSeek -Root $Root -ProcessId $ProcessId
+      return $resolved.SeekBar
+    } catch {
+      $lastError = $_
+      if ($attempt -ge ($MaxAttempts - 1)) {
+        throw $lastError
+      }
+      Start-Sleep -Milliseconds $RetryDelayMilliseconds
+    }
+  }
+}
+
+function Assert-SplayerVideoViewAutomation {
   param(
     [Parameter(Mandatory = $true)][System.Windows.Automation.AutomationElement]$Root,
     [int]$ProcessId = 0
   )
 
   Initialize-SplayerUiAutomation
-  $seekBar = Find-SplayerAutomationElementById -Root $Root -AutomationId 'SeekBar'
-  if (-not $seekBar) {
-    $seekBar = Find-SplayerAutomationElementByControlType -Root $Root -ControlType ([System.Windows.Automation.ControlType]::Slider)
+  $searchRoot = Get-SplayerMainWindowAutomationElement -Root $Root -ProcessId $ProcessId
+  $videoView = Find-SplayerAutomationElementById -Root $searchRoot -AutomationId 'VideoView'
+  if (-not $videoView -and $ProcessId -gt 0) {
+    $videoView = Find-SplayerAutomationElementByProcessAndId -ProcessId $ProcessId -AutomationId 'VideoView'
   }
-  if (-not $seekBar -and $ProcessId -gt 0) {
-    $seekBar = Find-SplayerAutomationElementByProcessAndId -ProcessId $ProcessId -AutomationId 'SeekBar'
-  }
-  if (-not $seekBar -and $ProcessId -gt 0) {
-    $seekBar = Find-SplayerAutomationElementByProcessAndControlType -ProcessId $ProcessId -ControlType ([System.Windows.Automation.ControlType]::Slider)
-  }
-  if (-not $seekBar) {
-    throw 'UIA seek bar was not found. Expected AutomationId=SeekBar or ControlType.Slider.'
+  if (-not $videoView) {
+    throw 'UIA video view was not found. Expected AutomationId=VideoView.'
   }
 
+  $boundingRect = $videoView.Current.BoundingRectangle
+  if ($boundingRect.Width -le 0 -or $boundingRect.Height -le 0) {
+    throw "UIA video view has an empty bounding rectangle: width=$($boundingRect.Width) height=$($boundingRect.Height)"
+  }
+
+  return $videoView
+}
+
+function Invoke-SplayerUiaSeek {
+  param(
+    [System.Windows.Automation.AutomationElement]$SeekBar = $null,
+    [System.Windows.Automation.AutomationElement]$Root = $null,
+    [IntPtr]$WindowHandle = [IntPtr]::Zero,
+    [int]$ProcessId = 0,
+    [Parameter(Mandatory = $true)][double]$TargetValue,
+    [int]$MaxAttempts = 8,
+    [int]$RetryDelayMilliseconds = 500
+  )
+
+  Initialize-SplayerUiAutomation
+  $lastError = $null
+  for ($attempt = 0; $attempt -lt $MaxAttempts; $attempt++) {
+    try {
+      $resolvedRoot = $Root
+      if (-not $resolvedRoot -and $ProcessId -gt 0) {
+        $latestHandle = Get-SplayerMainWindowHandle -ProcessId $ProcessId
+        if ($latestHandle -ne [IntPtr]::Zero) {
+          $WindowHandle = $latestHandle
+        }
+      }
+      if (-not $resolvedRoot -and $WindowHandle -ne [IntPtr]::Zero) {
+        try {
+          $resolvedRoot = Get-SplayerAutomationRoot -WindowHandle $WindowHandle
+        } catch {
+          # HWND UIA root can briefly fail while the fragment tree reparents after playback events.
+        }
+      }
+
+      $resolved = Resolve-SplayerSeekBarForSeek -Root $resolvedRoot -ProcessId $ProcessId -SeekBar $SeekBar
+      $rangeValuePattern = $resolved.RangeValuePattern
+      $minimum = $resolved.Minimum
+      $maximum = $resolved.Maximum
+      if ($TargetValue -lt $minimum -or $TargetValue -gt $maximum) {
+        throw "UIA seek target $TargetValue is outside range [$minimum, $maximum]."
+      }
+
+      $rangeValuePattern.SetValue($TargetValue)
+      return
+    } catch {
+      $lastError = $_
+      if ($attempt -ge 1) {
+        $SeekBar = $null
+      }
+      if ($attempt -ge ($MaxAttempts - 1)) {
+        throw $lastError
+      }
+      Start-Sleep -Milliseconds $RetryDelayMilliseconds
+    }
+  }
+}
+
+function Get-SplayerSeekBarRangeValuePattern {
+  param(
+    [Parameter(Mandatory = $true)][System.Windows.Automation.AutomationElement]$Root,
+    [int]$ProcessId = 0
+  )
+
+  $seekBar = Assert-SplayerSeekBarAutomation -Root $Root -ProcessId $ProcessId
   $rangeValuePattern = $null
   if (-not $seekBar.TryGetCurrentPattern([System.Windows.Automation.RangeValuePattern]::Pattern, [ref]$rangeValuePattern)) {
     throw 'UIA seek bar does not expose RangeValuePattern.'
   }
-
-  return $seekBar
+  return $rangeValuePattern
 }
 
 function Get-SplayerMsBuildPath {

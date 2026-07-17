@@ -4,7 +4,7 @@
 |------|------|
 | **状态** | 已完成 (Completed) |
 | **适用范围** | `MainFrm::SeekTo`、modern FFmpeg seek flush diagnostics、MKV seek selfcheck、测试脚本迁移、主窗口/seek bar UIA provider |
-| **相关 RFC** | [RFC-0024](../rfc-0024-ffmpeg-modern-island.md)、[RFC-0026](./rfc-0026-mkv-support-modernization.md)、[RFC-0028](../rfc-0028-uia-video-and-seek-followups.md) |
+| **相关 RFC** | [RFC-0024](../rfc-0024-ffmpeg-modern-island.md)、[RFC-0026](./rfc-0026-mkv-support-modernization.md)、[RFC-0028](./rfc-0028-uia-video-and-seek-followups.md) |
 | **创建日期** | 2026-04-27 |
 | **完成日期** | 2026-04-27 |
 
@@ -94,7 +94,7 @@ PowerShell parser 检查也已通过。
 剩余工作已转入：
 
 ```text
-.spec/rfc/rfc-0028-uia-video-and-seek-followups.md
+.spec/rfc/completed/rfc-0028-uia-video-and-seek-followups.md
 ```
 
 包括：

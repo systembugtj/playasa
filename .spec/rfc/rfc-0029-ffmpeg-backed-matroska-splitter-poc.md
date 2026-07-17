@@ -4,7 +4,7 @@
 |------|------|
 | **状态** | 提案 (Proposed) |
 | **适用范围** | FFmpeg-backed Matroska/WebM packet timeline dump、DirectShow source/splitter PoC、旧 `MatroskaSplitter` 与 `libavformat` packet contract 对比 |
-| **相关 RFC** | [RFC-0026](./completed/rfc-0026-mkv-support-modernization.md)、[RFC-0024](./rfc-0024-ffmpeg-modern-island.md)、[RFC-0028](./rfc-0028-uia-video-and-seek-followups.md) |
+| **相关 RFC** | [RFC-0026](./completed/rfc-0026-mkv-support-modernization.md)、[RFC-0024](./rfc-0024-ffmpeg-modern-island.md)、[RFC-0028](./completed/rfc-0028-uia-video-and-seek-followups.md) |
 | **创建日期** | 2026-04-27 |
 | **最后更新** | 2026-04-27 |
 

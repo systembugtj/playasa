@@ -10,7 +10,7 @@
 
 `.spec/rfc/` 跟踪 Playasa/SPlayer 现代化工作。**金规则**：实现与 RFC 声明对齐；完成后归档到 `.spec/rfc/completed/` 并修正全仓链接。
 
-最后更新：**2026-07-07**
+最后更新：**2026-07-16**
 
 ### 编号与状态一览
 
@@ -26,20 +26,20 @@
 | 0025 | FFmpeg DXVA / FfmpegContext 审计 | 已完成（审计） | [.spec/rfc/completed/rfc-0025-ffmpeg-dxva-followup.md](.spec/rfc/completed/rfc-0025-ffmpeg-dxva-followup.md) |
 | 0026 | MKV 短期 playback contract | 已完成 | [.spec/rfc/completed/rfc-0026-mkv-support-modernization.md](.spec/rfc/completed/rfc-0026-mkv-support-modernization.md) |
 | 0027 | MKV seek 稳定化 | 已完成 | [.spec/rfc/completed/rfc-0027-mkv-seek-stabilization.md](.spec/rfc/completed/rfc-0027-mkv-seek-stabilization.md) |
-| 0028 | UIA 视频区 + seek 预滚后续 | 提案 | [.spec/rfc/rfc-0028-uia-video-and-seek-followups.md](.spec/rfc/rfc-0028-uia-video-and-seek-followups.md) |
+| 0028 | UIA 视频区 + seek 预滚后续 | 已完成 | [.spec/rfc/completed/rfc-0028-uia-video-and-seek-followups.md](.spec/rfc/completed/rfc-0028-uia-video-and-seek-followups.md) |
 | 0029 | FFmpeg Matroska splitter PoC | 提案 | [.spec/rfc/rfc-0029-ffmpeg-backed-matroska-splitter-poc.md](.spec/rfc/rfc-0029-ffmpeg-backed-matroska-splitter-poc.md) |
 | 0030 | MPEG-2 DXVA picture context 合同 | 已实现（`MPCVideoDec` 路径） | [.spec/rfc/rfc-0030-mpeg2-dxva-context-modernization.md](.spec/rfc/rfc-0030-mpeg2-dxva-context-modernization.md) |
 | 0031 | MPEG-2 真实播放路径（`CMpeg2DecFilter`） | 已完成 | [.spec/rfc/completed/rfc-0031-mpeg2-playback-path-modernization.md](.spec/rfc/completed/rfc-0031-mpeg2-playback-path-modernization.md) |
 | 0032 | RMVB / RealVideo modern 播放 | 已完成 | [.spec/rfc/completed/rfc-0032-rmvb-realvideo-modern-playback.md](.spec/rfc/completed/rfc-0032-rmvb-realvideo-modern-playback.md) |
 | 0033 | DXVA 阶段 2：H.264 / VC-1 | 提案 | [.spec/rfc/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md](.spec/rfc/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) |
-| 0034 | RealAudio modern 播放 | 提案 | [.spec/rfc/rfc-0034-realaudio-modern-playback.md](.spec/rfc/rfc-0034-realaudio-modern-playback.md) |
+| 0034 | RealAudio modern 播放 | **执行中** | [.spec/rfc/rfc-0034-realaudio-modern-playback.md](.spec/rfc/rfc-0034-realaudio-modern-playback.md) |
 | 0035 | 旧 `mpcvideodec/ffmpeg` 树退役 | 提案 | [.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md](.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md) |
 
 ### FFmpeg modern 子 RFC 关系
 
 ```text
 RFC-0024 (island + bridge 父级)
-├── RFC-0026/0027 (MKV 短期) → RFC-0028 (UIA/seek) / RFC-0029 (长期 splitter)
+├── RFC-0026/0027/0028 (MKV 短期 + UIA/seek) ✓ → RFC-0029 (长期 splitter)
 ├── RFC-0030 (MPEG-2 DXVA context 合同)
 ├── RFC-0031 (CMpeg2DecFilter modern + 删 libmpeg2) ✓
 ├── RFC-0032 (RMVB/RealVideo; 含阶段 2 时间戳) ✓
@@ -53,9 +53,8 @@ RFC-0025 (已完成审计) ──► RFC-0030 ──► RFC-0033
 
 | 优先级 | RFC | 原因 |
 | --- | --- | --- |
-| P0 | **0028** | MKV/H.264 seek + UIA harness |
-| P1 | **0024** | 继续扩展 island codec / selfcheck |
-| P2 | **0034** | RealAudio（与 0032 正交） |
+| P0 | **0034** | RealAudio（0032 已收口；补齐 RMVB A/V） |
+| P0 | **0024** | 父级 island；随 0034 扩音频 decoder |
 | P2 | **0033** | DXVA；不破坏 modern software 线 |
 | P3 | **0035** | 旧树退役；依赖 0031/0032 等收口 |
 | P3 | **0029** | 长期 Matroska splitter PoC |
@@ -75,7 +74,7 @@ RFC-0025 (已完成审计) ──► RFC-0030 ──► RFC-0033
 | RFC | 脚本（相对 `src/Test/Scripts/`） |
 | --- | --- |
 | 0024 | `test-rfc0024-*-smoke.ps1`；`src/BuildScript/verify-rfc0024-ffmpeg-modern.ps1` |
-| 0027/0028 | `test-rfc0027-mkv-seek-selfcheck.ps1`, `test-rfc0027-uia-tree-selfcheck.ps1` |
+| 0027/0028 | `test-rfc0027-mkv-seek-selfcheck.ps1`, `test-rfc0027-uia-tree-selfcheck.ps1`, `test-rfc0028-uia-video-selfcheck.ps1`, `test-rfc0028-mkv-seek-uia-selfcheck.ps1` |
 | 0030 | `test-rfc0030-mpeg2-dxva-selfcheck.ps1` |
 | 0031 | `test-rfc0031-mpeg2-*.ps1` |
 | 0032 | `setup-rmvb-samples.ps1`, `test-rmvb-seek-selfcheck.ps1` |

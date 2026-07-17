@@ -33,7 +33,10 @@ enum {
     PLAYASA_FFMPEG_MODERN_CODEC_RV20 = 12,
     PLAYASA_FFMPEG_MODERN_CODEC_RV30 = 13,
     PLAYASA_FFMPEG_MODERN_CODEC_RV40 = 14,
-    PLAYASA_FFMPEG_MODERN_CODEC_MPEG1 = 15
+    PLAYASA_FFMPEG_MODERN_CODEC_MPEG1 = 15,
+    PLAYASA_FFMPEG_MODERN_CODEC_COOK = 16,
+    PLAYASA_FFMPEG_MODERN_CODEC_SIPR = 17,
+    PLAYASA_FFMPEG_MODERN_CODEC_ATRAC3 = 18
 };
 
 enum {
@@ -58,6 +61,14 @@ enum {
     PLAYASA_FFMPEG_MODERN_PIXFMT_GRAY8 = 11
 };
 
+enum {
+    PLAYASA_FFMPEG_MODERN_SAMPLEFMT_UNKNOWN = 0,
+    PLAYASA_FFMPEG_MODERN_SAMPLEFMT_S16 = 1,
+    PLAYASA_FFMPEG_MODERN_SAMPLEFMT_S32 = 2,
+    PLAYASA_FFMPEG_MODERN_SAMPLEFMT_FLT = 3,
+    PLAYASA_FFMPEG_MODERN_SAMPLEFMT_FLTP = 4
+};
+
 typedef struct PlayasaFfmpegModernFrameInfo {
     int32_t width;
     int32_t height;
@@ -68,15 +79,38 @@ typedef struct PlayasaFfmpegModernFrameInfo {
     int32_t linesize[4];
 } PlayasaFfmpegModernFrameInfo;
 
+typedef struct PlayasaFfmpegModernAudioOpenParams {
+    int32_t sample_rate;
+    int32_t channels;
+    int32_t bit_rate;
+    int32_t bits_per_coded_sample;
+    int32_t block_align;
+    const uint8_t* extra_data;
+    size_t extra_data_size;
+} PlayasaFfmpegModernAudioOpenParams;
+
+typedef struct PlayasaFfmpegModernAudioFrameInfo {
+    int32_t sample_rate;
+    int32_t channels;
+    int32_t sample_format;
+    int32_t nb_samples;
+    int64_t pts;
+    const uint8_t* data;
+    int32_t data_size;
+} PlayasaFfmpegModernAudioFrameInfo;
+
 PLAYASA_FFMPEG_MODERN_API uint32_t playasa_ffmpeg_modern_avcodec_version(void);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_codec_from_fourcc(uint32_t fourcc, uint32_t* codec);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_create(uint32_t codec, PlayasaFfmpegModernSession* session);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_open(PlayasaFfmpegModernSession session, const uint8_t* extra_data, size_t extra_data_size);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_open_with_h264_nal_length_size(PlayasaFfmpegModernSession session, const uint8_t* extra_data, size_t extra_data_size, int32_t h264_nal_length_size);
+PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_open_audio(PlayasaFfmpegModernSession session, const PlayasaFfmpegModernAudioOpenParams* params);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_decode(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, PlayasaFfmpegModernFrameInfo* frame_info);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_decode_with_pts(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, int64_t pts, PlayasaFfmpegModernFrameInfo* frame_info);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_decode_with_timing(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, int64_t pts, int64_t duration, PlayasaFfmpegModernFrameInfo* frame_info);
+PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_decode_audio(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, int64_t pts, PlayasaFfmpegModernAudioFrameInfo* frame_info);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_receive_pending(PlayasaFfmpegModernSession session, PlayasaFfmpegModernFrameInfo* frame_info);
+PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_receive_audio(PlayasaFfmpegModernSession session, PlayasaFfmpegModernAudioFrameInfo* frame_info);
 PLAYASA_FFMPEG_MODERN_API int playasa_ffmpeg_modern_drain(PlayasaFfmpegModernSession session, PlayasaFfmpegModernFrameInfo* frame_info);
 PLAYASA_FFMPEG_MODERN_API void playasa_ffmpeg_modern_flush(PlayasaFfmpegModernSession session);
 PLAYASA_FFMPEG_MODERN_API const char* playasa_ffmpeg_modern_last_error(PlayasaFfmpegModernSession session);

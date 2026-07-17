@@ -2,6 +2,7 @@
 #include "MainFrameUiaProvider.h"
 
 #include "MainFrm.h"
+#include "ChildView.h"
 #include "PlayerSeekBarUiaProvider.h"
 #include "PlayerVideoViewUiaProvider.h"
 
@@ -169,7 +170,10 @@ HRESULT STDMETHODCALLTYPE CMainFrameUiaProvider::Navigate(NavigateDirection dire
 	}
 
 	*provider = NULL;
-	if ((direction == NavigateDirection_FirstChild || direction == NavigateDirection_LastChild) && seekBarProvider_) {
+	if (direction == NavigateDirection_FirstChild && videoViewProvider_) {
+		*provider = static_cast<IRawElementProviderFragment*>(videoViewProvider_);
+		videoViewProvider_->AddRef();
+	} else if (direction == NavigateDirection_LastChild && seekBarProvider_) {
 		*provider = static_cast<IRawElementProviderFragment*>(seekBarProvider_);
 		seekBarProvider_->AddRef();
 	}
@@ -255,12 +259,27 @@ HRESULT STDMETHODCALLTYPE CMainFrameUiaProvider::ElementProviderFromPoint(double
 	}
 
 	*provider = NULL;
-	if (seekBarProvider_) {
+	if (seekBarProvider_ && frame_) {
 		CPlayerSeekBar* seekBar = frame_->GetSeekBar();
 		CRect seekRect;
 		seekBar->GetWindowRect(&seekRect);
 		if (seekRect.PtInRect(CPoint(static_cast<int>(x), static_cast<int>(y)))) {
 			return ReturnFragment(static_cast<IRawElementProviderFragment*>(seekBarProvider_), provider);
+		}
+	}
+	if (videoViewProvider_ && frame_) {
+		CChildView* videoView = frame_->GetVideoView();
+		CRect videoRect = videoView->GetVideoRect();
+		if (videoRect.IsRectEmpty()) {
+			videoView->GetClientRect(&videoRect);
+		}
+		CPoint topLeft(videoRect.left, videoRect.top);
+		CPoint bottomRight(videoRect.right, videoRect.bottom);
+		videoView->ClientToScreen(&topLeft);
+		videoView->ClientToScreen(&bottomRight);
+		CRect screenRect(topLeft, bottomRight);
+		if (screenRect.PtInRect(CPoint(static_cast<int>(x), static_cast<int>(y)))) {
+			return ReturnFragment(static_cast<IRawElementProviderFragment*>(videoViewProvider_), provider);
 		}
 	}
 	return ReturnFragment(static_cast<IRawElementProviderFragment*>(this), provider);

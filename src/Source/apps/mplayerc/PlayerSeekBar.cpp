@@ -143,12 +143,46 @@ bool CPlayerSeekBar::IsSeekEnabled() const
 
 void CPlayerSeekBar::SetAutomationPos(__int64 pos)
 {
-	if (!IsSeekEnabled()) {
+	if (m_start >= m_stop) {
 		return;
 	}
 
-	SetPosInternal(pos);
-	AfxGetMainWnd()->PostMessage(WM_HSCROLL, MAKEWPARAM((short)m_pos, SB_THUMBTRACK), (LPARAM)m_hWnd);
+	const __int64 clamped = min(max(pos, m_start), m_stop);
+	if (!::IsWindow(m_hWnd)) {
+		return;
+	}
+
+	ULARGE_INTEGER packed;
+	packed.QuadPart = static_cast<unsigned __int64>(clamped);
+	::SendMessage(
+		m_hWnd,
+		WM_SPLAYER_UIA_SEEK,
+		static_cast<WPARAM>(packed.LowPart),
+		static_cast<LPARAM>(packed.HighPart));
+}
+
+LRESULT CPlayerSeekBar::OnUiaSeekMessage(WPARAM wParam, LPARAM lParam)
+{
+	ULARGE_INTEGER packed;
+	packed.LowPart = static_cast<DWORD>(wParam);
+	packed.HighPart = static_cast<DWORD>(lParam);
+	const __int64 pos = static_cast<__int64>(packed.QuadPart);
+
+	SetPos(pos);
+	CMainFrame* frame = DYNAMIC_DOWNCAST(CMainFrame, GetParentFrame());
+	if (!frame) {
+		frame = DYNAMIC_DOWNCAST(CMainFrame, AfxGetMainWnd());
+	}
+	if (!frame) {
+		return 0;
+	}
+
+	__int64 t_start_time = 0;
+	__int64 t_stop_time = 0;
+	GetRange(t_start_time, t_stop_time);
+	const REFERENCE_TIME duration = t_stop_time > t_start_time ? (t_stop_time - t_start_time) : 0;
+	frame->SeekTo(GetPos(), 1, duration / 100);
+	return 0;
 }
 
 CRect CPlayerSeekBar::GetChannelRect()
@@ -222,6 +256,7 @@ BEGIN_MESSAGE_MAP(CPlayerSeekBar, CDialogBar)
 	ON_WM_RBUTTONDOWN()
 	ON_WM_RBUTTONUP()
 	ON_MESSAGE(WM_GETOBJECT, OnGetObject)
+	ON_MESSAGE(WM_SPLAYER_UIA_SEEK, OnUiaSeekMessage)
 END_MESSAGE_MAP()
 
 BOOL CPlayerSeekBar::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message){

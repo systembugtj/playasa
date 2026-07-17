@@ -44,6 +44,12 @@ ModernFfmpeg::DecodeCodec ToAdapterCodec(uint32_t codec)
         return ModernFfmpeg::kDecodeCodecRv40;
     case PLAYASA_FFMPEG_MODERN_CODEC_MPEG1:
         return ModernFfmpeg::kDecodeCodecMpeg1;
+    case PLAYASA_FFMPEG_MODERN_CODEC_COOK:
+        return ModernFfmpeg::kDecodeCodecCook;
+    case PLAYASA_FFMPEG_MODERN_CODEC_SIPR:
+        return ModernFfmpeg::kDecodeCodecSipr;
+    case PLAYASA_FFMPEG_MODERN_CODEC_ATRAC3:
+        return ModernFfmpeg::kDecodeCodecAtrac3;
     default:
         return ModernFfmpeg::kDecodeCodecMpeg4;
     }
@@ -68,6 +74,9 @@ bool IsValidCodec(uint32_t codec)
     case PLAYASA_FFMPEG_MODERN_CODEC_RV30:
     case PLAYASA_FFMPEG_MODERN_CODEC_RV40:
     case PLAYASA_FFMPEG_MODERN_CODEC_MPEG1:
+    case PLAYASA_FFMPEG_MODERN_CODEC_COOK:
+    case PLAYASA_FFMPEG_MODERN_CODEC_SIPR:
+    case PLAYASA_FFMPEG_MODERN_CODEC_ATRAC3:
         return true;
     default:
         return false;
@@ -176,9 +185,46 @@ uint32_t ToBridgeCodec(ModernFfmpeg::DecodeCodec codec)
         return PLAYASA_FFMPEG_MODERN_CODEC_RV40;
     case ModernFfmpeg::kDecodeCodecMpeg1:
         return PLAYASA_FFMPEG_MODERN_CODEC_MPEG1;
+    case ModernFfmpeg::kDecodeCodecCook:
+        return PLAYASA_FFMPEG_MODERN_CODEC_COOK;
+    case ModernFfmpeg::kDecodeCodecSipr:
+        return PLAYASA_FFMPEG_MODERN_CODEC_SIPR;
+    case ModernFfmpeg::kDecodeCodecAtrac3:
+        return PLAYASA_FFMPEG_MODERN_CODEC_ATRAC3;
     default:
         return PLAYASA_FFMPEG_MODERN_CODEC_MPEG4;
     }
+}
+
+int ToBridgeSampleFormat(int sampleFormat)
+{
+    switch (sampleFormat) {
+    case ModernFfmpeg::kSampleFormatS16:
+        return PLAYASA_FFMPEG_MODERN_SAMPLEFMT_S16;
+    case ModernFfmpeg::kSampleFormatS32:
+        return PLAYASA_FFMPEG_MODERN_SAMPLEFMT_S32;
+    case ModernFfmpeg::kSampleFormatFlt:
+        return PLAYASA_FFMPEG_MODERN_SAMPLEFMT_FLT;
+    case ModernFfmpeg::kSampleFormatFltp:
+        return PLAYASA_FFMPEG_MODERN_SAMPLEFMT_FLTP;
+    default:
+        return PLAYASA_FFMPEG_MODERN_SAMPLEFMT_UNKNOWN;
+    }
+}
+
+void CopyAudioFrameInfo(const ModernFfmpeg::DecodedAudioFrameInfo& source, PlayasaFfmpegModernAudioFrameInfo* target)
+{
+    if (!target) {
+        return;
+    }
+
+    target->sample_rate = source.sampleRate;
+    target->channels = source.channels;
+    target->sample_format = ToBridgeSampleFormat(source.sampleFormat);
+    target->nb_samples = source.nbSamples;
+    target->pts = source.pts;
+    target->data = source.data;
+    target->data_size = source.dataSize;
 }
 
 } // namespace
@@ -242,6 +288,32 @@ int playasa_ffmpeg_modern_open(PlayasaFfmpegModernSession session, const uint8_t
     return playasa_ffmpeg_modern_open_with_h264_nal_length_size(session, extra_data, extra_data_size, 0);
 }
 
+int playasa_ffmpeg_modern_open_audio(PlayasaFfmpegModernSession session, const PlayasaFfmpegModernAudioOpenParams* params)
+{
+    ModernFfmpeg::DecodeSession* decodeSession = ToSession(session);
+    if (!decodeSession || !params) {
+        return 0;
+    }
+    if (!params->extra_data && params->extra_data_size > 0) {
+        return 0;
+    }
+
+    ModernFfmpeg::AudioOpenParams adapterParams = {};
+    adapterParams.sampleRate = params->sample_rate;
+    adapterParams.channels = params->channels;
+    adapterParams.bitRate = params->bit_rate;
+    adapterParams.bitsPerCodedSample = params->bits_per_coded_sample;
+    adapterParams.blockAlign = params->block_align;
+    adapterParams.extraData = params->extra_data;
+    adapterParams.extraDataSize = params->extra_data_size;
+
+    try {
+        return decodeSession->OpenWithAudioParams(adapterParams) ? 1 : 0;
+    } catch (...) {
+        return 0;
+    }
+}
+
 int playasa_ffmpeg_modern_decode(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, PlayasaFfmpegModernFrameInfo* frame_info)
 {
     return playasa_ffmpeg_modern_decode_with_pts(session, data, data_size, PLAYASA_FFMPEG_MODERN_NO_PTS, frame_info);
@@ -280,6 +352,40 @@ int playasa_ffmpeg_modern_receive_pending(PlayasaFfmpegModernSession session, Pl
         ModernFfmpeg::DecodedFrameInfo adapterFrame = {};
         const int status = ToBridgeStatus(decodeSession->ReceivePending(&adapterFrame));
         CopyFrameInfo(adapterFrame, frame_info);
+        return status;
+    } catch (...) {
+        return PLAYASA_FFMPEG_MODERN_STATUS_FAILURE;
+    }
+}
+
+int playasa_ffmpeg_modern_decode_audio(PlayasaFfmpegModernSession session, const uint8_t* data, size_t data_size, int64_t pts, PlayasaFfmpegModernAudioFrameInfo* frame_info)
+{
+    ModernFfmpeg::DecodeSession* decodeSession = ToSession(session);
+    if (!decodeSession) {
+        return PLAYASA_FFMPEG_MODERN_STATUS_FAILURE;
+    }
+
+    try {
+        ModernFfmpeg::DecodedAudioFrameInfo adapterFrame = {};
+        const int status = ToBridgeStatus(decodeSession->DecodeAudio(data, data_size, pts, &adapterFrame));
+        CopyAudioFrameInfo(adapterFrame, frame_info);
+        return status;
+    } catch (...) {
+        return PLAYASA_FFMPEG_MODERN_STATUS_FAILURE;
+    }
+}
+
+int playasa_ffmpeg_modern_receive_audio(PlayasaFfmpegModernSession session, PlayasaFfmpegModernAudioFrameInfo* frame_info)
+{
+    ModernFfmpeg::DecodeSession* decodeSession = ToSession(session);
+    if (!decodeSession) {
+        return PLAYASA_FFMPEG_MODERN_STATUS_FAILURE;
+    }
+
+    try {
+        ModernFfmpeg::DecodedAudioFrameInfo adapterFrame = {};
+        const int status = ToBridgeStatus(decodeSession->ReceiveAudio(&adapterFrame));
+        CopyAudioFrameInfo(adapterFrame, frame_info);
         return status;
     } catch (...) {
         return PLAYASA_FFMPEG_MODERN_STATUS_FAILURE;

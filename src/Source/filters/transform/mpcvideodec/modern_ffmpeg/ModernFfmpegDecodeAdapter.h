@@ -22,7 +22,10 @@ enum DecodeCodec {
     kDecodeCodecRv20,
     kDecodeCodecRv30,
     kDecodeCodecRv40,
-    kDecodeCodecMpeg1
+    kDecodeCodecMpeg1,
+    kDecodeCodecCook,
+    kDecodeCodecSipr,
+    kDecodeCodecAtrac3
 };
 
 enum DecodeStatus {
@@ -30,6 +33,14 @@ enum DecodeStatus {
     kDecodeStatusNeedMoreInput,
     kDecodeStatusEndOfStream,
     kDecodeStatusFailure
+};
+
+enum SampleFormat {
+    kSampleFormatUnknown = 0,
+    kSampleFormatS16 = 1,
+    kSampleFormatS32 = 2,
+    kSampleFormatFlt = 3,
+    kSampleFormatFltp = 4
 };
 
 struct DecodedFrameInfo {
@@ -42,6 +53,26 @@ struct DecodedFrameInfo {
     int linesize[4];
 };
 
+struct AudioOpenParams {
+    int sampleRate;
+    int channels;
+    int bitRate;
+    int bitsPerCodedSample;
+    int blockAlign;
+    const uint8_t* extraData;
+    size_t extraDataSize;
+};
+
+struct DecodedAudioFrameInfo {
+    int sampleRate;
+    int channels;
+    int sampleFormat;
+    int nbSamples;
+    int64_t pts;
+    const uint8_t* data;
+    int dataSize;
+};
+
 class DecodeSession {
 public:
     explicit DecodeSession(DecodeCodec codec);
@@ -50,10 +81,13 @@ public:
     bool Open();
     bool OpenWithExtradata(const uint8_t* extraData, size_t extraDataSize);
     bool OpenWithH264NalLengthSize(const uint8_t* extraData, size_t extraDataSize, int h264NalLengthSize);
+    bool OpenWithAudioParams(const AudioOpenParams& params);
     DecodeStatus Decode(const uint8_t* data, size_t dataSize, DecodedFrameInfo* frameInfo);
     DecodeStatus DecodeWithPts(const uint8_t* data, size_t dataSize, int64_t pts, DecodedFrameInfo* frameInfo);
     DecodeStatus DecodeWithTiming(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo);
+    DecodeStatus DecodeAudio(const uint8_t* data, size_t dataSize, int64_t pts, DecodedAudioFrameInfo* frameInfo);
     DecodeStatus ReceivePending(DecodedFrameInfo* frameInfo);
+    DecodeStatus ReceiveAudio(DecodedAudioFrameInfo* frameInfo);
     DecodeStatus Drain(DecodedFrameInfo* frameInfo);
     void Flush();
 
@@ -64,14 +98,17 @@ private:
     DecodeSession& operator=(const DecodeSession&);
 
     DecodeStatus ReceiveFrame(DecodedFrameInfo* frameInfo);
+    DecodeStatus ReceiveAudioFrame(DecodedAudioFrameInfo* frameInfo);
     DecodeStatus SendPacket(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo);
     DecodeStatus SendParsedPacket(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo);
     DecodeStatus SendH264Packet(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration, DecodedFrameInfo* frameInfo);
     DecodeStatus SendStoredPendingPacket(DecodedFrameInfo* frameInfo);
     void SaveParsedPendingInput(const uint8_t* data, int dataSize, int64_t pts, int64_t duration);
     void SavePendingPacket(const uint8_t* data, size_t dataSize, int64_t pts, int64_t duration);
+    bool PackAudioFrameToS16(const void* frame, DecodedAudioFrameInfo* frameInfo);
     void SetError(const char* message);
     void SetAvError(const char* operation, int errorCode);
+    bool IsAudioCodec() const;
 
     DecodeCodec codec_;
     void* codecContext_;
@@ -93,11 +130,13 @@ private:
     bool h264UseNativeAvc_;
     bool h264HasPendingVcl_;
     bool hasDecodedFrame_;
+    std::vector<uint8_t> audioPcmBuffer_;
     char lastError_[256];
 };
 
 bool DecodeCodecFromFourcc(uint32_t fourcc, DecodeCodec* codec);
 bool DecodeCodecFromModernAvCodecId(int codecId, DecodeCodec* codec);
 bool IsFirstWaveSoftwareCodec(DecodeCodec codec);
+bool IsRealAudioCodec(DecodeCodec codec);
 
 } // namespace ModernFfmpeg

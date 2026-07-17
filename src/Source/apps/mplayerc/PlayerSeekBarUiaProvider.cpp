@@ -87,6 +87,11 @@ void CPlayerSeekBarUiaProvider::SetFragmentParent(IRawElementProviderFragment* p
 	parent_ = parent;
 }
 
+void CPlayerSeekBarUiaProvider::SetFragmentRoot(IRawElementProviderFragmentRoot* root)
+{
+	root_ = root;
+}
+
 void CPlayerSeekBarUiaProvider::SetPreviousSibling(IRawElementProviderFragment* previousSibling)
 {
 	previousSibling_ = previousSibling;
@@ -196,6 +201,12 @@ HRESULT STDMETHODCALLTYPE CPlayerSeekBarUiaProvider::get_HostRawElementProvider(
 	}
 
 	*provider = NULL;
+	// Virtual children under MainFrame must not merge the popup HWND host; otherwise
+	// RangeValuePattern.SetValue is routed to the default HWND provider and fails.
+	if (parent_) {
+		return S_OK;
+	}
+
 	return UiaHostProviderFromHwnd(seekBar_ ? seekBar_->m_hWnd : NULL, provider);
 }
 
@@ -323,13 +334,17 @@ HRESULT STDMETHODCALLTYPE CPlayerSeekBarUiaProvider::GetFocus(IRawElementProvide
 
 HRESULT STDMETHODCALLTYPE CPlayerSeekBarUiaProvider::SetValue(double value)
 {
-	if (!seekBar_ || !seekBar_->IsSeekEnabled()) {
-		return HRESULT_FROM_WIN32(ERROR_INVALID_STATE);
+	if (!seekBar_) {
+		return E_POINTER;
 	}
 
 	__int64 minimum = 0;
 	__int64 maximum = 0;
 	GetRange(minimum, maximum);
+	if (maximum <= minimum) {
+		return HRESULT_FROM_WIN32(ERROR_INVALID_STATE);
+	}
+
 	const __int64 target = max(minimum, min(maximum, static_cast<__int64>(value)));
 	seekBar_->SetAutomationPos(target);
 	return S_OK;

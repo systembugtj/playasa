@@ -4,7 +4,7 @@
 |------|------|
 | **状态** | 已完成 (Completed) |
 | **适用范围** | `MatroskaSplitter`、`BaseSplitter` packet contract、`MPCVideoDec` modern FFmpeg bridge、MKV/H264 播放验证 |
-| **相关 RFC** | [RFC-0024](../rfc-0024-ffmpeg-modern-island.md)、[RFC-0025](./rfc-0025-ffmpeg-dxva-followup.md)、[RFC-0028](../rfc-0028-uia-video-and-seek-followups.md)、[RFC-0029](../rfc-0029-ffmpeg-backed-matroska-splitter-poc.md) |
+| **相关 RFC** | [RFC-0024](../rfc-0024-ffmpeg-modern-island.md)、[RFC-0025](./rfc-0025-ffmpeg-dxva-followup.md)、[RFC-0028](./rfc-0028-uia-video-and-seek-followups.md)、[RFC-0029](../rfc-0029-ffmpeg-backed-matroska-splitter-poc.md) |
 | **创建日期** | 2026-04-27 |
 | **完成日期** | 2026-04-27 |
 
@@ -75,7 +75,7 @@ test-rfc0026-mkv-timing-selfcheck: OK
 2. 短期最高优先级是稳定现有 DirectShow packet/timing contract。
 3. FFmpeg-backed MKV 支持如果继续推进，必须在 DirectShow source/splitter 层。
 4. 旧 `MatroskaSplitter` 的长期替换 PoC 由 [RFC-0029](../rfc-0029-ffmpeg-backed-matroska-splitter-poc.md) 跟踪。
-5. seek 后首帧与 decode-start/presentation-target 分离属于后续 seek 稳定性工作，由 [RFC-0028](../rfc-0028-uia-video-and-seek-followups.md) 跟踪。
+5. seek 后首帧与 decode-start/presentation-target 分离属于后续 seek 稳定性工作，由 [RFC-0028](./rfc-0028-uia-video-and-seek-followups.md) 跟踪。
 
 ## 5. 相关文件
 

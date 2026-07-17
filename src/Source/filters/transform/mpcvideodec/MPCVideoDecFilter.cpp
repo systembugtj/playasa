@@ -2077,11 +2077,17 @@ HRESULT CMPCVideoDecFilter::DeliverModernFfmpegFrame(IMediaSample* pIn, PlayasaF
 		rtStart = PlayasaApplyRealVideoOutputRtStart(m_rtRVStart, realvideo_in_timestamp, m_tStart, m_rtAvrTimePerFrame);
 		rtStop = rtStart + 1;
 	} else {
+		const REFERENCE_TIME sampleRtStart = rtStart;
 		if (frameInfo.pts != PLAYASA_FFMPEG_MODERN_NO_PTS) {
 			rtStart = frameInfo.pts;
 		}
 		const REFERENCE_TIME frameDuration = NormalizeModernFfmpegFrameDuration(frameInfo.duration, inputDuration, m_rtAvrTimePerFrame);
 		rtStop = rtStart + frameDuration;
+		// After seek, bridge PTS can lag behind splitter-relative sample times; trust the sample clock then.
+		if (rtStart < 0 && sampleRtStart >= 0) {
+			rtStart = sampleRtStart;
+			rtStop = rtStart + frameDuration;
+		}
 	}
 	pOut->SetTime(&rtStart, &rtStop);
 	pOut->SetMediaTime(NULL, NULL);

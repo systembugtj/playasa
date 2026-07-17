@@ -341,6 +341,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClCompile Include="KeyProvider.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="MainFrameUiaProvider.cpp" />
+    <ClCompile Include="PlayerVideoViewUiaProvider.cpp" />
     <ClCompile Include="MakeMultiplyBmp.cpp" />
     <ClCompile Include="MediaFormats.cpp" />
     <ClCompile Include="MediaTypesDlg.cpp" />
@@ -532,6 +533,7 @@ echo #define MPC_REV_STR _T("") &gt;&gt;.\revision.h
     <ClInclude Include="KeyProvider.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="MainFrameUiaProvider.h" />
+    <ClInclude Include="PlayerVideoViewUiaProvider.h" />
     <ClInclude Include="MakeMultiplyBmp.h" />
     <ClInclude Include="MediaFormats.h" />
     <ClInclude Include="MediaTypesDlg.h" />

@@ -233,6 +233,8 @@ public:
 ////////////
 #include "..\..\transform\mpcvideodec\modern_ffmpeg\RealVideoExtradata.h"
 #include "..\..\transform\mpcvideodec\modern_ffmpeg\RealVideoPresentationTiming.h"
+#include "..\..\transform\mpcvideodec\modern_ffmpeg\RealAudioModernDecodeAdapter.h"
+#include "..\..\transform\mpcvideodec\modern_ffmpeg\RealAudioExtradata.h"
 
 class __declspec(uuid("238D0F23-5DC9-45A6-9BE2-666160C324DD")) CRealVideoDecoder : public CBaseVideoFilter
 {
@@ -293,9 +295,6 @@ public:
 };
 
 
-struct AVCodec;
-struct AVCodecContext;
-
 class __declspec(uuid("941A4793-A705-4312-8DFC-C11CA05F397E")) CRealAudioDecoder : public CTransformFilter
 {
 #ifndef RA_FFMPEG
@@ -327,13 +326,12 @@ class __declspec(uuid("941A4793-A705-4312-8DFC-C11CA05F397E")) CRealAudioDecoder
     HMODULE m_hDrvDll;
     DWORD m_dwCookie;
 #else
-    // === FFMpeg variables
-    AVCodec*				m_pAVCodec;
-    AVCodecContext*			m_pAVCtx;
-    BYTE*					m_pPCMData;
-    bool InitFfmpeg(int nCodecId);
-    void ffmpeg_stream_finish();
-    static void LogLibAVCodec(void* par,int level,const char *fmt,va_list valist);
+    CRealAudioModernDecodeAdapter m_modernAudio;
+    uint32_t m_modernCodec;
+    int m_modernBlockAlign;
+    bool m_fModernFirstPcmLogged;
+    bool InitModernAudio(uint32_t modernCodec);
+    void FreeModernAudio();
 #endif
    
 	HRESULT InitRA(const CMediaType* pmt);

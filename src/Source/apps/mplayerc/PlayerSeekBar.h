@@ -21,6 +21,10 @@
 
 #pragma once
 
+#ifndef WM_SPLAYER_UIA_SEEK
+#define WM_SPLAYER_UIA_SEEK (WM_APP + 427)
+#endif
+
 #include "SUIButton.h"
 // CPlayerSeekBar
 #include "SeekBarTip.h"
@@ -87,6 +91,7 @@ protected:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	afx_msg LRESULT OnGetObject(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnUiaSeekMessage(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 public:

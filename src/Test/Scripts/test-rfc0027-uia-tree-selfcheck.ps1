@@ -7,7 +7,8 @@
 param(
   [string]$SamplePath = '',
   [int]$TimeoutSeconds = 45,
-  [switch]$RequireSeekBar
+  [switch]$RequireSeekBar,
+  [switch]$RequireVideoView
 )
 
 $ErrorActionPreference = 'Stop'
@@ -42,6 +43,10 @@ try {
 
   if ($RequireSeekBar) {
     Assert-SplayerSeekBarAutomation -Root $automationRoot -ProcessId $process.Id | Out-Null
+  }
+
+  if ($RequireVideoView) {
+    Assert-SplayerVideoViewAutomation -Root $automationRoot -ProcessId $process.Id | Out-Null
   }
 
   Write-Host 'test-rfc0027-uia-tree-selfcheck: OK' -ForegroundColor Green

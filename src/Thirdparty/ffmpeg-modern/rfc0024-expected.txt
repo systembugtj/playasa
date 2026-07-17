@@ -1,7 +1,7 @@
 RFC-0024 FFmpeg modern island pin
 
 Status: vendored-source-pinned
-Last updated: 2026-04-25
+Last updated: 2026-07-16
 
 Source:
 - Product: FFmpeg
@@ -52,6 +52,9 @@ Configure pins:
 - --enable-decoder=mpeg2video
 - --enable-decoder=mpeg1video
 - --enable-decoder=vc1
+- --enable-decoder=cook
+- --enable-decoder=sipr
+- --enable-decoder=atrac3
 - --enable-demuxer=avi
 - --enable-demuxer=flv
 - --enable-demuxer=matroska
@@ -78,9 +81,7 @@ First-wave software codecs:
 - H264 software decode
 - MPEG-2 software decode
 - WMV3 software decode
-- VC-1 software decode
-
-Adapter pins:
+- RealAudio cook / sipr / atrac3 (RFC-0034)
 - src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegDecodeAdapter.h
 - src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegDecodeAdapter.cpp
 - Adapter must use avcodec_send_packet / avcodec_receive_frame.
