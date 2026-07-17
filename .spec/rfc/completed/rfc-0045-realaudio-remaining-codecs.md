@@ -19,10 +19,10 @@
 
 | Commit | 文件 | 说明 |
 | --- | --- | --- |
-| `e76b6289`..`CLOSE_HASH` | `rfc0024-expected.txt`、build/verify | `--enable-decoder=aac\|ra_144\|ra_288` |
-| `e76b6289`..`CLOSE_HASH` | `ffmpeg_modern_bridge.h`、`ModernFfmpeg*` | codec 19–21 + `IsRealAudioCodec` |
-| `e76b6289`..`CLOSE_HASH` | `RealAudioExtradata.*`、`RealMediaSplitter.cpp` | AAC ASC `0x02`；subtype；InitRA |
-| `CLOSE_HASH` | `MPCVideoDecModernBridgeSmoke.cpp`、`test-rfc0045-*.ps1` | AAC/RA144/RA288 open smoke + selfcheck |
+| `e76b6289`..`01df921f` | `rfc0024-expected.txt`、build/verify | `--enable-decoder=aac\|ra_144\|ra_288` |
+| `e76b6289`..`01df921f` | `ffmpeg_modern_bridge.h`、`ModernFfmpeg*` | codec 19–21 + `IsRealAudioCodec` |
+| `e76b6289`..`01df921f` | `RealAudioExtradata.*`、`RealMediaSplitter.cpp` | AAC ASC `0x02`；subtype；InitRA |
+| `01df921f` | `MPCVideoDecModernBridgeSmoke.cpp`、`test-rfc0045-*.ps1` | AAC/RA144/RA288 open smoke + selfcheck |
 
 Build: island rebuild + bridge + `./dev.ps1 buildFast` PASS（2026-07-17）。
 

@@ -19,8 +19,8 @@
 
 | Commit | 文件 | 说明 |
 | --- | --- | --- |
-| `e76b6289`..`CLOSE_HASH` | `RealMediaSplitter.h` / `.cpp` | 删除 `RA_FFMPEG`/Real SDK；仅保留 `CRealAudioModernDecodeAdapter`；sipr swap 保留 modern 实现；`DecideBufferSize` 用 `kRealAudioMaxPcmBufferBytes` |
-| `CLOSE_HASH` | `FGManager.cpp` | 去掉误留的 `RA_FFMPEG` 名称分支 |
+| `e76b6289`..`01df921f` | `RealMediaSplitter.h` / `.cpp` | 删除 `RA_FFMPEG`/Real SDK；仅保留 `CRealAudioModernDecodeAdapter`；sipr swap 保留 modern 实现；`DecideBufferSize` 用 `kRealAudioMaxPcmBufferBytes` |
+| `01df921f` | `FGManager.cpp` | 去掉误留的 `RA_FFMPEG` 名称分支 |
 
 Grep：`RA_FFMPEG` / `RAOpenCodec` / `m_hDrvDll` / `RADecode` / `PCloseCodec` → 零命中。
 

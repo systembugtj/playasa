@@ -71,7 +71,7 @@
 | Commit | 文件 | 说明 |
 | --- | --- | --- |
 | `e76b6289` | `ffmpeg_modern_bridge.h`、`ModernFfmpeg*`、`RealAudio*`、`RealMediaSplitter.*` | cook/sipr/atrac3 + audio ABI 主实现 |
-| `CLOSE_HASH` | `RealMediaSplitter.*`、`completed/rfc-0034-*.md` | 收口归档与遗留交叉引用（0044/0045） |
+| `01df921f` | `RealMediaSplitter.*`、`completed/rfc-0034-*.md` | 收口归档与遗留交叉引用（0044/0045） |
 
 Build: `./dev.ps1 buildFast` PASS（2026-07-17）；`build-rfc0024-ffmpeg-modern.ps1` + `build-rfc0024-ffmpeg-bridge.ps1` PASS。
 

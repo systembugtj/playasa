@@ -2,10 +2,11 @@
 
 | 字段 | 内容 |
 | --- | --- |
-| **状态** | 提案 (Proposed) |
+| **状态** | 执行中 (In Progress) |
 | **创建日期** | 2026-05-17 |
+| **最后更新** | 2026-07-17 |
 | **负责人** | AI / Playasa |
-| **相关 RFC** | [RFC-0025](./completed/rfc-0025-ffmpeg-dxva-followup.md)、[RFC-0030](./rfc-0030-mpeg2-dxva-context-modernization.md)、[RFC-0024](./rfc-0024-ffmpeg-modern-island.md)、[RFC-0031](./completed/rfc-0031-mpeg2-playback-path-modernization.md) |
+| **相关 RFC** | [RFC-0025](./completed/rfc-0025-ffmpeg-dxva-followup.md)、[RFC-0030](./rfc-0030-mpeg2-dxva-context-modernization.md)、[RFC-0024](./rfc-0024-ffmpeg-modern-island.md)、[RFC-0031](./completed/rfc-0031-mpeg2-playback-path-modernization.md)、[RFC-0035](./rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md) |
 
 ## 1. 摘要
 
@@ -67,10 +68,12 @@
 
 **方案 A**：H.264 DXVA contract 先行；VC-1 紧随其后。实施前必须确认对应 codec 的 **modern software** selfcheck 与 seek 稳定（RFC-0024/0027/0028）。
 
-## 8. 实施计划（待启动）
+## 8. 实施计划
 
-1. 审计 `FfmpegContext.c` / `DXVADecoder` 中 H.264、VC-1 字段使用清单。
-2. 新增 `DxvaH264PictureContext`、`DxvaVc1PictureContext`（命名可调整）头文件与只读 reader。
+1. **阶段 1（已完成 2026-07-17）**：审计 `FfmpegContext.c` / `DXVADecoderH264` / `DXVADecoderVC1` 对 `H264Context` / `VC1Context` 的字段使用。
+   - 脚本：`src/BuildScript/audit-rfc0033-dxva-h264-vc1-refs.ps1`
+   - 清单：`src/Thirdparty/ffmpeg-modern/mpcvideodec-dxva-h264-vc1-refs.txt`
+2. 新增 `DxvaH264PictureContext`、`DxvaVc1PictureContext`（命名可调整）头文件与只读 reader（模板：`DxvaMpeg2PictureContext` / `FFMpeg2ReadPictureContext`）。
 3. 重构 DXVA decoder 消费点为 contract-only。
 4. 新增 `test-rfc0033-h264-dxva-selfcheck.ps1`（或扩展现有 0030 脚本参数化）。
 5. 手测：DXVA 开/关、modern bridge 开/关 四象限矩阵。
@@ -86,6 +89,6 @@ test-rfc0030-mpeg2-dxva-selfcheck.ps1: 仍 PASS / SKIP 语义不变
 
 ## 10. 下一步行动
 
-1. 等待 RFC-0031 libmpeg2 收口与 RFC-0032 阶段 2 完成，避免并行大改 `mpcvideodec`。
-2. 从 H.264 DXVA 字段审计与 contract 头文件开始。
-3. 更新本 RFC 状态为「执行中」时同步 [ROADMAP](../../ROADMAP.md) 与 [TASK_TRACKING.md](../../TASK_TRACKING.md)。
+1. ~~等待 RFC-0031/0032 收口~~（已完成）。
+2. **下一步**：设计并落地 `DxvaH264PictureContext` + `FFH264ReadPictureContext`（先 H.264，后 VC-1）。
+3. 状态/索引已同步 [ROADMAP](../../ROADMAP.md) 与 [TASK_TRACKING.md](../../TASK_TRACKING.md)。
