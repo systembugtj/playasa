@@ -50,6 +50,12 @@ ModernFfmpeg::DecodeCodec ToAdapterCodec(uint32_t codec)
         return ModernFfmpeg::kDecodeCodecSipr;
     case PLAYASA_FFMPEG_MODERN_CODEC_ATRAC3:
         return ModernFfmpeg::kDecodeCodecAtrac3;
+    case PLAYASA_FFMPEG_MODERN_CODEC_AAC:
+        return ModernFfmpeg::kDecodeCodecAac;
+    case PLAYASA_FFMPEG_MODERN_CODEC_RA144:
+        return ModernFfmpeg::kDecodeCodecRa144;
+    case PLAYASA_FFMPEG_MODERN_CODEC_RA288:
+        return ModernFfmpeg::kDecodeCodecRa288;
     default:
         return ModernFfmpeg::kDecodeCodecMpeg4;
     }
@@ -77,6 +83,9 @@ bool IsValidCodec(uint32_t codec)
     case PLAYASA_FFMPEG_MODERN_CODEC_COOK:
     case PLAYASA_FFMPEG_MODERN_CODEC_SIPR:
     case PLAYASA_FFMPEG_MODERN_CODEC_ATRAC3:
+    case PLAYASA_FFMPEG_MODERN_CODEC_AAC:
+    case PLAYASA_FFMPEG_MODERN_CODEC_RA144:
+    case PLAYASA_FFMPEG_MODERN_CODEC_RA288:
         return true;
     default:
         return false;
@@ -191,6 +200,12 @@ uint32_t ToBridgeCodec(ModernFfmpeg::DecodeCodec codec)
         return PLAYASA_FFMPEG_MODERN_CODEC_SIPR;
     case ModernFfmpeg::kDecodeCodecAtrac3:
         return PLAYASA_FFMPEG_MODERN_CODEC_ATRAC3;
+    case ModernFfmpeg::kDecodeCodecAac:
+        return PLAYASA_FFMPEG_MODERN_CODEC_AAC;
+    case ModernFfmpeg::kDecodeCodecRa144:
+        return PLAYASA_FFMPEG_MODERN_CODEC_RA144;
+    case ModernFfmpeg::kDecodeCodecRa288:
+        return PLAYASA_FFMPEG_MODERN_CODEC_RA288;
     default:
         return PLAYASA_FFMPEG_MODERN_CODEC_MPEG4;
     }

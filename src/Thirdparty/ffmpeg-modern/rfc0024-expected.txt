@@ -55,6 +55,9 @@ Configure pins:
 - --enable-decoder=cook
 - --enable-decoder=sipr
 - --enable-decoder=atrac3
+- --enable-decoder=aac
+- --enable-decoder=ra_144
+- --enable-decoder=ra_288
 - --enable-demuxer=avi
 - --enable-demuxer=flv
 - --enable-demuxer=matroska
@@ -82,6 +85,7 @@ First-wave software codecs:
 - MPEG-2 software decode
 - WMV3 software decode
 - RealAudio cook / sipr / atrac3 (RFC-0034)
+- RealAudio aac / ra_144 / ra_288 (RFC-0045)
 - src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegDecodeAdapter.h
 - src/Source/filters/transform/mpcvideodec/modern_ffmpeg/ModernFfmpegDecodeAdapter.cpp
 - Adapter must use avcodec_send_packet / avcodec_receive_frame.

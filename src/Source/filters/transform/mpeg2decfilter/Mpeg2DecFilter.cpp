@@ -477,7 +477,7 @@ void CMpeg2DecFilter::InputTypeChanged()
 	m_fModernMpeg2LoggedFirstFrame = false;
 	m_modernMpeg2ConsecutiveFailures = 0;
 	m_fWaitForKeyFrame = true;
-	m_fFilm = false;
+			m_fFilm = false;
 	m_fb.flags = 0;
 }
 
@@ -562,8 +562,8 @@ HRESULT CMpeg2DecFilter::Transform(IMediaSample* pIn)
 
 	hr = TransformModern(pIn, pDataIn, len, rtStart, rtStop);
 	if (SUCCEEDED(hr)) {
-		return hr;
-	}
+						return hr;
+				}
 	ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg failed: hr=0x%08x error=%S"), hr, m_modernDec ? m_modernDec->LastError() : "adapter missing");
 	return hr;
 }
@@ -586,9 +586,9 @@ HRESULT CMpeg2DecFilter::TransformModern(IMediaSample* pIn, BYTE* pDataIn, long 
 		if (FAILED(hr)) {
 			if (m_fModernMpeg2SuppressRawEsMarkerFailures || m_fModernMpeg2AfterFlush) {
 				ModernMpeg2SelfcheckLog(_T("MPEG-2 modern FFmpeg skipped post-flush/raw ES marker frame after downstream stop: hr=0x%08x"), hr);
-				return S_OK;
-			}
-			return hr;
+        return S_OK;
+    }
+		return hr;
 		} else {
 			m_modernMpeg2ConsecutiveFailures = 0;
 			m_fModernMpeg2SuppressRawEsMarkerFailures = false;

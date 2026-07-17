@@ -29,8 +29,7 @@
 
 
 // RFC-0032: RealVideo software decode is modern-bridge-only (no RV_FFMPEG / libmpeg2-style legacy).
-// RFC-0034: RealAudio default path is modern bridge; Real SDK remains under #ifndef RA_FFMPEG for optional rollback.
-#define RA_FFMPEG
+// RFC-0044: RealAudio software decode is modern-bridge-only (no Real SDK legacy).
 
 #pragma pack(push, 1)
 
@@ -298,42 +297,12 @@ public:
 
 class __declspec(uuid("941A4793-A705-4312-8DFC-C11CA05F397E")) CRealAudioDecoder : public CTransformFilter
 {
-#ifndef RA_FFMPEG
-	typedef HRESULT (WINAPI *PCloseCodec)(DWORD);
-	typedef HRESULT (WINAPI *PDecode)(DWORD,BYTE*,long,BYTE*,long*,long);
-	typedef HRESULT (WINAPI *PFlush)(DWORD,DWORD,DWORD);
-	typedef HRESULT (WINAPI *PFreeDecoder)(DWORD);
-	typedef void* (WINAPI *PGetFlavorProperty)(void*,DWORD,DWORD,int*);
-	typedef HRESULT (WINAPI *PInitDecoder)(DWORD, void*);
-	typedef HRESULT (WINAPI *POpenCodec)(void*);
-	typedef HRESULT (WINAPI *POpenCodec2)(void*, const char*);
-	typedef HRESULT (WINAPI *PSetFlavor)(DWORD, WORD);
-	typedef void (WINAPI *PSetDLLAccessPath)(const char*);
-	typedef void (WINAPI *PSetPwd)(DWORD, const char*);
-
-	PCloseCodec RACloseCodec;
-	PDecode RADecode;
-	PFlush RAFlush;
-	PFreeDecoder RAFreeDecoder;
-	PGetFlavorProperty RAGetFlavorProperty;
-	PInitDecoder RAInitDecoder;
-	POpenCodec RAOpenCodec;
-	POpenCodec2 RAOpenCodec2;
-	PSetFlavor RASetFlavor;
-	PSetDLLAccessPath RASetDLLAccessPath;
-	PSetPwd RASetPwd;
-
-    CStringA m_dllpath;
-    HMODULE m_hDrvDll;
-    DWORD m_dwCookie;
-#else
-    CRealAudioModernDecodeAdapter m_modernAudio;
-    uint32_t m_modernCodec;
-    int m_modernBlockAlign;
-    bool m_fModernFirstPcmLogged;
-    bool InitModernAudio(uint32_t modernCodec);
-    void FreeModernAudio();
-#endif
+	CRealAudioModernDecodeAdapter m_modernAudio;
+	uint32_t m_modernCodec;
+	int m_modernBlockAlign;
+	bool m_fModernFirstPcmLogged;
+	bool InitModernAudio(uint32_t modernCodec);
+	void FreeModernAudio();
    
 	HRESULT InitRA(const CMediaType* pmt);
 	void FreeRA();

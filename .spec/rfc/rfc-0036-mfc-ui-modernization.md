@@ -4,7 +4,7 @@
 |------|------|
 | **状态** | 执行中 (In Progress) — 父级本身不产出代码，状态跟随子 RFC 进度 |
 | **类型** | Umbrella（父级；本 RFC 不直接交付任何代码，只交付子 RFC 列表与排序原则） |
-| **子 RFC** | [RFC-0037](./rfc-0037-ui-surface-inventory.md)（现状清单，已提案） |
+| **子 RFC** | [RFC-0037](./completed/rfc-0037-ui-surface-inventory.md)（现状清单，已完成）、[RFC-0038](./rfc-0038-playertooltopbar-hover-leave-fix.md)（提案）、[RFC-0039](./rfc-0039-suibutton-hover-reliability.md)（提案）、[RFC-0040](./rfc-0040-native-control-keyboard-focus-visuals.md)（提案）、[RFC-0041](./rfc-0041-skin-theme-consistency-cleanup.md)（提案）、[RFC-0042](./rfc-0042-dpi-cache-consolidation.md)（提案）、[RFC-0043](./rfc-0043-customizefontdlg-drawitem-states.md)（提案） |
 | **适用范围** | `src/Source/apps/mplayerc/` 下全部 UI 相关表面（对话框、工具栏、自定义控件、皮肤/主题资源）；具体文件边界由各子 RFC 各自声明 |
 | **相关 RFC** | [RFC-0011](./completed/rfc-0011-windows-repository-layout.md)、[RFC-0028](./completed/rfc-0028-uia-video-and-seek-followups.md) |
 | **创建日期** | 2026-07-17 |
@@ -55,19 +55,27 @@ Playasa/SPlayer 的桌面 UI 基于 MFC/Win32，长期以来 UI 相关改进（�
 ### 7.1 已做决策
 
 1. 本 RFC 认领 ROADMAP.md 中「MFC UI 现代化」backlog 项，编号 RFC-0036，类型为纯 Umbrella。
-2. 第一个子 RFC 为 RFC-0037（现状清单），已创建，状态提案。
-3. 本父级 RFC 不产出任何代码或独立文档交付物；现状清单交付物归属 RFC-0037。
+2. RFC-0037（现状清单）已完成并归档，覆盖 `MainFrm`/`ChildView`/`PlayerToolBar`/`PlayerToolTopBar`/`PlayerFloatToolBar`/`SVPSliderCtrl`/`VolumeCtrl`/`SUIButton`/`SkinPreviewDlg`/`Model/ThemePkg`/`UserInterface/Dialogs`（12 文件）/`UserInterface/Renderer`（10 文件），共 33 项表面。
+3. 据清单已创建 6 个具体子 RFC，均为提案状态，各自内聚、可独立实施与验证：
+   - **RFC-0038**：`PlayerToolTopBar` 悬停/mouse-leave 修复（缺失 `TrackMouseEvent` 调用）。
+   - **RFC-0039**：`CSUIButton` 悬停状态可靠性（改用 `TrackMouseEvent`，惠及 ChildView/PlayerToolBar/PlayerToolTopBar/SVPSliderCtrl 四个复用表面）。
+   - **RFC-0040**：`VolumeCtrl`/`SVPSliderCtrl` 键盘焦点视觉（含 `VolumeCtrl` 显式抑制 `CDIS_FOCUS` 的回归）。
+   - **RFC-0041**：皮肤/主题一致性清理（`SkinPreviewDlg` 接入 `GetColorFromTheme` + `Model/ThemePkg` 死代码桩处置）。
+   - **RFC-0042**：DPI 缓存统一（`MainFrm`/`SUIButton`/`GetSystemFontWithScale` 三处独立 `GetDeviceCaps` 副本）。
+   - **RFC-0043**：`CustomizeFontDlg::DrawItem` owner-draw 状态完整性（补齐 `ODS_SELECTED`/`ODS_DISABLED`/`ODS_FOCUS`）。
+4. 以下项识别为体量过大或有依赖，暂不开子 RFC，留在本父级 backlog：`MainFrm` god-object 拆分（16,051 行，含死代码 `OnPaint`/空壳 `OnDrawItem`）、`PlayerToolBar` 全面主题一致性、工具栏按钮逐个 UIA 可访问性身份（依赖 RFC-0039 先落地）。
+5. 本父级 RFC 本身仍不产出任何代码；上述 6 项交付物归属各自子 RFC。
 
 ### 7.2 待决策
 
-1. 现状清单（RFC-0037）完成后，具体改进项应各自建几个子 RFC——留待清单产出后按表面数量决定。
-2. 是否需要新增 UI 相关 selfcheck 脚本目录（类比 `src/Test/Scripts/` 下其他 RFC 的 `test-rfc00NN-*.ps1`）——留给对应子 RFC 决定。
+1. RFC-0038～0043 完成后，是否为 `MainFrm` 拆分、`PlayerToolBar` 主题一致性、工具栏按钮 UIA 身份分别开出新一批子 RFC（RFC-0044 起）——留待前 6 项收口后评估。
+2. 是否需要新增 UI 相关 selfcheck 脚本目录（类比 `src/Test/Scripts/` 下其他 RFC 的 `test-rfc00NN-*.ps1`）——留给对应子 RFC 决定，RFC-0038/0039/0040 均涉及运行时行为，建议至少手测。
 
 ## 8. 参考文献
 
 - `.cursor/skills/mfc-ui-modernization/SKILL.md`
 - [RFC-0028：UIA 视频区与 seek 预滚后续](./completed/rfc-0028-uia-video-and-seek-followups.md)
-- [ROADMAP.md](../../ROADMAP.md)
+- [ROADMAP.md](../ROADMAP.md)
 
 ---
 

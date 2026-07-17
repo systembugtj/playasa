@@ -25,7 +25,10 @@ enum DecodeCodec {
     kDecodeCodecMpeg1,
     kDecodeCodecCook,
     kDecodeCodecSipr,
-    kDecodeCodecAtrac3
+    kDecodeCodecAtrac3,
+    kDecodeCodecAac,
+    kDecodeCodecRa144,
+    kDecodeCodecRa288
 };
 
 enum DecodeStatus {

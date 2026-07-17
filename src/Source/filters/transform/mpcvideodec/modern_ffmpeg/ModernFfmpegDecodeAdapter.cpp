@@ -124,6 +124,12 @@ enum AVCodecID ToAvCodecId(DecodeCodec codec)
         return AV_CODEC_ID_SIPR;
     case kDecodeCodecAtrac3:
         return AV_CODEC_ID_ATRAC3;
+    case kDecodeCodecAac:
+        return AV_CODEC_ID_AAC;
+    case kDecodeCodecRa144:
+        return AV_CODEC_ID_RA_144;
+    case kDecodeCodecRa288:
+        return AV_CODEC_ID_RA_288;
     default:
         return AV_CODEC_ID_NONE;
     }
@@ -1316,6 +1322,15 @@ bool DecodeCodecFromModernAvCodecId(int codecId, DecodeCodec* codec)
     case AV_CODEC_ID_ATRAC3:
         *codec = kDecodeCodecAtrac3;
         return true;
+    case AV_CODEC_ID_AAC:
+        *codec = kDecodeCodecAac;
+        return true;
+    case AV_CODEC_ID_RA_144:
+        *codec = kDecodeCodecRa144;
+        return true;
+    case AV_CODEC_ID_RA_288:
+        *codec = kDecodeCodecRa288;
+        return true;
     default:
         return false;
     }
@@ -1352,6 +1367,9 @@ bool IsRealAudioCodec(DecodeCodec codec)
     case kDecodeCodecCook:
     case kDecodeCodecSipr:
     case kDecodeCodecAtrac3:
+    case kDecodeCodecAac:
+    case kDecodeCodecRa144:
+    case kDecodeCodecRa288:
         return true;
     default:
         return false;

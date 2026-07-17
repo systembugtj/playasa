@@ -31,6 +31,8 @@
 #include "..\..\..\subtitles\SubtitleInputPin.h"
 #include "..\..\..\svplib\SVPToolBox.h"
 
+#include <vector>
+
 #undef  SVP_LogMsg3
 #undef  SVP_LogMsg5
 #undef  SVP_LogMsg6
@@ -2150,38 +2152,21 @@ HRESULT CRealVideoDecoder::AlterQuality(Quality q)
 
 CRealAudioDecoder::CRealAudioDecoder(LPUNKNOWN lpunk, HRESULT* phr)
 : CTransformFilter(NAME("CRealAudioDecoder"), lpunk, __uuidof(this))
-#ifndef RA_FFMPEG
-, m_hDrvDll(NULL)
-, m_dwCookie(0)
-#endif
+, m_modernCodec(0)
+, m_modernBlockAlign(0)
+, m_fModernFirstPcmLogged(false)
 {
 	if(phr) *phr = S_OK;
-#ifdef RA_FFMPEG
-    m_modernCodec = 0;
-    m_modernBlockAlign = 0;
-    m_fModernFirstPcmLogged = false;
-#endif
 }
 
 CRealAudioDecoder::~CRealAudioDecoder()
 {
-	//	FreeRA();
-#ifndef RA_FFMPEG
-    if(m_hDrvDll) FreeLibrary(m_hDrvDll);
-#endif
+	FreeRA();
 }
 
 HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 {
 	FreeRA();
-
-	HRESULT hr;
-#ifndef RA_FFMPEG
-
-	if(RAOpenCodec2 && FAILED(hr = RAOpenCodec2(&m_dwCookie, m_dllpath))
-		|| RAOpenCodec && FAILED(hr = RAOpenCodec(&m_dwCookie)))
-		return VFW_E_TYPE_NOT_ACCEPTED;
-#endif
 
 	WAVEFORMATEX* pwfe = (WAVEFORMATEX*)pmt->Format();
 
@@ -2191,91 +2176,50 @@ HRESULT CRealAudioDecoder::InitRA(const CMediaType* pmt)
 	DWORD cbSize = pwfe->cbSize;
 	if(cbSize == sizeof(WAVEFORMATEX)) {ASSERT(0); cbSize = 0;}
 
-	WORD wBitsPerSample = pwfe->wBitsPerSample;
-	if(!wBitsPerSample) wBitsPerSample = 16;
-
-#pragma pack(push, 1)
-	struct {DWORD freq; WORD bpsample, channels, quality; DWORD bpframe, packetsize, extralen; void* extra;} initdata =
-	{pwfe->nSamplesPerSec, wBitsPerSample, pwfe->nChannels, 100, 
-	0, 0, 0, NULL};
-#pragma pack(pop)
-
-	CAutoVectorPtr<BYTE> pBuff;
-
-	if(pmt->subtype == MEDIASUBTYPE_AAC)
+	// AAC family may not carry cook-style rainfo; modern open uses WAVEFORMATEX + ASC.
+	if(pmt->subtype == MEDIASUBTYPE_AAC
+		|| pmt->subtype == MEDIASUBTYPE_RAAC
+		|| pmt->subtype == MEDIASUBTYPE_RACP)
 	{
-		pBuff.Allocate(cbSize+1);
-		pBuff[0] = 0x02;
-		memcpy(pBuff+1, pwfe+1, cbSize);
-		initdata.extralen = cbSize+1;
-		initdata.extra = pBuff;
+		ZeroMemory(&m_rai, sizeof(m_rai));
+		return S_OK;
+	}
+
+	if(pmt->FormatLength() <= sizeof(WAVEFORMATEX) + cbSize) // must have type_specific_data appended
+		return VFW_E_TYPE_NOT_ACCEPTED;
+
+	BYTE* fmt = pmt->Format() + sizeof(WAVEFORMATEX) + cbSize;
+
+	for(int i = 0, len = pmt->FormatLength() - (sizeof(WAVEFORMATEX) + cbSize); i < len-4; i++, fmt++)
+	{
+		if(fmt[0] == '.' || fmt[1] == 'r' || fmt[2] == 'a')
+			break;
+	}
+
+	m_rai = *(rainfo*)fmt;
+	m_rai.bswap();
+
+	if(m_rai.version2 == 4)
+	{
+		BYTE* p = (BYTE*)((rainfo4*)fmt+1);
+		int len = *p++; p += len; len = *p++; p += len; 
+		ASSERT(len == 4);
+	}
+	else if(m_rai.version2 == 5)
+	{
+		// rainfo5 header validated; extradata consumed by modern bridge at open time.
 	}
 	else
 	{
-		if(pmt->FormatLength() <= sizeof(WAVEFORMATEX) + cbSize) // must have type_specific_data appended
-			return VFW_E_TYPE_NOT_ACCEPTED;
-
-		BYTE* fmt = pmt->Format() + sizeof(WAVEFORMATEX) + cbSize;
-
-		for(int i = 0, len = pmt->FormatLength() - (sizeof(WAVEFORMATEX) + cbSize); i < len-4; i++, fmt++)
-		{
-			if(fmt[0] == '.' || fmt[1] == 'r' || fmt[2] == 'a')
-				break;
-		}
-
-		m_rai = *(rainfo*)fmt;
-		m_rai.bswap();
-
-		BYTE* p;
-
-		if(m_rai.version2 == 4)
-		{
-			p = (BYTE*)((rainfo4*)fmt+1);
-			int len = *p++; p += len; len = *p++; p += len; 
-			ASSERT(len == 4);
-		}
-		else if(m_rai.version2 == 5)
-		{
-			p = (BYTE*)((rainfo5*)fmt+1);
-		}
-		else
-		{
-			return VFW_E_TYPE_NOT_ACCEPTED;
-		}
-
-		p += 3;
-		if(m_rai.version2 == 5) p++;
-
-		initdata.bpframe = m_rai.sub_packet_size;
-		initdata.packetsize = m_rai.coded_frame_size;
-		initdata.extralen = min((pmt->Format() + pmt->FormatLength()) - (p + 4), *(DWORD*)p);
-		initdata.extra = p + 4;
+		return VFW_E_TYPE_NOT_ACCEPTED;
 	}
-#ifndef RA_FFMPEG
-	if(FAILED(hr = RAInitDecoder(m_dwCookie, &initdata)))
-		return VFW_E_TYPE_NOT_ACCEPTED;
 
-	if(RASetPwd)
-		RASetPwd(m_dwCookie, "Ardubancel Quazanga");
-
-	if(RASetFlavor && FAILED(hr = RASetFlavor(m_dwCookie, m_rai.flavor)))
-		return VFW_E_TYPE_NOT_ACCEPTED;
-#endif
 	return S_OK;
 }
 
 void CRealAudioDecoder::FreeRA()
 {
-#ifndef RA_FFMPEG
-	if(m_dwCookie)
-	{
-		RAFreeDecoder(m_dwCookie);
-		RACloseCodec(m_dwCookie);
-		m_dwCookie = 0;
-	}
-#else
 	FreeModernAudio();
-#endif
 }
 //#include <Psapi.h>
 HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
@@ -2381,31 +2325,16 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
 					for(int n=0;n<38;n++){
 						int i=bs*sipr_swaps[n][0];
 						int o=bs*sipr_swaps[n][1];
-						// swap nibbles of block 'i' with 'o'      TODO: optimize
-#ifdef RA_FFMPEG
-                        /* swap 4bit-nibbles of block 'i' with 'o' */
-                        for (int j = 0; j < bs; j++, i++, o++) {
-                            int x = (src[i >> 1] >> (4 * (i & 1))) & 0xF,
-                                y = (src[o >> 1] >> (4 * (o & 1))) & 0xF;
+						/* swap 4bit-nibbles of block 'i' with 'o' */
+						for (int j = 0; j < bs; j++, i++, o++) {
+							int x = (src[i >> 1] >> (4 * (i & 1))) & 0xF,
+								y = (src[o >> 1] >> (4 * (o & 1))) & 0xF;
 
-                            src[o >> 1] = (x << (4 * (o & 1))) |
-                                (src[o >> 1] & (0xF << (4 * !(o & 1))));
-                            src[i >> 1] = (y << (4 * (i & 1))) |
-                                (src[i >> 1] & (0xF << (4 * !(i & 1))));
-                        }
-#else
-
-                        for(int j=0;j<bs;j++){
-                            int x=(i&1) ? (src[(i>>1)]>>4) : (src[(i>>1)]&15);
-                            int y=(o&1) ? (src[(o>>1)]>>4) : (src[(o>>1)]&15);
-                            if(o&1) src[(o>>1)]=(src[(o>>1)]&0x0F)|(x<<4);
-                            else  src[(o>>1)]=(src[(o>>1)]&0xF0)|x;
-                            if(i&1) src[(i>>1)]=(src[(i>>1)]&0x0F)|(y<<4);
-                            else  src[(i>>1)]=(src[(i>>1)]&0xF0)|y;
-                            ++i;++o;
-                        }
-#endif
-
+							src[o >> 1] = (x << (4 * (o & 1))) |
+								(src[o >> 1] & (0xF << (4 * !(o & 1))));
+							src[i >> 1] = (y << (4 * (i & 1))) |
+								(src[i >> 1] & (0xF << (4 * !(i & 1))));
+						}
 					}
 			}
 
@@ -2438,9 +2367,6 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
      BYTE* pFFOut = pDataOut;
 	for(; src < dst; src += w)
 	{
-#ifndef RA_FFMPEG
-		hr = RADecode(m_dwCookie, src, w, pDataOut, &len, -1);
-#else
         hr = S_OK;
         if (!modernCodec) {
             continue;
@@ -2481,25 +2407,17 @@ HRESULT CRealAudioDecoder::Receive(IMediaSample* pIn)
                 nSize -= blockAlign;
             }
         }
-#endif
 
 		if(FAILED(hr))
 		{
 			SVP_LogMsg5(_T("RA returned an error code!!!\n"));
 			continue;
-			//			return hr;
 		}
-
-
-//         GetProcessMemoryInfo( GetCurrentProcess(), &pmc, sizeof(pmc)) ;
-//         SVP_LogMsg5(L"CRealAudioDecoder::Memory5  %x %d", tid,   pmc.WorkingSetSize/1024/1024);
 	}
 
-#ifdef RA_FFMPEG
     if (!m_modernAudio.IsOpen() || len <= 0) {
         return S_OK;
     }
-#endif
 
     WAVEFORMATEX* pwfe = (WAVEFORMATEX*)m_pOutput->CurrentMediaType().Format();
 
@@ -2536,7 +2454,8 @@ bool CRealAudioDecoder::InitModernAudio(uint32_t modernCodec)
 	FreeModernAudio();
 
 	PlayasaFfmpegModernAudioOpenParams params = {};
-	if (!RealAudioModern::BuildAudioOpenParams(m_pInput->CurrentMediaType(), modernCodec, &params)) {
+	std::vector<uint8_t> ownedExtraData;
+	if (!RealAudioModern::BuildAudioOpenParams(m_pInput->CurrentMediaType(), modernCodec, &params, &ownedExtraData)) {
 		RealAudioModernSelfcheckLog(_T("RealAudio modern FFmpeg bridge extradata build failed codec=%u"), modernCodec);
 		return false;
 	}
@@ -2579,98 +2498,6 @@ HRESULT CRealAudioDecoder::CheckInputType(const CMediaType* mtIn)
 
 	if(!m_pInput->IsConnected())
 	{
-#ifndef RA_FFMPEG
-        if(m_hDrvDll) {FreeLibrary(m_hDrvDll); m_hDrvDll = NULL;}
-
-
-		CAtlList<CString> paths;
-		CString olddll, newdll, oldpath, newpath;
-
-		TCHAR fourcc[5] = 
-		{
-			(TCHAR)((mtIn->subtype.Data1>>0)&0xff),
-			(TCHAR)((mtIn->subtype.Data1>>8)&0xff),
-			(TCHAR)((mtIn->subtype.Data1>>16)&0xff),
-			(TCHAR)((mtIn->subtype.Data1>>24)&0xff),
-			0
-		};
-
-		if(!_tcscmp(_T("RACP"), fourcc) || !_tcscmp(_T("\xff"), fourcc))
-			_tcscpy(fourcc, _T("RAAC"));
-
-		olddll.Format(_T("%s3260.dll"), fourcc);
-		newdll.Format(_T("%s.dll"), fourcc);
-        //AfxMessageBox(newdll);
-		CSVPToolBox svpTool;
-		m_hDrvDll = LoadLibrary(svpTool.GetPlayerPath(newdll));
-        //AfxMessageBox(newdll);
-		SVP_LogMsg( svpTool.GetPlayerPath(newdll) + _T(" real decoder dll loading"));
-		if(!m_hDrvDll){
-
-			CRegKey key;
-			TCHAR buff[MAX_PATH];
-			ULONG len = sizeof(buff);
-			if(ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("Software\\RealNetworks\\Preferences\\DT_Codecs"), KEY_READ)
-				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && _tcslen(buff) > 0)
-			{
-				oldpath = buff;
-				TCHAR c = oldpath[oldpath.GetLength()-1];
-				if(c != '\\' && c != '/') oldpath += '\\';
-				key.Close();
-			}
-			len = sizeof(buff);
-			if(ERROR_SUCCESS == key.Open(HKEY_CLASSES_ROOT, _T("Helix\\HelixSDK\\10.0\\Preferences\\DT_Codecs"), KEY_READ)
-				&& ERROR_SUCCESS == key.QueryStringValue(NULL, buff, &len) && _tcslen(buff) > 0)
-			{
-				newpath = buff;
-				TCHAR c = newpath[newpath.GetLength()-1];
-				if(c != '\\' && c != '/') newpath += '\\';
-				key.Close();
-			}
-
-			if(!newpath.IsEmpty()) paths.AddTail(newpath + newdll);
-			if(!oldpath.IsEmpty()) paths.AddTail(oldpath + newdll);
-			paths.AddTail(newdll); // default dll paths
-			if(!newpath.IsEmpty()) paths.AddTail(newpath + olddll);
-			if(!oldpath.IsEmpty()) paths.AddTail(oldpath + olddll);
-			paths.AddTail(olddll); // default dll paths
-
-			POSITION pos = paths.GetHeadPosition();
-			while(pos && !(m_hDrvDll = LoadLibrary(paths.GetNext(pos))));
-
-		}
-		if(m_hDrvDll)
-		{
-			RACloseCodec = (PCloseCodec)GetProcAddress(m_hDrvDll, "RACloseCodec");
-			RADecode = (PDecode)GetProcAddress(m_hDrvDll, "RADecode");
-			RAFlush = (PFlush)GetProcAddress(m_hDrvDll, "RAFlush");
-			RAFreeDecoder = (PFreeDecoder)GetProcAddress(m_hDrvDll, "RAFreeDecoder");
-			RAGetFlavorProperty = (PGetFlavorProperty)GetProcAddress(m_hDrvDll, "RAGetFlavorProperty");
-			RAInitDecoder = (PInitDecoder)GetProcAddress(m_hDrvDll, "RAInitDecoder");
-			RAOpenCodec = (POpenCodec)GetProcAddress(m_hDrvDll, "RAOpenCodec");
-			RAOpenCodec2 = (POpenCodec2)GetProcAddress(m_hDrvDll, "RAOpenCodec2");
-			RASetFlavor = (PSetFlavor)GetProcAddress(m_hDrvDll, "RASetFlavor");
-			RASetDLLAccessPath = (PSetDLLAccessPath)GetProcAddress(m_hDrvDll, "RASetDLLAccessPath");
-			RASetPwd = (PSetPwd)GetProcAddress(m_hDrvDll, "RASetPwd");
-		}
-
-		if(!m_hDrvDll || !RACloseCodec || !RADecode /*|| !RAFlush*/
-			|| !RAFreeDecoder || !RAGetFlavorProperty || !RAInitDecoder 
-			|| !(RAOpenCodec || RAOpenCodec2) /*|| !RASetFlavor*/)
-			return VFW_E_TYPE_NOT_ACCEPTED;
-
-		if(m_hDrvDll)
-		{
-			char buff[MAX_PATH];
-			GetModuleFileNameA(m_hDrvDll, buff, MAX_PATH);
-			CPathA p(buff);
-			p.RemoveFileSpec();
-			p.AddBackslash();
-			m_dllpath = p.m_strPath;
-			if(RASetDLLAccessPath)
-				RASetDLLAccessPath("DT_Codecs=" + m_dllpath);
-		}
-#endif
 		if(FAILED(InitRA(mtIn)))
 			return VFW_E_TYPE_NOT_ACCEPTED;
 	}
@@ -2705,12 +2532,12 @@ HRESULT CRealAudioDecoder::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR
 	WAVEFORMATEX* pwfe = (WAVEFORMATEX*)m_pOutput->CurrentMediaType().Format();
 
 	WORD wBitsPerSample = pwfe->wBitsPerSample;
-	if(!wBitsPerSample) wBitsPerSample = 16;
-
-	// ok, maybe this is too much...
-	pProperties->cBuffers = 8;
 	pProperties->cbBuffer = max( pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, kRealAudioMaxPcmBufferBytes ); // nAvgBytesPerSec;
     SVP_LogMsg5(L"pProperties->cbBuffer %d %d", pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, kRealAudioMaxPcmBufferBytes);
+	// ok, maybe this is too much...
+	pProperties->cBuffers = 8;
+	pProperties->cbBuffer = max( pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, AVCODEC_MAX_AUDIO_FRAME_SIZE*8 ); // nAvgBytesPerSec;
+    SVP_LogMsg5(L"pProperties->cbBuffer %d %d", pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, AVCODEC_MAX_AUDIO_FRAME_SIZE*8);
 	pProperties->cbAlign = 1;
 	pProperties->cbPrefix = 0;
 
@@ -2779,12 +2606,10 @@ HRESULT CRealAudioDecoder::StartStreaming()
 	m_bufflen = 0;
 	m_rtBuffStart = 0;
 
-#ifdef RA_FFMPEG
 	const uint32_t modernCodec = RealAudioModern::CodecFromSubtype(m_pInput->CurrentMediaType().subtype);
 	if (modernCodec && !InitModernAudio(modernCodec)) {
 		RealAudioModernSelfcheckLog(_T("RealAudio modern FFmpeg bridge open failed: %S"), m_modernAudio.LastError());
 	}
-#endif
 
 	return __super::StartStreaming();
 }
@@ -2793,9 +2618,7 @@ HRESULT CRealAudioDecoder::StopStreaming()
 {
 	m_buff.Free();
 	m_bufflen = 0;
-#ifdef RA_FFMPEG
     FreeModernAudio();
-#endif
 	return __super::StopStreaming();
 }
 
@@ -2806,10 +2629,8 @@ HRESULT CRealAudioDecoder::EndOfStream()
 
 HRESULT CRealAudioDecoder::BeginFlush()
 {
-#ifdef RA_FFMPEG
 	m_modernAudio.Flush();
 	RealAudioModernSelfcheckLog(_T("RealAudio modern FFmpeg bridge flush on BeginFlush"));
-#endif
 	return __super::BeginFlush();
 }
 

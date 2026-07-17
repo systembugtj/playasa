@@ -35,7 +35,13 @@
 | 0034 | RealAudio modern 播放 | 已完成 | [.spec/rfc/completed/rfc-0034-realaudio-modern-playback.md](.spec/rfc/completed/rfc-0034-realaudio-modern-playback.md) |
 | 0035 | 旧 `mpcvideodec/ffmpeg` 树退役 | 提案 | [.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md](.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md) |
 | 0036 | MFC/Win32 UI 现代化（父级） | **执行中**（父级不产出代码） | [.spec/rfc/rfc-0036-mfc-ui-modernization.md](.spec/rfc/rfc-0036-mfc-ui-modernization.md) |
-| 0037 | UI 表面现状清单 | 提案 | [.spec/rfc/rfc-0037-ui-surface-inventory.md](.spec/rfc/rfc-0037-ui-surface-inventory.md) |
+| 0037 | UI 表面现状清单 | 已完成 | [.spec/rfc/completed/rfc-0037-ui-surface-inventory.md](.spec/rfc/completed/rfc-0037-ui-surface-inventory.md) |
+| 0038 | PlayerToolTopBar 悬停/leave 修复 | 提案 | [.spec/rfc/rfc-0038-playertooltopbar-hover-leave-fix.md](.spec/rfc/rfc-0038-playertooltopbar-hover-leave-fix.md) |
+| 0039 | CSUIButton 悬停可靠性 | 提案 | [.spec/rfc/rfc-0039-suibutton-hover-reliability.md](.spec/rfc/rfc-0039-suibutton-hover-reliability.md) |
+| 0040 | 原生滑块控件键盘焦点视觉 | 提案 | [.spec/rfc/rfc-0040-native-control-keyboard-focus-visuals.md](.spec/rfc/rfc-0040-native-control-keyboard-focus-visuals.md) |
+| 0041 | 皮肤/主题一致性清理 | 提案 | [.spec/rfc/rfc-0041-skin-theme-consistency-cleanup.md](.spec/rfc/rfc-0041-skin-theme-consistency-cleanup.md) |
+| 0042 | DPI 缓存统一 | 提案 | [.spec/rfc/rfc-0042-dpi-cache-consolidation.md](.spec/rfc/rfc-0042-dpi-cache-consolidation.md) |
+| 0043 | CustomizeFontDlg DrawItem 状态完整性 | 提案 | [.spec/rfc/rfc-0043-customizefontdlg-drawitem-states.md](.spec/rfc/rfc-0043-customizefontdlg-drawitem-states.md) |
 
 ### FFmpeg modern 子 RFC 关系
 
@@ -56,7 +62,15 @@ RFC-0025 (已完成审计) ──► RFC-0030 ──► RFC-0033
 
 ```text
 RFC-0036 (UI 现代化父级；不产出代码)
-└── RFC-0037 (UI 表面现状清单) → RFC-0038+ (按表面逐个改进，清单产出后创建)
+├── RFC-0037 (UI 表面现状清单) ✓
+├── RFC-0038 (PlayerToolTopBar 悬停/leave 修复)
+├── RFC-0039 (CSUIButton 悬停可靠性；惠及 ChildView/PlayerToolBar/PlayerToolTopBar/SVPSliderCtrl)
+├── RFC-0040 (VolumeCtrl/SVPSliderCtrl 键盘焦点视觉)
+├── RFC-0041 (皮肤/主题一致性清理：SkinPreviewDlg + ThemePkg)
+├── RFC-0042 (DPI 缓存统一：MainFrm/SUIButton/GetSystemFontWithScale)
+└── RFC-0043 (CustomizeFontDlg DrawItem 状态完整性)
+
+backlog（体量过大/有依赖，暂不开 RFC）：MainFrm 拆分、PlayerToolBar 主题一致性、工具栏按钮逐个 UIA 身份
 ```
 
 ### 推荐执行顺序
@@ -64,7 +78,10 @@ RFC-0036 (UI 现代化父级；不产出代码)
 | 优先级 | RFC | 原因 |
 | --- | --- | --- |
 | P0 | **0024** | 父级 island；继续扩 codec / 稳固 bridge |
-| P1 | **0037** | UI 现状清单（RFC-0036 父级首个子 RFC） |
+| P1 | **0038** | 快速修复，定位明确 |
+| P1 | **0039** | 惠及 4 个宿主表面，组件级根治 |
+| P2 | **0040 / 0041 / 0043** | 小范围可独立改动 |
+| P2 | **0042** | 跨文件一致性，先统一来源不做运行时 DPI 响应 |
 | P2 | **0033** | DXVA；不破坏 modern software 线 |
 | P3 | **0035** | 旧树退役；依赖 0031/0032/0034 等收口 |
 | P3 | **0029** | 长期 Matroska splitter PoC |
