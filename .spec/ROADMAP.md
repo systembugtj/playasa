@@ -10,7 +10,7 @@
 
 `.spec/rfc/` 跟踪 Playasa/SPlayer 现代化工作。**金规则**：实现与 RFC 声明对齐；完成后归档到 `.spec/rfc/completed/` 并修正全仓链接。
 
-最后更新：**2026-07-17**
+最后更新：**2026-07-17**（新增 RFC-0046）
 
 ### 编号与状态一览
 
@@ -44,6 +44,7 @@
 | 0043 | CustomizeFontDlg DrawItem 状态完整性 | 提案 | [.spec/rfc/rfc-0043-customizefontdlg-drawitem-states.md](.spec/rfc/rfc-0043-customizefontdlg-drawitem-states.md) |
 | 0044 | RealAudio legacy SDK / `RA_FFMPEG` 清理 | 已完成 | [.spec/rfc/completed/rfc-0044-realaudio-legacy-cleanup.md](.spec/rfc/completed/rfc-0044-realaudio-legacy-cleanup.md) |
 | 0045 | RealAudio 剩余 codec（AAC / 14_4 / 28_8） | 已完成 | [.spec/rfc/completed/rfc-0045-realaudio-remaining-codecs.md](.spec/rfc/completed/rfc-0045-realaudio-remaining-codecs.md) |
+| 0046 | MpaDecFilter modern 音频迁移 | 提案 | [.spec/rfc/rfc-0046-mpadecfilter-modern-audio.md](.spec/rfc/rfc-0046-mpadecfilter-modern-audio.md) |
 
 ### FFmpeg modern 子 RFC 关系
 
@@ -56,6 +57,7 @@ RFC-0024 (island + bridge 父级)
 ├── RFC-0034 (RealAudio cook/sipr/atrac3) ✓
 ├── RFC-0044 (RealAudio legacy SDK 清理) ✓
 ├── RFC-0045 (RealAudio AAC / ra_144 / ra_288) ✓
+├── RFC-0046 (MpaDecFilter modern audio；解 0035 门禁)
 ├── RFC-0033 (DXVA H.264/VC-1; 承接 RFC-0025)
 └── RFC-0035 (全部 software 路径稳定后删旧 ffmpeg 树)
 
@@ -82,7 +84,8 @@ backlog（体量过大/有依赖，暂不开 RFC）：MainFrm 拆分、PlayerToo
 | 优先级 | RFC | 原因 |
 | --- | --- | --- |
 | P0 | **0033** | DXVA 解耦；阻塞 RFC-0035 删旧树 |
-| P1 | **0035** | 旧树退役审计已启动；等 0033 + MpaDec |
+| P0 | **0046** | MpaDecFilter 脱旧 libavcodec；阻塞 RFC-0035 删旧树 |
+| P1 | **0035** | 旧树退役审计已启动；等 0033 + 0046 |
 | P1 | **0038** | UI：快速修复，定位明确 |
 | P1 | **0039** | UI：惠及 4 个宿主表面 |
 | P2 | **0040 / 0041 / 0043** | UI 小范围可独立改动 |
@@ -112,6 +115,7 @@ backlog（体量过大/有依赖，暂不开 RFC）：MainFrm 拆分、PlayerToo
 | 0034 | `test-rfc0034-realaudio-selfcheck.ps1` |
 | 0035 | `src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1` |
 | 0044/0045 | `test-rfc0045-realaudio-remaining-selfcheck.ps1`（含 cook 回归 + AAC/RA144/RA288 bridge open） |
+| 0046 | `test-rfc0046-mpadec-modern-selfcheck.ps1`（待建）；bridge smoke 扩展 |
 
 ### 新建 RFC 规则
 
