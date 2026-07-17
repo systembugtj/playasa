@@ -31,15 +31,19 @@
 #include "..\..\..\subtitles\SubtitleInputPin.h"
 #include "..\..\..\svplib\SVPToolBox.h"
 
-#include "..\..\transform\mpcvideodec\ffmpeg\PODtypes.h"
-#include "..\..\transform\mpcvideodec\ffmpeg\libavcodec\avcodec.h"
-
 #undef  SVP_LogMsg3
 #undef  SVP_LogMsg5
 #undef  SVP_LogMsg6
 #define SVP_LogMsg3  __noop
 #define SVP_LogMsg5 __noop
 #define SVP_LogMsg6 __noop
+
+namespace {
+
+// Former AVCODEC_MAX_AUDIO_FRAME_SIZE (192000) * 8 — allocator floor for PCM delivery buffers.
+const long kRealAudioMaxPcmBufferBytes = 192000L * 8;
+
+} // namespace
 
 static void RealAudioModernSelfcheckLog(LPCTSTR format, ...)
 {
@@ -2705,8 +2709,8 @@ HRESULT CRealAudioDecoder::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR
 
 	// ok, maybe this is too much...
 	pProperties->cBuffers = 8;
-	pProperties->cbBuffer = max( pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, AVCODEC_MAX_AUDIO_FRAME_SIZE*8 ); // nAvgBytesPerSec;
-    SVP_LogMsg5(L"pProperties->cbBuffer %d %d", pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, AVCODEC_MAX_AUDIO_FRAME_SIZE*8);
+	pProperties->cbBuffer = max( pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, kRealAudioMaxPcmBufferBytes ); // nAvgBytesPerSec;
+    SVP_LogMsg5(L"pProperties->cbBuffer %d %d", pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, kRealAudioMaxPcmBufferBytes);
 	pProperties->cbAlign = 1;
 	pProperties->cbPrefix = 0;
 

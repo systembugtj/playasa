@@ -6,7 +6,7 @@
 | **创建日期** | 2026-05-17 |
 | **完成日期** | 2026-07-11 |
 | **负责人** | AI / Playasa |
-| **相关 RFC** | [RFC-0024](../rfc-0024-ffmpeg-modern-island.md)、[RFC-0025](./rfc-0025-ffmpeg-dxva-followup.md)、[RFC-0017](./rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0034](../rfc-0034-realaudio-modern-playback.md)（音频，非本 RFC）、[RFC-0035](../rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md)、[RFC 索引](../../ROADMAP.md) |
+| **相关 RFC** | [RFC-0024](../rfc-0024-ffmpeg-modern-island.md)、[RFC-0025](./rfc-0025-ffmpeg-dxva-followup.md)、[RFC-0017](./rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0034](./rfc-0034-realaudio-modern-playback.md)（音频，已完成）、[RFC-0035](../rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md)、[RFC 索引](../../ROADMAP.md) |
 
 ## 1. 背景
 

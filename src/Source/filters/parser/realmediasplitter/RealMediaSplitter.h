@@ -29,6 +29,7 @@
 
 
 // RFC-0032: RealVideo software decode is modern-bridge-only (no RV_FFMPEG / libmpeg2-style legacy).
+// RFC-0034: RealAudio default path is modern bridge; Real SDK remains under #ifndef RA_FFMPEG for optional rollback.
 #define RA_FFMPEG
 
 #pragma pack(push, 1)

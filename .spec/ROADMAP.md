@@ -10,7 +10,7 @@
 
 `.spec/rfc/` 跟踪 Playasa/SPlayer 现代化工作。**金规则**：实现与 RFC 声明对齐；完成后归档到 `.spec/rfc/completed/` 并修正全仓链接。
 
-最后更新：**2026-07-16**
+最后更新：**2026-07-17**
 
 ### 编号与状态一览
 
@@ -32,8 +32,10 @@
 | 0031 | MPEG-2 真实播放路径（`CMpeg2DecFilter`） | 已完成 | [.spec/rfc/completed/rfc-0031-mpeg2-playback-path-modernization.md](.spec/rfc/completed/rfc-0031-mpeg2-playback-path-modernization.md) |
 | 0032 | RMVB / RealVideo modern 播放 | 已完成 | [.spec/rfc/completed/rfc-0032-rmvb-realvideo-modern-playback.md](.spec/rfc/completed/rfc-0032-rmvb-realvideo-modern-playback.md) |
 | 0033 | DXVA 阶段 2：H.264 / VC-1 | 提案 | [.spec/rfc/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md](.spec/rfc/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) |
-| 0034 | RealAudio modern 播放 | **执行中** | [.spec/rfc/rfc-0034-realaudio-modern-playback.md](.spec/rfc/rfc-0034-realaudio-modern-playback.md) |
+| 0034 | RealAudio modern 播放 | 已完成 | [.spec/rfc/completed/rfc-0034-realaudio-modern-playback.md](.spec/rfc/completed/rfc-0034-realaudio-modern-playback.md) |
 | 0035 | 旧 `mpcvideodec/ffmpeg` 树退役 | 提案 | [.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md](.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md) |
+| 0036 | MFC/Win32 UI 现代化（父级） | **执行中**（父级不产出代码） | [.spec/rfc/rfc-0036-mfc-ui-modernization.md](.spec/rfc/rfc-0036-mfc-ui-modernization.md) |
+| 0037 | UI 表面现状清单 | 提案 | [.spec/rfc/rfc-0037-ui-surface-inventory.md](.spec/rfc/rfc-0037-ui-surface-inventory.md) |
 
 ### FFmpeg modern 子 RFC 关系
 
@@ -43,20 +45,28 @@ RFC-0024 (island + bridge 父级)
 ├── RFC-0030 (MPEG-2 DXVA context 合同)
 ├── RFC-0031 (CMpeg2DecFilter modern + 删 libmpeg2) ✓
 ├── RFC-0032 (RMVB/RealVideo; 含阶段 2 时间戳) ✓
+├── RFC-0034 (RealAudio cook/sipr/atrac3) ✓
 ├── RFC-0033 (DXVA H.264/VC-1; 承接 RFC-0025)
 └── RFC-0035 (全部 software 路径稳定后删旧 ffmpeg 树)
 
 RFC-0025 (已完成审计) ──► RFC-0030 ──► RFC-0033
 ```
 
+### UI 现代化子 RFC 关系
+
+```text
+RFC-0036 (UI 现代化父级；不产出代码)
+└── RFC-0037 (UI 表面现状清单) → RFC-0038+ (按表面逐个改进，清单产出后创建)
+```
+
 ### 推荐执行顺序
 
 | 优先级 | RFC | 原因 |
 | --- | --- | --- |
-| P0 | **0034** | RealAudio（0032 已收口；补齐 RMVB A/V） |
-| P0 | **0024** | 父级 island；随 0034 扩音频 decoder |
+| P0 | **0024** | 父级 island；继续扩 codec / 稳固 bridge |
+| P1 | **0037** | UI 现状清单（RFC-0036 父级首个子 RFC） |
 | P2 | **0033** | DXVA；不破坏 modern software 线 |
-| P3 | **0035** | 旧树退役；依赖 0031/0032 等收口 |
+| P3 | **0035** | 旧树退役；依赖 0031/0032/0034 等收口 |
 | P3 | **0029** | 长期 Matroska splitter PoC |
 | 基建 | **0015 / 0018 / 0019** | 更新器、Boost、三方链接契约 |
 
@@ -64,10 +74,9 @@ RFC-0025 (已完成审计) ──► RFC-0030 ──► RFC-0033
 
 | 项 | 说明 | 建议 |
 | --- | --- | --- |
-| zeromq 4.x 迁移 | TASK_TRACKING 备注 | 体量够大时再开 RFC-0036 |
+| zeromq 4.x 迁移 | TASK_TRACKING 备注 | 体量够大时再开新编号 RFC（当前最大编号见上表） |
 | ED2K 路径手测 | RFC-0012 P3 备注 | 手测清单写入 TASK_TRACKING |
 | 媒体库/历史记录手测 | RFC-0012 P4 备注 | 同上 |
-| MFC UI 现代化 | `.cursor/skills/mfc-ui-modernization` | 可未来 RFC-003x |
 
 ### RFC 测试脚本速查
 
@@ -78,6 +87,7 @@ RFC-0025 (已完成审计) ──► RFC-0030 ──► RFC-0033
 | 0030 | `test-rfc0030-mpeg2-dxva-selfcheck.ps1` |
 | 0031 | `test-rfc0031-mpeg2-*.ps1` |
 | 0032 | `setup-rmvb-samples.ps1`, `test-rmvb-seek-selfcheck.ps1` |
+| 0034 | `test-rfc0034-realaudio-selfcheck.ps1` |
 
 ### 新建 RFC 规则
 

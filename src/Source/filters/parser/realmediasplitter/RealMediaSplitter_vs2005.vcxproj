@@ -177,7 +177,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode lib|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\..\Thirdparty\pkg;$(SolutionDir)Source\filters\BaseClasses;..\..\transform\mpcvideodec\ffmpeg;..\..\transform\mpcvideodec\ffmpeg\libavcodec;..\..\transform\mpcvideodec\ffmpeg\libavutil;..\..\transform\mpcvideodec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\..\Thirdparty\pkg;$(SolutionDir)Source\filters\BaseClasses;..\..\transform\mpcvideodec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Lib>
@@ -188,12 +188,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode lib|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\..\Thirdparty\pkg;$(SolutionDir)Source\filters\BaseClasses;..\..\transform\mpcvideodec\ffmpeg;..\..\transform\mpcvideodec\ffmpeg\libavcodec;..\..\transform\mpcvideodec\ffmpeg\libavutil;..\..\transform\mpcvideodec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\include;..\..\..\..\Thirdparty\pkg;$(SolutionDir)Source\filters\BaseClasses;..\..\transform\mpcvideodec;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>basesplitter.lib;basevideofilter.lib;libavcodec_gcc.lib;libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>basesplitter.lib;basevideofilter.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../../../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -236,7 +236,7 @@
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>unrar.lib;zlibD.lib;svplibD.lib;strmbaseDU.lib;libgcc.a;libmingwex.a;libavcodec_gcc.lib;dsutilDU.lib;foundation.lib;basesplitterDU.lib;basevideofilterDU.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>unrar.lib;zlibD.lib;svplibD.lib;strmbaseDU.lib;dsutilDU.lib;foundation.lib;basesplitterDU.lib;basevideofilterDU.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libc.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
