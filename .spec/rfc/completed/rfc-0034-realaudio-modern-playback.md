@@ -68,14 +68,10 @@
 
 ### Code
 
-| 区域 | 文件 | 说明 |
+| Commit | 文件 | 说明 |
 | --- | --- | --- |
-| ABI | `src/Thirdparty/pkg/ffmpeg_modern_bridge.h` | COOK/SIPR/ATRAC3 + audio API |
-| Bridge | `ModernFfmpegDecodeAdapter.*`, `ModernFfmpegBridge.cpp`, `.def` | 音频 session / PCM |
-| Consumer | `RealAudioModernDecodeAdapter.*`, `RealAudioExtradata.*` | RealAudio 动态加载 |
-| Decoder | `RealMediaSplitter.cpp` / `.h` | `CRealAudioDecoder` modern 路径 |
-| Island | `rfc0024-expected.txt`, build/verify scripts | decoder 钉扎 |
-| 工程 | `RealMediaSplitter_vs2005.vcxproj` | 去掉 legacy libavcodec 链接 |
+| `e76b6289` | `ffmpeg_modern_bridge.h`、`ModernFfmpeg*`、`RealAudio*`、`RealMediaSplitter.*` | cook/sipr/atrac3 + audio ABI 主实现 |
+| `CLOSE_HASH` | `RealMediaSplitter.*`、`completed/rfc-0034-*.md` | 收口归档与遗留交叉引用（0044/0045） |
 
 Build: `./dev.ps1 buildFast` PASS（2026-07-17）；`build-rfc0024-ffmpeg-modern.ps1` + `build-rfc0024-ffmpeg-bridge.ps1` PASS。
 
@@ -92,6 +88,6 @@ Build: `./dev.ps1 buildFast` PASS（2026-07-17）；`build-rfc0024-ffmpeg-modern
 
 | 项 | 状态 |
 | --- | --- |
-| Real SDK `#ifndef RA_FFMPEG` 死代码 | 保留；可随 RFC-0035 / 后续清理删除 |
-| AAC / 14_4 / 28_8 | 未 modern；需要时可扩 codec enum + island |
-| sipr 样本 A/B | 本 RFC selfcheck 以 cook RMVB 为主 |
+| Real SDK `#ifndef RA_FFMPEG` 死代码 | **已由 [RFC-0044](./rfc-0044-realaudio-legacy-cleanup.md) 删除** |
+| AAC / 14_4 / 28_8 | **已由 [RFC-0045](./rfc-0045-realaudio-remaining-codecs.md) modern 化** |
+| sipr 样本 A/B | 本 RFC selfcheck 以 cook RMVB 为主；可选后续增强 |

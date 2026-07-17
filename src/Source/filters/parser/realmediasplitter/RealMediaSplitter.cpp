@@ -2532,12 +2532,12 @@ HRESULT CRealAudioDecoder::DecideBufferSize(IMemAllocator* pAllocator, ALLOCATOR
 	WAVEFORMATEX* pwfe = (WAVEFORMATEX*)m_pOutput->CurrentMediaType().Format();
 
 	WORD wBitsPerSample = pwfe->wBitsPerSample;
-	pProperties->cbBuffer = max( pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, kRealAudioMaxPcmBufferBytes ); // nAvgBytesPerSec;
-    SVP_LogMsg5(L"pProperties->cbBuffer %d %d", pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, kRealAudioMaxPcmBufferBytes);
+	if(!wBitsPerSample) wBitsPerSample = 16;
+
 	// ok, maybe this is too much...
 	pProperties->cBuffers = 8;
-	pProperties->cbBuffer = max( pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, AVCODEC_MAX_AUDIO_FRAME_SIZE*8 ); // nAvgBytesPerSec;
-    SVP_LogMsg5(L"pProperties->cbBuffer %d %d", pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, AVCODEC_MAX_AUDIO_FRAME_SIZE*8);
+	pProperties->cbBuffer = max( pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, kRealAudioMaxPcmBufferBytes ); // nAvgBytesPerSec;
+    SVP_LogMsg5(L"pProperties->cbBuffer %d %d", pwfe->nChannels*pwfe->nSamplesPerSec*wBitsPerSample>>3, kRealAudioMaxPcmBufferBytes);
 	pProperties->cbAlign = 1;
 	pProperties->cbPrefix = 0;
 

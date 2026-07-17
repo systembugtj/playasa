@@ -33,7 +33,7 @@
 | 0032 | RMVB / RealVideo modern 播放 | 已完成 | [.spec/rfc/completed/rfc-0032-rmvb-realvideo-modern-playback.md](.spec/rfc/completed/rfc-0032-rmvb-realvideo-modern-playback.md) |
 | 0033 | DXVA 阶段 2：H.264 / VC-1 | 提案 | [.spec/rfc/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md](.spec/rfc/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) |
 | 0034 | RealAudio modern 播放 | 已完成 | [.spec/rfc/completed/rfc-0034-realaudio-modern-playback.md](.spec/rfc/completed/rfc-0034-realaudio-modern-playback.md) |
-| 0035 | 旧 `mpcvideodec/ffmpeg` 树退役 | 提案 | [.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md](.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md) |
+| 0035 | 旧 `mpcvideodec/ffmpeg` 树退役 | **执行中** | [.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md](.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md) |
 | 0036 | MFC/Win32 UI 现代化（父级） | **执行中**（父级不产出代码） | [.spec/rfc/rfc-0036-mfc-ui-modernization.md](.spec/rfc/rfc-0036-mfc-ui-modernization.md) |
 | 0037 | UI 表面现状清单 | 已完成 | [.spec/rfc/completed/rfc-0037-ui-surface-inventory.md](.spec/rfc/completed/rfc-0037-ui-surface-inventory.md) |
 | 0038 | PlayerToolTopBar 悬停/leave 修复 | 提案 | [.spec/rfc/rfc-0038-playertooltopbar-hover-leave-fix.md](.spec/rfc/rfc-0038-playertooltopbar-hover-leave-fix.md) |
@@ -42,6 +42,8 @@
 | 0041 | 皮肤/主题一致性清理 | 提案 | [.spec/rfc/rfc-0041-skin-theme-consistency-cleanup.md](.spec/rfc/rfc-0041-skin-theme-consistency-cleanup.md) |
 | 0042 | DPI 缓存统一 | 提案 | [.spec/rfc/rfc-0042-dpi-cache-consolidation.md](.spec/rfc/rfc-0042-dpi-cache-consolidation.md) |
 | 0043 | CustomizeFontDlg DrawItem 状态完整性 | 提案 | [.spec/rfc/rfc-0043-customizefontdlg-drawitem-states.md](.spec/rfc/rfc-0043-customizefontdlg-drawitem-states.md) |
+| 0044 | RealAudio legacy SDK / `RA_FFMPEG` 清理 | 已完成 | [.spec/rfc/completed/rfc-0044-realaudio-legacy-cleanup.md](.spec/rfc/completed/rfc-0044-realaudio-legacy-cleanup.md) |
+| 0045 | RealAudio 剩余 codec（AAC / 14_4 / 28_8） | 已完成 | [.spec/rfc/completed/rfc-0045-realaudio-remaining-codecs.md](.spec/rfc/completed/rfc-0045-realaudio-remaining-codecs.md) |
 
 ### FFmpeg modern 子 RFC 关系
 
@@ -52,6 +54,8 @@ RFC-0024 (island + bridge 父级)
 ├── RFC-0031 (CMpeg2DecFilter modern + 删 libmpeg2) ✓
 ├── RFC-0032 (RMVB/RealVideo; 含阶段 2 时间戳) ✓
 ├── RFC-0034 (RealAudio cook/sipr/atrac3) ✓
+├── RFC-0044 (RealAudio legacy SDK 清理) ✓
+├── RFC-0045 (RealAudio AAC / ra_144 / ra_288) ✓
 ├── RFC-0033 (DXVA H.264/VC-1; 承接 RFC-0025)
 └── RFC-0035 (全部 software 路径稳定后删旧 ffmpeg 树)
 
@@ -77,13 +81,13 @@ backlog（体量过大/有依赖，暂不开 RFC）：MainFrm 拆分、PlayerToo
 
 | 优先级 | RFC | 原因 |
 | --- | --- | --- |
-| P0 | **0024** | 父级 island；继续扩 codec / 稳固 bridge |
-| P1 | **0038** | 快速修复，定位明确 |
-| P1 | **0039** | 惠及 4 个宿主表面，组件级根治 |
-| P2 | **0040 / 0041 / 0043** | 小范围可独立改动 |
-| P2 | **0042** | 跨文件一致性，先统一来源不做运行时 DPI 响应 |
-| P2 | **0033** | DXVA；不破坏 modern software 线 |
-| P3 | **0035** | 旧树退役；依赖 0031/0032/0034 等收口 |
+| P0 | **0033** | DXVA 解耦；阻塞 RFC-0035 删旧树 |
+| P1 | **0035** | 旧树退役审计已启动；等 0033 + MpaDec |
+| P1 | **0038** | UI：快速修复，定位明确 |
+| P1 | **0039** | UI：惠及 4 个宿主表面 |
+| P2 | **0040 / 0041 / 0043** | UI 小范围可独立改动 |
+| P2 | **0042** | DPI 缓存统一 |
+| P2 | **0024** | 父级 island 维护（RealAudio 子项已收口） |
 | P3 | **0029** | 长期 Matroska splitter PoC |
 | 基建 | **0015 / 0018 / 0019** | 更新器、Boost、三方链接契约 |
 
@@ -105,6 +109,8 @@ backlog（体量过大/有依赖，暂不开 RFC）：MainFrm 拆分、PlayerToo
 | 0031 | `test-rfc0031-mpeg2-*.ps1` |
 | 0032 | `setup-rmvb-samples.ps1`, `test-rmvb-seek-selfcheck.ps1` |
 | 0034 | `test-rfc0034-realaudio-selfcheck.ps1` |
+| 0035 | `src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1` |
+| 0044/0045 | `test-rfc0045-realaudio-remaining-selfcheck.ps1`（含 cook 回归 + AAC/RA144/RA288 bridge open） |
 
 ### 新建 RFC 规则
 

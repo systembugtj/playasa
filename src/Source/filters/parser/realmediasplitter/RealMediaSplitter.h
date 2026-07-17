@@ -28,8 +28,8 @@
 #include "..\..\..\..\Thirdparty\pkg\ffmpeg_modern_bridge.h"
 
 
-// RFC-0032: RealVideo software decode is modern-bridge-only (no RV_FFMPEG / libmpeg2-style legacy).
-// RFC-0044: RealAudio software decode is modern-bridge-only (no Real SDK legacy).
+// RFC-0032: RealVideo software decode is modern-bridge-only (legacy RealVideo FFmpeg path removed).
+// RFC-0044: RealAudio software decode is modern-bridge-only (legacy Real SDK path removed).
 
 #pragma pack(push, 1)
 

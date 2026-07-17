@@ -2083,11 +2083,7 @@ CFGManagerCustom::CFGManagerCustom(LPCTSTR pName, LPUNKNOWN pUnk, UINT src, UINT
 
 #if 1
     pFGF = new CFGFilterInternal<CRealAudioDecoder>(
-#ifndef RA_FFMPEG
-        L"MPC RealAudio Decoder" ,
-#else
         L"SVP Real Audio Decoder 2.0",
-#endif		 
         MERIT64_ABOVE_DSHOW );
     pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_ATRC);
     pFGF->AddType(MEDIATYPE_Audio, MEDIASUBTYPE_14_4);

@@ -5,7 +5,7 @@
 
 #include <guiddef.h>
 
-struct CMediaType;
+class CMediaType;
 struct PlayasaFfmpegModernAudioOpenParams;
 
 namespace RealAudioModern {

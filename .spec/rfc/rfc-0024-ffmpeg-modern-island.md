@@ -4,7 +4,7 @@
 |------|------|
 | **状态** | 执行中 (In Progress) |
 | **适用范围** | `src/Thirdparty/ffmpeg-modern`、`src/BuildScript`、`src/Source/filters/transform/mpcvideodec` 新版 FFmpeg adapter 与非 DXVA 软件解码路径 |
-| **相关 RFC** | [RFC-0017](./completed/rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0019](./rfc-0019-thirdparty-crt-mfc-linkage-contract.md)、[RFC-0030](./rfc-0030-mpeg2-dxva-context-modernization.md)、[RFC-0031](./completed/rfc-0031-mpeg2-playback-path-modernization.md)、[RFC-0032](./completed/rfc-0032-rmvb-realvideo-modern-playback.md)、[RFC-0034](./completed/rfc-0034-realaudio-modern-playback.md)、[RFC-0033](./rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md)、[RFC-0035](./rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md)、[RFC 索引](../../ROADMAP.md) |
+| **相关 RFC** | [RFC-0017](./completed/rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0019](./rfc-0019-thirdparty-crt-mfc-linkage-contract.md)、[RFC-0030](./rfc-0030-mpeg2-dxva-context-modernization.md)、[RFC-0031](./completed/rfc-0031-mpeg2-playback-path-modernization.md)、[RFC-0032](./completed/rfc-0032-rmvb-realvideo-modern-playback.md)、[RFC-0034](./completed/rfc-0034-realaudio-modern-playback.md)、[RFC-0044](./completed/rfc-0044-realaudio-legacy-cleanup.md)、[RFC-0045](./completed/rfc-0045-realaudio-remaining-codecs.md)、[RFC-0033](./rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md)、[RFC-0035](./rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md)、[RFC 索引](../../ROADMAP.md) |
 | **创建日期** | 2026-04-25 |
 | **最后更新** | 2026-04-26 |
 

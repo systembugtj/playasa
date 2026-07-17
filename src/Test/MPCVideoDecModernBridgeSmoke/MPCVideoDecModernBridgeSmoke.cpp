@@ -34,6 +34,33 @@ bool CheckCodec(uint32_t fourcc, bool openSession)
     return true;
 }
 
+bool CheckAudioCodec(uint32_t codec, int sampleRate, int channels, int blockAlign)
+{
+    PlayasaFfmpegModernSession session = 0;
+    if (!playasa_ffmpeg_modern_create(codec, &session) || !session) {
+        fprintf(stderr, "failed to create audio bridge session for codec=%u\n", codec);
+        return false;
+    }
+
+    PlayasaFfmpegModernAudioOpenParams params = {};
+    params.sample_rate = sampleRate;
+    params.channels = channels;
+    params.bit_rate = 128000;
+    params.bits_per_coded_sample = 16;
+    params.block_align = blockAlign;
+    params.extra_data = 0;
+    params.extra_data_size = 0;
+
+    if (!playasa_ffmpeg_modern_open_audio(session, &params)) {
+        fprintf(stderr, "failed to open audio codec=%u: %s\n", codec, playasa_ffmpeg_modern_last_error(session));
+        playasa_ffmpeg_modern_destroy(session);
+        return false;
+    }
+
+    playasa_ffmpeg_modern_destroy(session);
+    return true;
+}
+
 } // namespace
 
 int main()
@@ -52,6 +79,28 @@ int main()
     }
     if (!CheckCodec(kFourccWmv3, false)) {
         return 4;
+    }
+
+    // RFC-0045: remaining RealAudio codecs must open via audio ABI.
+    if (!CheckAudioCodec(PLAYASA_FFMPEG_MODERN_CODEC_AAC, 44100, 2, 0)) {
+        return 5;
+    }
+    if (!CheckAudioCodec(PLAYASA_FFMPEG_MODERN_CODEC_RA144, 8000, 1, 20)) {
+        return 6;
+    }
+    // FFmpeg ra_288 requires block_align == 38.
+    if (!CheckAudioCodec(PLAYASA_FFMPEG_MODERN_CODEC_RA288, 8000, 1, 38)) {
+        return 7;
+    }
+
+    // COOK requires RealMedia extradata; create-only proves decoder is linked.
+    {
+        PlayasaFfmpegModernSession session = 0;
+        if (!playasa_ffmpeg_modern_create(PLAYASA_FFMPEG_MODERN_CODEC_COOK, &session) || !session) {
+            fprintf(stderr, "failed to create COOK bridge session\n");
+            return 8;
+        }
+        playasa_ffmpeg_modern_destroy(session);
     }
 
     printf("bridge smoke OK: avcodec=%u\n", version);
