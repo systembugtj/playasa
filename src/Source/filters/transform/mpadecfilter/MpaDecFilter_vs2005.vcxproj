@@ -189,11 +189,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <ClCompile>
+      <AdditionalIncludeDirectories>libflac/include;modern_ffmpeg;../mpcvideodec/modern_ffmpeg;../../../../Thirdparty/pkg;$(SolutionDir)Source\filters\BaseClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>REGISTER_FILTER;WIN32;FLAC__NO_DLL;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>zlibD.lib;libavcodec_gcc.lib;libgcc.a;libmingwex.a;libflacD.lib;libfaad2D.lib;libmadD.lib;liba52D.lib;libdtsD.lib;decssDU.lib;dsutilDU.lib;foundation.lib;strmbaseDU.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>zlibD.lib;libflacD.lib;libfaad2D.lib;libmadD.lib;liba52D.lib;libdtsD.lib;decssDU.lib;dsutilDU.lib;foundation.lib;strmbaseDU.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MpaDecFilter.def</ModuleDefinitionFile>
@@ -206,6 +207,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">
     <ClCompile>
+      <AdditionalIncludeDirectories>libflac/include;modern_ffmpeg;../mpcvideodec/modern_ffmpeg;../../../../Thirdparty/pkg;$(SolutionDir)Source\filters\BaseClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>REGISTER_FILTER;WIN32;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -232,7 +234,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode lib|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>libflac/include;../mpcvideodec\ffmpeg\libavcodec;../mpcvideodec/ffmpeg;../../../../include;$(SolutionDir)Source\filters\BaseClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>libflac/include;modern_ffmpeg;../mpcvideodec/modern_ffmpeg;../../../../Thirdparty/pkg;../../../../include;$(SolutionDir)Source\filters\BaseClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;FLAC__NO_DLL;FLAC__NO_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Lib>
@@ -253,18 +255,27 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Unicode lib|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>libflac/include;../mpcvideodec\ffmpeg\libavcodec;../mpcvideodec/ffmpeg;../../../../include;$(SolutionDir)Source\filters\BaseClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>libflac/include;modern_ffmpeg;../mpcvideodec/modern_ffmpeg;../../../../Thirdparty/pkg;../../../../include;$(SolutionDir)Source\filters\BaseClasses;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;FLAC__NO_DLL;FLAC__NO_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>libfaad.lib;libmad.lib;libdts.lib;liba52.lib;libflac.lib;libavcodec_gcc.lib;libgcc.a;libmingwex.a;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libfaad.lib;libmad.lib;libdts.lib;liba52.lib;libflac.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)..\out\bin\Win32\Release;$(SolutionDir)lib;../../../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MpaDecFilter.cpp" />
     <ClCompile Include="MpaDecSettingsWnd.cpp" />
+    <ClCompile Include="modern_ffmpeg\MpaDecAudioOpenParams.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="modern_ffmpeg\MpaDecCodecMap.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="modern_ffmpeg\MpaDecModernDecodeAdapter.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Unicode lib|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">Create</PrecompiledHeader>
@@ -280,6 +291,9 @@
     <ClInclude Include="IMpaDecFilter.h" />
     <ClInclude Include="MpaDecFilter.h" />
     <ClInclude Include="MpaDecSettingsWnd.h" />
+    <ClInclude Include="modern_ffmpeg\MpaDecAudioOpenParams.h" />
+    <ClInclude Include="modern_ffmpeg\MpaDecCodecMap.h" />
+    <ClInclude Include="modern_ffmpeg\MpaDecModernDecodeAdapter.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

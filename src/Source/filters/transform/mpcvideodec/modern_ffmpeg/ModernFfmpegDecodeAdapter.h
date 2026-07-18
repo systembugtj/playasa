@@ -28,7 +28,19 @@ enum DecodeCodec {
     kDecodeCodecAtrac3,
     kDecodeCodecAac,
     kDecodeCodecRa144,
-    kDecodeCodecRa288
+    kDecodeCodecRa288,
+    kDecodeCodecWmav1,
+    kDecodeCodecWmav2,
+    kDecodeCodecAmrNb,
+    kDecodeCodecAmrWb,
+    kDecodeCodecNellymoser,
+    kDecodeCodecQdm2,
+    kDecodeCodecEac3,
+    kDecodeCodecTruehd,
+    kDecodeCodecMlp,
+    kDecodeCodecFlac,
+    kDecodeCodecPcmMulaw,
+    kDecodeCodecAdpcmImaQt
 };
 
 enum DecodeStatus {
@@ -140,6 +152,6 @@ private:
 bool DecodeCodecFromFourcc(uint32_t fourcc, DecodeCodec* codec);
 bool DecodeCodecFromModernAvCodecId(int codecId, DecodeCodec* codec);
 bool IsFirstWaveSoftwareCodec(DecodeCodec codec);
-bool IsRealAudioCodec(DecodeCodec codec);
+bool IsBridgeAudioCodec(DecodeCodec codec);
 
 } // namespace ModernFfmpeg

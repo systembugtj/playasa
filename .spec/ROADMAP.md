@@ -31,7 +31,7 @@
 | 0030 | MPEG-2 DXVA picture context 合同 | 已实现（`MPCVideoDec` 路径） | [.spec/rfc/rfc-0030-mpeg2-dxva-context-modernization.md](.spec/rfc/rfc-0030-mpeg2-dxva-context-modernization.md) |
 | 0031 | MPEG-2 真实播放路径（`CMpeg2DecFilter`） | 已完成 | [.spec/rfc/completed/rfc-0031-mpeg2-playback-path-modernization.md](.spec/rfc/completed/rfc-0031-mpeg2-playback-path-modernization.md) |
 | 0032 | RMVB / RealVideo modern 播放 | 已完成 | [.spec/rfc/completed/rfc-0032-rmvb-realvideo-modern-playback.md](.spec/rfc/completed/rfc-0032-rmvb-realvideo-modern-playback.md) |
-| 0033 | DXVA 阶段 2：H.264 / VC-1 | **执行中** | [.spec/rfc/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md](.spec/rfc/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) |
+| 0033 | DXVA 阶段 2：H.264 / VC-1 | 已完成 | [.spec/rfc/completed/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md](.spec/rfc/completed/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) |
 | 0034 | RealAudio modern 播放 | 已完成 | [.spec/rfc/completed/rfc-0034-realaudio-modern-playback.md](.spec/rfc/completed/rfc-0034-realaudio-modern-playback.md) |
 | 0035 | 旧 `mpcvideodec/ffmpeg` 树退役 | **执行中** | [.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md](.spec/rfc/rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md) |
 | 0036 | MFC/Win32 UI 现代化（父级） | **执行中**（父级不产出代码） | [.spec/rfc/rfc-0036-mfc-ui-modernization.md](.spec/rfc/rfc-0036-mfc-ui-modernization.md) |
@@ -44,7 +44,7 @@
 | 0043 | CustomizeFontDlg DrawItem 状态完整性 | 提案 | [.spec/rfc/rfc-0043-customizefontdlg-drawitem-states.md](.spec/rfc/rfc-0043-customizefontdlg-drawitem-states.md) |
 | 0044 | RealAudio legacy SDK / `RA_FFMPEG` 清理 | 已完成 | [.spec/rfc/completed/rfc-0044-realaudio-legacy-cleanup.md](.spec/rfc/completed/rfc-0044-realaudio-legacy-cleanup.md) |
 | 0045 | RealAudio 剩余 codec（AAC / 14_4 / 28_8） | 已完成 | [.spec/rfc/completed/rfc-0045-realaudio-remaining-codecs.md](.spec/rfc/completed/rfc-0045-realaudio-remaining-codecs.md) |
-| 0046 | MpaDecFilter modern 音频迁移 | 提案 | [.spec/rfc/rfc-0046-mpadecfilter-modern-audio.md](.spec/rfc/rfc-0046-mpadecfilter-modern-audio.md) |
+| 0046 | MpaDecFilter modern 音频迁移 | 已完成 | [.spec/rfc/completed/rfc-0046-mpadecfilter-modern-audio.md](.spec/rfc/completed/rfc-0046-mpadecfilter-modern-audio.md) |
 
 ### FFmpeg modern 子 RFC 关系
 
@@ -57,8 +57,8 @@ RFC-0024 (island + bridge 父级)
 ├── RFC-0034 (RealAudio cook/sipr/atrac3) ✓
 ├── RFC-0044 (RealAudio legacy SDK 清理) ✓
 ├── RFC-0045 (RealAudio AAC / ra_144 / ra_288) ✓
-├── RFC-0046 (MpaDecFilter modern audio；解 0035 门禁)
-├── RFC-0033 (DXVA H.264/VC-1; 承接 RFC-0025)
+├── RFC-0046 (MpaDecFilter modern audio) ✓
+├── RFC-0033 (DXVA H.264/VC-1) ✓
 └── RFC-0035 (全部 software 路径稳定后删旧 ffmpeg 树)
 
 RFC-0025 (已完成审计) ──► RFC-0030 ──► RFC-0033
@@ -83,9 +83,7 @@ backlog（体量过大/有依赖，暂不开 RFC）：MainFrm 拆分、PlayerToo
 
 | 优先级 | RFC | 原因 |
 | --- | --- | --- |
-| P0 | **0033** | DXVA 解耦；阻塞 RFC-0035 删旧树 |
-| P0 | **0046** | MpaDecFilter 脱旧 libavcodec；阻塞 RFC-0035 删旧树 |
-| P1 | **0035** | 旧树退役审计已启动；等 0033 + 0046 |
+| P0 | **0035** | 旧树退役；0033/0046 门禁已解除，继续删树前置 |
 | P1 | **0038** | UI：快速修复，定位明确 |
 | P1 | **0039** | UI：惠及 4 个宿主表面 |
 | P2 | **0040 / 0041 / 0043** | UI 小范围可独立改动 |
@@ -109,13 +107,13 @@ backlog（体量过大/有依赖，暂不开 RFC）：MainFrm 拆分、PlayerToo
 | 0024 | `test-rfc0024-*-smoke.ps1`；`src/BuildScript/verify-rfc0024-ffmpeg-modern.ps1` |
 | 0027/0028 | `test-rfc0027-mkv-seek-selfcheck.ps1`, `test-rfc0027-uia-tree-selfcheck.ps1`, `test-rfc0028-uia-video-selfcheck.ps1`, `test-rfc0028-mkv-seek-uia-selfcheck.ps1` |
 | 0030 | `test-rfc0030-mpeg2-dxva-selfcheck.ps1` |
-| 0033 | `src/BuildScript/audit-rfc0033-dxva-h264-vc1-refs.ps1`（阶段 1）；selfcheck TBD |
+| 0033 | `test-rfc0033-h264-dxva-selfcheck.ps1`；`src/BuildScript/audit-rfc0033-dxva-h264-vc1-refs.ps1` |
 | 0031 | `test-rfc0031-mpeg2-*.ps1` |
 | 0032 | `setup-rmvb-samples.ps1`, `test-rmvb-seek-selfcheck.ps1` |
 | 0034 | `test-rfc0034-realaudio-selfcheck.ps1` |
 | 0035 | `src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1` |
 | 0044/0045 | `test-rfc0045-realaudio-remaining-selfcheck.ps1`（含 cook 回归 + AAC/RA144/RA288 bridge open） |
-| 0046 | `test-rfc0046-mpadec-modern-selfcheck.ps1`（待建）；bridge smoke 扩展 |
+| 0046 | `test-rfc0046-mpadec-modern-selfcheck.ps1`；bridge smoke（WMAV2/AMR_NB） |
 
 ### 新建 RFC 规则
 

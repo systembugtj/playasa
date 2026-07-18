@@ -93,12 +93,19 @@ int main()
         return 7;
     }
 
+    if (!CheckAudioCodec(PLAYASA_FFMPEG_MODERN_CODEC_WMAV2, 44100, 2, 1024)) {
+        return 8;
+    }
+    if (!CheckAudioCodec(PLAYASA_FFMPEG_MODERN_CODEC_AMR_NB, 8000, 1, 32)) {
+        return 9;
+    }
+
     // COOK requires RealMedia extradata; create-only proves decoder is linked.
     {
         PlayasaFfmpegModernSession session = 0;
         if (!playasa_ffmpeg_modern_create(PLAYASA_FFMPEG_MODERN_CODEC_COOK, &session) || !session) {
             fprintf(stderr, "failed to create COOK bridge session\n");
-            return 8;
+            return 10;
         }
         playasa_ffmpeg_modern_destroy(session);
     }

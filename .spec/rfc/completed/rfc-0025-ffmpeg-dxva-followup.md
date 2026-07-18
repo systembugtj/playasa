@@ -134,7 +134,7 @@ RFC-0024 迁移了新版 FFmpeg 的软件解码 island，并在 modern bridge �
 
 1. MPEG-2 DXVA 子 RFC 已创建：[RFC-0030](../rfc-0030-mpeg2-dxva-context-modernization.md)。
 2. `RFC-0030` 限定只做 `DxvaMpeg2PictureContext` 和旧 reader 输出重构。
-3. VC-1 / H.264 DXVA 迁移等待 MPEG-2 context 模式验证后再继续；实施 RFC：[RFC-0033](../rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md)。
+3. VC-1 / H.264 DXVA 迁移已由 [RFC-0033](./rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) 完成（contract + reader）。
 4. DXVA selection/fallback 低容量日志和手测记录模板应随具体 codec 实施 RFC 增加。
 
 ## 6. 非目标

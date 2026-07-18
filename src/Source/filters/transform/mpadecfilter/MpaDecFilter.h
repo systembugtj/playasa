@@ -23,6 +23,7 @@
 
 #include <atlcoll.h>
 #include <stdint.h>
+#include <vector>
 #include "libmad-0.15.0b\msvc++\mad.h"
 #include "a52dec-0.7.4\include\a52.h"
 #include "dtsdec-0.0.1\include\dts.h"
@@ -76,12 +77,7 @@ struct flac_state_t
 	HRESULT				hr;
 };
 
-struct AVCodec;
-struct AVCodecContext;
-struct AVFrame;
-struct AVCodecParserContext;
-
-
+#include "modern_ffmpeg/MpaDecModernDecodeAdapter.h"
 
 class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F")) CMpaDecFilter 
 	: public CTransformFilter
@@ -102,11 +98,9 @@ protected:
 	flac_state_t			m_flac;
 	DolbyDigitalMode		m_DolbyDigitalMode;
 
-	// === FFMpeg variables
-	AVCodec*				m_pAVCodec;
-	AVCodecContext*			m_pAVCtx;
-	AVCodecParserContext*	m_pParser;
-	BYTE*					m_pPCMData;
+	CMpaDecModernDecodeAdapter m_modernAudio;
+	int						m_modernLegacyCodecId;
+	std::vector<uint8_t>	m_modernOwnedExtraData;
 
 	CAtlArray<BYTE> m_buff;
 	REFERENCE_TIME m_rtStart;
@@ -142,9 +136,6 @@ protected:
 	bool	InitFfmpeg(int nCodecId);
 	void	ffmpeg_stream_finish();
 	HRESULT DeliverFfmpeg(int nCodecId, BYTE* p, int buffsize, int& size);
-	static void		LogLibAVCodec(void* par,int level,const char *fmt,va_list valist);
-    BYTE*									m_pFFBuffer;
-    int										m_nFFBufferSize;
 protected:
 	CCritSec m_csProps;
 	MPCSampleFormat m_iSampleFormat;

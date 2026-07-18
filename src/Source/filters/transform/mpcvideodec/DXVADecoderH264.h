@@ -25,6 +25,7 @@
 
 #include <dxva.h>
 #include "DXVADecoder.h"
+#include "DxvaCodecContext.h"
 #include "H264QuantizationMatrix.h"
 
 

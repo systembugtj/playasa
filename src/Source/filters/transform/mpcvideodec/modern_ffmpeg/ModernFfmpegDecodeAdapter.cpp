@@ -130,6 +130,30 @@ enum AVCodecID ToAvCodecId(DecodeCodec codec)
         return AV_CODEC_ID_RA_144;
     case kDecodeCodecRa288:
         return AV_CODEC_ID_RA_288;
+    case kDecodeCodecWmav1:
+        return AV_CODEC_ID_WMAV1;
+    case kDecodeCodecWmav2:
+        return AV_CODEC_ID_WMAV2;
+    case kDecodeCodecAmrNb:
+        return AV_CODEC_ID_AMR_NB;
+    case kDecodeCodecAmrWb:
+        return AV_CODEC_ID_AMR_WB;
+    case kDecodeCodecNellymoser:
+        return AV_CODEC_ID_NELLYMOSER;
+    case kDecodeCodecQdm2:
+        return AV_CODEC_ID_QDM2;
+    case kDecodeCodecEac3:
+        return AV_CODEC_ID_EAC3;
+    case kDecodeCodecTruehd:
+        return AV_CODEC_ID_TRUEHD;
+    case kDecodeCodecMlp:
+        return AV_CODEC_ID_MLP;
+    case kDecodeCodecFlac:
+        return AV_CODEC_ID_FLAC;
+    case kDecodeCodecPcmMulaw:
+        return AV_CODEC_ID_PCM_MULAW;
+    case kDecodeCodecAdpcmImaQt:
+        return AV_CODEC_ID_ADPCM_IMA_QT;
     default:
         return AV_CODEC_ID_NONE;
     }
@@ -493,7 +517,7 @@ bool DecodeSession::OpenWithExtradata(const uint8_t* extraData, size_t extraData
 
 bool DecodeSession::IsAudioCodec() const
 {
-    return IsRealAudioCodec(codec_);
+    return IsBridgeAudioCodec(codec_);
 }
 
 bool DecodeSession::OpenWithAudioParams(const AudioOpenParams& params)
@@ -1331,6 +1355,42 @@ bool DecodeCodecFromModernAvCodecId(int codecId, DecodeCodec* codec)
     case AV_CODEC_ID_RA_288:
         *codec = kDecodeCodecRa288;
         return true;
+    case AV_CODEC_ID_WMAV1:
+        *codec = kDecodeCodecWmav1;
+        return true;
+    case AV_CODEC_ID_WMAV2:
+        *codec = kDecodeCodecWmav2;
+        return true;
+    case AV_CODEC_ID_AMR_NB:
+        *codec = kDecodeCodecAmrNb;
+        return true;
+    case AV_CODEC_ID_AMR_WB:
+        *codec = kDecodeCodecAmrWb;
+        return true;
+    case AV_CODEC_ID_NELLYMOSER:
+        *codec = kDecodeCodecNellymoser;
+        return true;
+    case AV_CODEC_ID_QDM2:
+        *codec = kDecodeCodecQdm2;
+        return true;
+    case AV_CODEC_ID_EAC3:
+        *codec = kDecodeCodecEac3;
+        return true;
+    case AV_CODEC_ID_TRUEHD:
+        *codec = kDecodeCodecTruehd;
+        return true;
+    case AV_CODEC_ID_MLP:
+        *codec = kDecodeCodecMlp;
+        return true;
+    case AV_CODEC_ID_FLAC:
+        *codec = kDecodeCodecFlac;
+        return true;
+    case AV_CODEC_ID_PCM_MULAW:
+        *codec = kDecodeCodecPcmMulaw;
+        return true;
+    case AV_CODEC_ID_ADPCM_IMA_QT:
+        *codec = kDecodeCodecAdpcmImaQt;
+        return true;
     default:
         return false;
     }
@@ -1361,7 +1421,7 @@ bool IsFirstWaveSoftwareCodec(DecodeCodec codec)
     }
 }
 
-bool IsRealAudioCodec(DecodeCodec codec)
+bool IsBridgeAudioCodec(DecodeCodec codec)
 {
     switch (codec) {
     case kDecodeCodecCook:
@@ -1370,6 +1430,18 @@ bool IsRealAudioCodec(DecodeCodec codec)
     case kDecodeCodecAac:
     case kDecodeCodecRa144:
     case kDecodeCodecRa288:
+    case kDecodeCodecWmav1:
+    case kDecodeCodecWmav2:
+    case kDecodeCodecAmrNb:
+    case kDecodeCodecAmrWb:
+    case kDecodeCodecNellymoser:
+    case kDecodeCodecQdm2:
+    case kDecodeCodecEac3:
+    case kDecodeCodecTruehd:
+    case kDecodeCodecMlp:
+    case kDecodeCodecFlac:
+    case kDecodeCodecPcmMulaw:
+    case kDecodeCodecAdpcmImaQt:
         return true;
     default:
         return false;

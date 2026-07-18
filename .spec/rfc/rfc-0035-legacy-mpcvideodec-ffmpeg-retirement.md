@@ -6,7 +6,7 @@
 | **创建日期** | 2026-05-17 |
 | **最后更新** | 2026-07-17 |
 | **负责人** | AI / Playasa |
-| **相关 RFC** | [RFC-0024](./rfc-0024-ffmpeg-modern-island.md)、[RFC-0017](./completed/rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0031](./completed/rfc-0031-mpeg2-playback-path-modernization.md)、[RFC-0032](./completed/rfc-0032-rmvb-realvideo-modern-playback.md)、[RFC-0033](./rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md)、[RFC-0034](./completed/rfc-0034-realaudio-modern-playback.md)、[RFC-0044](./completed/rfc-0044-realaudio-legacy-cleanup.md)、[RFC-0045](./completed/rfc-0045-realaudio-remaining-codecs.md)、[RFC-0046](./rfc-0046-mpadecfilter-modern-audio.md) |
+| **相关 RFC** | [RFC-0024](./rfc-0024-ffmpeg-modern-island.md)、[RFC-0017](./completed/rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0031](./completed/rfc-0031-mpeg2-playback-path-modernization.md)、[RFC-0032](./completed/rfc-0032-rmvb-realvideo-modern-playback.md)、[RFC-0033](./completed/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md)、[RFC-0034](./completed/rfc-0034-realaudio-modern-playback.md)、[RFC-0044](./completed/rfc-0044-realaudio-legacy-cleanup.md)、[RFC-0045](./completed/rfc-0045-realaudio-remaining-codecs.md)、[RFC-0046](./completed/rfc-0046-mpadecfilter-modern-audio.md) |
 
 ## 1. 摘要
 
@@ -22,8 +22,8 @@
 | MPEG-2 真实路径 modern-only | RFC-0031 | ✓ |
 | RealVideo modern + 时间戳 | RFC-0032 | ✓ |
 | RealAudio modern + legacy 清理 | RFC-0034/0044/0045 | ✓ |
-| DXVA 不依赖旧私有结构 | RFC-0033 | **阻塞**（执行中） |
-| `MpaDecFilter` 不再链接旧 libavcodec | [RFC-0046](./rfc-0046-mpadecfilter-modern-audio.md) | **阻塞**（提案） |
+| DXVA 不依赖旧私有结构 | [RFC-0033](./completed/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) | ✓ |
+| `MpaDecFilter` 不再链接旧 libavcodec | [RFC-0046](./completed/rfc-0046-mpadecfilter-modern-audio.md) | ✓ |
 | `verify-rfc0017` 策略更新 | RFC-0017 | 待删树时更新 |
 
 ## 3. 目标
@@ -45,7 +45,7 @@
 1. ~~生成 `mpcvideodec-legacy-ffmpeg-refs.txt` 门闩（脚本化引用计数）~~（2026-07-17）
 2. 与各子 RFC 勾选门禁（§2）。
 3. 在 RFC-0033 收口后：删除仍依赖 `FfmpegContext` 的 DXVA 私有结构读路径（或缩成 shim）。
-4. 由 [RFC-0046](./rfc-0046-mpadecfilter-modern-audio.md) 迁移 `MpaDecFilter` 旧 audio decode，去掉 `libavcodec_gcc` 链接。
+4. ~~由 RFC-0046 迁移 MpaDecFilter~~（已完成）
 5. 移除 `mpcvideodec/ffmpeg/` 目录与 vcxproj 编译项；更新 `verify-rfc0017`。
 6. 归档 RFC-0024 为 completed 或改为「island-only 维护」。
 
@@ -62,9 +62,10 @@ test-rfc0024-*, test-rfc0031-*, test-rmvb-*, test-rfc0027-*, test-rfc0034-*, tes
 ## 7. 下一步行动
 
 1. ~~运行步骤 1 引用审计~~（已完成）
-2. **阻塞**：推进 [RFC-0033](./rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md)（H.264/VC-1 DXVA contract）
-3. **阻塞**：推进 [RFC-0046](./rfc-0046-mpadecfilter-modern-audio.md)（MpaDecFilter modern audio）
-4. 门禁全绿后再删树
+2. ~~推进 RFC-0033~~（已完成）
+3. ~~推进 RFC-0046~~（已完成；audit MpaDec 0 hits）
+4. 收窄/移除 MPCVideoDec 旧 software fallback 与 `FfmpegContext` 剩余引用，再删树
+5. 门禁全绿后再删树
 
 ## 8. 当前清单（审计 2026-07-17）
 
@@ -102,4 +103,4 @@ powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/audit-rfc003
 
 ### 结论
 
-**现在不能删 `mpcvideodec/ffmpeg`。** 最短路径：RFC-0033（DXVA 解耦）+ RFC-0046（MpaDec modern）→ 再执行 §5.5 删树。
+**现在仍不能删 `mpcvideodec/ffmpeg`。** RFC-0033 / RFC-0046 门禁已解除；仍需收口 MPCVideoDec 旧 fallback 与其它 `libavcodec_gcc` 消费者后再执行 §5.5 删树。

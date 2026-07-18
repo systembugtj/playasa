@@ -92,8 +92,17 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 	int							nFieldType;
 	int							nSliceType;
 
-	FFVC1UpdatePictureParam (&m_PictureParams, m_pFilter->GetAVCtx(), &nFieldType, &nSliceType, pDataIn, nSize);
-	if (FFIsSkipped (m_pFilter->GetAVCtx()))
+	DxvaVc1PictureContext		pictureContext;
+
+	/* RFC-0033: VC-1 DXVA params via project-owned contract (private codec state stays in FfmpegContext.c). */
+	memset(&pictureContext, 0, sizeof(pictureContext));
+	pictureContext.pictureParams = m_PictureParams;
+	if (FAILED (FFVC1ReadPictureContext (&pictureContext, m_pFilter->GetAVCtx(), pDataIn, nSize)))
+		return S_FALSE;
+	m_PictureParams = pictureContext.pictureParams;
+	nFieldType = pictureContext.fieldType;
+	nSliceType = pictureContext.sliceType;
+	if (pictureContext.frameSkipped)
 		return S_OK;
 
 	// Wait I frame after a flush

@@ -25,6 +25,7 @@
 
 #include <dxva.h>
 #include "DXVADecoder.h"
+#include "DxvaCodecContext.h"
 
 class CDXVADecoderVC1 :	public CDXVADecoder
 {

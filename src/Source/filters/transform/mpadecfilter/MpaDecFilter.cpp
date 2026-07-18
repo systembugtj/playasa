@@ -31,8 +31,9 @@
 #include <moreuuids.h>
 
 #include <vector>
-#include "..\mpcvideodec\ffmpeg\PODtypes.h"
-#include "..\mpcvideodec\ffmpeg\libavcodec\avcodec.h"
+#include "modern_ffmpeg/MpaDecCodecMap.h"
+#include "modern_ffmpeg/MpaDecAudioOpenParams.h"
+#include "ffmpeg_modern_bridge.h"
 
 #include "faad2\include\neaacdec.h"
 
@@ -329,12 +330,7 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_fDynamicRangeControl[dts] = false;
 	m_fDynamicRangeControl[aac] = false;
 	m_DolbyDigitalMode			= DD_Unknown;
-	m_pAVCodec					= NULL;
-	m_pAVCtx					= NULL;
-	m_pParser					= NULL;
-	m_pPCMData					= NULL;
-    m_pFFBuffer				= NULL;
-    m_nFFBufferSize			= 0;
+	m_modernLegacyCodecId		= 0;
 	memset (&m_flac, 0, sizeof(m_flac));
 
 	CRegKey key;
@@ -356,9 +352,6 @@ CMpaDecFilter::CMpaDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 CMpaDecFilter::~CMpaDecFilter()
 {
-    if (m_pFFBuffer)					free(m_pFFBuffer);
-    m_nFFBufferSize	= 0;
-
 	CRegKey key;
 	if(ERROR_SUCCESS == key.Create(HKEY_CURRENT_USER, _T("Software\\SPlayer\\Filters\\MPEG Audio Decoder")))
 	{
@@ -409,8 +402,8 @@ HRESULT CMpaDecFilter::NewSegment(REFERENCE_TIME tStart, REFERENCE_TIME tStop, d
 	m_sample_max = 0.1f;
 	m_ps2_state.sync = false;
 	m_DolbyDigitalMode = DD_Unknown;
-	if (m_pAVCtx)
-		avcodec_flush_buffers (m_pAVCtx);
+	if (m_modernAudio.IsOpen())
+		m_modernAudio.Flush();
 	if (m_flac.pDecoder)
 		FLAC__stream_decoder_flush((FLAC__StreamDecoder*) m_flac.pDecoder);
 	return __super::NewSegment(tStart, tStop, dRate);
@@ -486,9 +479,9 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 	SVP_LogMsg6("CMpaDecFilter::Receive2");
   
 	if(subtype == MEDIASUBTYPE_AMR || subtype == MEDIASUBTYPE_SAMR)
-		hr = ProcessFfmpeg(CODEC_ID_AMR_NB);
+		hr = ProcessFfmpeg(kMpaDecLegacyCodecAmrNb);
 	else if(subtype == MEDIASUBTYPE_SAWB)
-		hr = ProcessFfmpeg(CODEC_ID_AMR_WB);
+		hr = ProcessFfmpeg(kMpaDecLegacyCodecAmrWb);
 	else if(subtype == MEDIASUBTYPE_DVD_LPCM_AUDIO)
 		hr = ProcessLPCM();
 	else if(subtype == MEDIASUBTYPE_HDMV_LPCM_AUDIO)
@@ -515,33 +508,33 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 		hr = ProcessFlac();
     else if( MEDIASUBTYPE_F1AC_FLAC ==  subtype ){
         //TODO : give up ProcessFlac or  ProcessFfmpeg(CODEC_ID_FLAC), let's chose one
-        hr = ProcessFfmpeg(CODEC_ID_FLAC);
+        hr = ProcessFfmpeg(kMpaDecLegacyCodecFlac);
     }else if(subtype == MEDIASUBTYPE_NELLYMOSER)
-		hr = ProcessFfmpeg(CODEC_ID_NELLYMOSER);
+		hr = ProcessFfmpeg(kMpaDecLegacyCodecNellymoser);
     else if(subtype == MEDIASUBTYPE_IMA4){
         if(m_buff.GetCount() < 256){
             return S_OK;
         }
-		hr = ProcessFfmpeg(CODEC_ID_ADPCM_IMA_QT);
+		hr = ProcessFfmpeg(kMpaDecLegacyCodecAdpcmImaQt);
     }
     else if(subtype ==MEDIASUBTYPE_COOK){
-        hr = ProcessFfmpeg(CODEC_ID_COOK);
+        hr = ProcessFfmpeg(kMpaDecLegacyCodecCook);
     }
     else if(subtype ==MEDIASUBTYPE_SIPR){
-        hr = ProcessFfmpeg(CODEC_ID_SIPR);
+        hr = ProcessFfmpeg(kMpaDecLegacyCodecSipr);
     }
     else if(subtype ==MEDIASUBTYPE_QDM2){
        
-        hr = ProcessFfmpeg(CODEC_ID_QDM2);
+        hr = ProcessFfmpeg(kMpaDecLegacyCodecQdm2);
     }
 	else if(subtype ==MEDIASUBTYPE_14_4)
-		hr = ProcessFfmpeg(CODEC_ID_RA_144);
+		hr = ProcessFfmpeg(kMpaDecLegacyCodecRa144);
 	else if(subtype ==MEDIASUBTYPE_28_8)
-		hr = ProcessFfmpeg(CODEC_ID_RA_288);
+		hr = ProcessFfmpeg(kMpaDecLegacyCodecRa288);
 	else if(subtype == MEDIASUBTYPE_WMA1)
-		hr = ProcessFfmpeg(CODEC_ID_WMAV1);
+		hr = ProcessFfmpeg(kMpaDecLegacyCodecWmav1);
 	else if(subtype == MEDIASUBTYPE_WMA2)
-		hr = ProcessFfmpeg(CODEC_ID_WMAV2);
+		hr = ProcessFfmpeg(kMpaDecLegacyCodecWmav2);
 	else if(MEDIASUBTYPE_PCM_ULAW == subtype ){
 		//SVP_LogMsg6("MEDIASUBTYPE_PCM_ULAW");
 		//SVP_LogMsg6("pIn->GetActualDataLength %d %d %d %d", len, pDataIn[0], pDataIn[1], m_buff.GetCount());
@@ -549,7 +542,7 @@ HRESULT CMpaDecFilter::Receive(IMediaSample* pIn)
 			return S_OK;
 		}
         SVP_LogMsg6("MEDIASUBTYPE_PCM_ULAW %f  %f %f", double(rtStart), double(rtStop),  double(m_rtStart));
-		hr = ProcessFfmpeg(CODEC_ID_PCM_MULAW);
+		hr = ProcessFfmpeg(kMpaDecLegacyCodecPcmMulaw);
 	}
 	else if(MEDIASUBTYPE_PCM_RAW == subtype ){
 		hr = ProcessPCMU8();
@@ -1032,7 +1025,7 @@ HRESULT CMpaDecFilter::ProcessAC3()
 			}
 			else if (bsid <= 16)
 			{
-				DeliverFfmpeg(CODEC_ID_EAC3, p, end-p, size);
+				DeliverFfmpeg(kMpaDecLegacyCodecEac3, p, end-p, size);
 				if (size > 0)
 					m_DolbyDigitalMode = DD_EAC3;
         if (size<0) size = end-p;
@@ -1054,7 +1047,7 @@ HRESULT CMpaDecFilter::ProcessAC3()
 
 			if (nLenght >= 4)
 			{
-				DeliverFfmpeg(CODEC_ID_TRUEHD, p, end-p, size);
+				DeliverFfmpeg(kMpaDecLegacyCodecTruehd, p, end-p, size);
 				if (size<0) size = end-p;
 			}
 		}
@@ -1069,7 +1062,7 @@ HRESULT CMpaDecFilter::ProcessAC3()
 
 			if (nLenght >= 4)
 			{
-				DeliverFfmpeg(CODEC_ID_MLP, p, end-p, size);
+				DeliverFfmpeg(kMpaDecLegacyCodecMlp, p, end-p, size);
 				if (size<0) size = end-p;
 			}
 		}
@@ -2511,478 +2504,152 @@ void CMpaDecFilter::flac_stream_finish()
 
 #pragma region Ffmpeg decoder
 
-
-
-// Version 1 : using av_parser_parse !
-#if 0
 HRESULT CMpaDecFilter::DeliverFfmpeg(int nCodecId, BYTE* p, int buffsize, int& size)
 {
-	HRESULT		hr = S_OK;
-	
+	HRESULT hr = S_OK;
 	size = 0;
-	if (!m_pAVCtx || nCodecId != m_pAVCtx->codec_id)
-		if (!InitFfmpeg (nCodecId)) return E_FAIL;
 
-	while (buffsize > 0)
-	{
-		BYTE*	pParserData;
-		int		nParserLength	= AVCODEC_MAX_AUDIO_FRAME_SIZE;
-		int		nPCMLength		= AVCODEC_MAX_AUDIO_FRAME_SIZE;
-		int		nRet;
+	const uint32_t modernCodec = ModernCodecFromLegacyCodecId(nCodecId);
+	if (!modernCodec) {
+		return E_FAIL;
+	}
 
-		if (m_pAVCtx->codec_id != CODEC_ID_MLP)
-		{
-			// Parse buffer
-			nRet = av_parser_parse( m_pParser, m_pAVCtx, (uint8_t**)&pParserData, &nParserLength, 
-									(const uint8_t*)p, buffsize, AV_NOPTS_VALUE, AV_NOPTS_VALUE);
-			if (nRet<0 || (nRet==0 && nParserLength==0))
-			   return S_OK;
-
-			buffsize	-= nRet;
-			p			+= nRet;
-			size		+= nRet;
-
-			// Decode frame
-			if (nParserLength > 0)
-			{
-				nRet = avcodec_decode_audio2(m_pAVCtx, (int16_t*)m_pPCMData, &nPCMLength, (const uint8_t*)pParserData, nParserLength);
-				if (nRet<0 || (nRet==0 &&nPCMLength==0))
-					continue;
-			}
-			else
-				continue;
+	if (!m_modernAudio.IsOpen() || nCodecId != m_modernLegacyCodecId) {
+		if (!InitFfmpeg(nCodecId)) {
+			return E_FAIL;
 		}
-		else
-		{
-			// No parsing for MLP : decode only
-			nRet = avcodec_decode_audio2(m_pAVCtx, (int16_t*)m_pPCMData, &nPCMLength, (const uint8_t*)p, buffsize);
-			if (nRet<0 || (nRet==0 && nParserLength==0))
-			   return S_OK;
+	}
 
-			buffsize	-= nRet;
-			p			+= nRet;
-			size		+= nRet;
-		}
+	WAVEFORMATEX* wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
+	const int blockAlign = wfein->nBlockAlign > 0 ? wfein->nBlockAlign : buffsize;
+	const bool consumeWholeBuffer =
+		nCodecId == kMpaDecLegacyCodecMlp ||
+		nCodecId == kMpaDecLegacyCodecTruehd ||
+		nCodecId == kMpaDecLegacyCodecEac3;
 
-		if (nPCMLength > 0)
-		{
-			WAVEFORMATEX*		wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-			CAtlArray<float>	pBuff;
-			int					nRemap;
-			float*				pDataOut;
-                    
-			nRemap = FFGetChannelMap (m_pAVCtx);
-			if (nRemap >=0)
-			{
-				scmap_t& scmap = s_scmap_ac3[nRemap];
+	CAtlArray<float> pBuffOut;
+	scmap_t* scmap = NULL;
+	int sampleRate = wfein->nSamplesPerSec;
 
-				switch (m_pAVCtx->sample_fmt)
-				{
-				case SAMPLE_FMT_S16 :
-					pBuff.SetCount (nPCMLength / 2);
-					pDataOut = pBuff.GetData();
+	BYTE* pDataIn = p;
+	int remaining = buffsize;
 
-					for (int i=0; i<pBuff.GetCount()/m_pAVCtx->channels; i++)
-					{
-						for(int ch=0; ch<m_pAVCtx->channels; ch++)
-						{
-							*pDataOut = (float)((int16_t*)m_pPCMData) [scmap.ch[ch]+i*m_pAVCtx->channels] / SHRT_MAX;
-							pDataOut++;
+	while (remaining > 0) {
+		const int chunkSize = consumeWholeBuffer ? remaining : min(remaining, blockAlign);
+		PlayasaFfmpegModernAudioFrameInfo frameInfo = {};
+		int status = m_modernAudio.DecodeAudio(pDataIn, chunkSize, PLAYASA_FFMPEG_MODERN_NO_PTS, &frameInfo);
+
+		if (status == PLAYASA_FFMPEG_MODERN_STATUS_FRAME_READY) {
+			do {
+				const int channels = frameInfo.channels;
+				if (channels > 0 && frameInfo.nb_samples > 0 && frameInfo.data) {
+					if (nCodecId == kMpaDecLegacyCodecEac3) {
+						scmap = &m_ffmpeg_ac3[min(channels - 1, countof(m_ffmpeg_ac3) - 1)];
+					} else {
+						scmap = &m_scmap_default[min(channels - 1, countof(m_scmap_default) - 1)];
+					}
+					if (frameInfo.sample_rate > 0) {
+						sampleRate = frameInfo.sample_rate;
+					}
+
+					const size_t idxStart = pBuffOut.GetCount();
+					pBuffOut.SetCount(idxStart + static_cast<size_t>(frameInfo.nb_samples) * static_cast<size_t>(scmap->nChannels));
+					float* pDataOut = pBuffOut.GetData() + idxStart;
+
+					if (frameInfo.sample_format == PLAYASA_FFMPEG_MODERN_SAMPLEFMT_S32) {
+						const int32_t* pcm = reinterpret_cast<const int32_t*>(frameInfo.data);
+						for (int i = 0; i < frameInfo.nb_samples; ++i) {
+							for (int ch = 0; ch < scmap->nChannels; ++ch) {
+								const int srcCh = scmap->ch[ch];
+								if (srcCh < 0) {
+									*pDataOut++ = 0.0f;
+									continue;
+								}
+								*pDataOut++ = static_cast<float>(pcm[srcCh + i * channels]) / INT_MAX;
+							}
+						}
+					} else {
+						const int16_t* pcm = reinterpret_cast<const int16_t*>(frameInfo.data);
+						for (int i = 0; i < frameInfo.nb_samples; ++i) {
+							for (int ch = 0; ch < scmap->nChannels; ++ch) {
+								const int srcCh = scmap->ch[ch];
+								if (srcCh < 0) {
+									*pDataOut++ = 0.0f;
+									continue;
+								}
+								*pDataOut++ = static_cast<float>(pcm[srcCh + i * channels]) / SHRT_MAX;
+							}
 						}
 					}
-					break;
-
-				case SAMPLE_FMT_S32 :
-					pBuff.SetCount (nPCMLength / 4);
-					pDataOut = pBuff.GetData();
-
-					for (int i=0; i<pBuff.GetCount()/m_pAVCtx->channels; i++)
-					{
-						for(int ch=0; ch<m_pAVCtx->channels; ch++)
-						{
-							*pDataOut = (float)((int32_t*)m_pPCMData) [scmap.ch[ch]+i*m_pAVCtx->channels] / INT_MAX;
-							pDataOut++;
-						}
-					}
-					break;
-				default :
-					ASSERT(FALSE);
-					break;
 				}
-				hr = Deliver(pBuff, m_pAVCtx->sample_rate, m_pAVCtx->channels, scmap.dwChannelMask);
+
+				if (status == PLAYASA_FFMPEG_MODERN_STATUS_FRAME_READY) {
+					status = m_modernAudio.ReceiveAudio(&frameInfo);
+				}
+			} while (status == PLAYASA_FFMPEG_MODERN_STATUS_FRAME_READY);
+
+			pDataIn += chunkSize;
+			remaining -= chunkSize;
+			size += chunkSize;
+		} else if (status == PLAYASA_FFMPEG_MODERN_STATUS_NEED_MORE_INPUT) {
+			pDataIn += chunkSize;
+			remaining -= chunkSize;
+			size += chunkSize;
+		} else {
+			if (consumeWholeBuffer && size == 0) {
+				size = -1;
 			}
+			break;
 		}
+	}
+
+	if (pBuffOut.GetCount() > 0 && scmap) {
+		hr = Deliver(pBuffOut, sampleRate, scmap->nChannels, scmap->dwChannelMask);
 	}
 
 	return hr;
 }
 
-#else
- 
-#define  NEWDELIVER 1
-HRESULT CMpaDecFilter::DeliverFfmpeg(int nCodecId, BYTE* p, int buffsize, int& size)
-{
-
-#if NEWDELIVER
-	HRESULT		hr			= S_OK;
-	int			nPCMLength	= 0;
-	 SVP_LogMsg5(L"DeliverFfmpeg %d", buffsize);
-	if (!m_pAVCtx || nCodecId != m_pAVCtx->codec_id)
-		if (!InitFfmpeg (nCodecId))
-		{
-			size = 0;
-			SVP_LogMsg5(L"InitFfmpeg Failed");
-			return E_FAIL;
-		}
-    BYTE* pDataInBuff = p;
-    CAtlArray<float>	pBuffOut;
-    scmap_t* scmap = NULL; 
-    SVP_LogMsg5(L"DeliverFfmpeg2 %d", buffsize);
-    while (buffsize > 0)
-    {
-        nPCMLength	= AVCODEC_MAX_AUDIO_FRAME_SIZE;
-        if (buffsize+FF_INPUT_BUFFER_PADDING_SIZE > m_nFFBufferSize)
-        {
-            m_nFFBufferSize = buffsize+FF_INPUT_BUFFER_PADDING_SIZE;
-            m_pFFBuffer		= (BYTE*)realloc(m_pFFBuffer, m_nFFBufferSize);
-            
-        }
-
-        // Required number of additionally allocated bytes at the end of the input bitstream for decoding.
-        // This is mainly needed because some optimized bitstream readers read
-        // 32 or 64 bit at once and could read over the end.<br>
-        // Note: If the first 23 bits of the additional bytes are not 0, then damaged
-        // MPEG bitstreams could cause overread and segfault.
-        memcpy(m_pFFBuffer, pDataInBuff, buffsize);
-        memset(m_pFFBuffer+buffsize,0,FF_INPUT_BUFFER_PADDING_SIZE);
-
-        SVP_LogMsg5(L"nPCMLength1 %d %d size %d buffsize %d srate %d" ,m_pAVCtx->codec_id ,  nPCMLength, size , buffsize);
-	    int used_byte = avcodec_decode_audio2(m_pAVCtx, (int16_t*)m_pPCMData, &nPCMLength, (const uint8_t*)m_pFFBuffer, buffsize);
-	    SVP_LogMsg5(L"nPCM %x %x %x %x %x %x %x %x %x %x", m_pPCMData[0], m_pPCMData[1], m_pPCMData[2], m_pPCMData[3], m_pPCMData[4], m_pPCMData[5], m_pPCMData[6], m_pPCMData[7], m_pPCMData[8], m_pPCMData[9]);
-        SVP_LogMsg5(L"nPCMLength2 %d size %d buffsize %d %d" , nPCMLength, used_byte , buffsize, m_pAVCtx->sample_fmt);
-        
-        if(used_byte < 0 ) { size = used_byte;  return S_OK; }
-        if(used_byte == 0 && nPCMLength <= 0 ) {size = used_byte; return S_OK; }
-        size += used_byte;//
-
-	    if ( nPCMLength>0)
-	    {
-		    WAVEFORMATEX*		wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-		    CAtlArray<float>	pBuff;
-		    int					iSpeakerConfig;
-		    int					nRemap;
-		    float*				pDataOut;
-                    
-		    nRemap = FFGetChannelMap (m_pAVCtx);
-		    //iSpeakerConfig  = GetSpeakerConfig(ac3);
-		    //nRemap = min (nRemap, iSpeakerConfig);		// <== TODO : correct ??
-
-		    if (nRemap >=0)
-		    {
-					   
-    		
-		        switch (nCodecId)
-		        {
-		            case CODEC_ID_EAC3 :
-			            scmap = &m_ffmpeg_ac3[FFGetChannelMap(m_pAVCtx)];
-			            break;
-		            default :
-			            scmap = &m_scmap_default[m_pAVCtx->channels-1];
-			            break;
-		        }
-
-			    switch (m_pAVCtx->sample_fmt)
-			    {
-			    case SAMPLE_FMT_S16 :
-				    pBuff.SetCount (nPCMLength / 2);
-				    pDataOut = pBuff.GetData();
-
-				    for (size_t i=0; i<pBuff.GetCount()/m_pAVCtx->channels; i++)
-				    {
-					    for(int ch=0; ch<m_pAVCtx->channels; ch++)
-					    {
-						    *pDataOut = (float)((int16_t*)m_pPCMData) [scmap->ch[ch]+i*m_pAVCtx->channels] / SHRT_MAX;
-						    pDataOut++;
-					    }
-				    }
-				    break;
-
-			    case SAMPLE_FMT_S32 :
-				    pBuff.SetCount (nPCMLength / 4);
-				    pDataOut = pBuff.GetData();
-
-				    for (size_t i=0; i<pBuff.GetCount()/m_pAVCtx->channels; i++)
-				    {
-					    for(int ch=0; ch<m_pAVCtx->channels; ch++)
-					    {
-					    *pDataOut = (float)((int32_t*)m_pPCMData) [scmap->ch[ch]+i*m_pAVCtx->channels] / INT_MAX;
-    //						*pDataOut = (float)((int32_t*)m_pPCMData) [ch+i*m_pAVCtx->channels] / INT_MAX;
-						    pDataOut++;
-					    }
-				    }
-				    break;
-			    default :
-				    ASSERT(FALSE);
-				    break;
-			    }
-
-                if(pBuff.GetCount() > 0){
-                    int idx_start = pBuffOut.GetCount();
-                    pBuffOut.SetCount( idx_start + pBuff.GetCount()  );
-                    for(int i = 0; i< pBuff.GetCount(); i++){
-                        pBuffOut[idx_start+i] = pBuff[i];
-                    }
-                }
-		   
-		    }
-        }
-
-        buffsize	-= used_byte;
-        pDataInBuff += used_byte;
-    }
-    if(pBuffOut.GetCount() > 0 && scmap)
-        hr = Deliver(pBuffOut, m_pAVCtx->sample_rate, scmap->nChannels, scmap->dwChannelMask);
-	return hr;
-
-#else
-    HRESULT		hr			= S_OK;
-    int			nPCMLength	= AVCODEC_MAX_AUDIO_FRAME_SIZE;
-
-    if (!m_pAVCtx || nCodecId != m_pAVCtx->codec_id)
-    if (!InitFfmpeg (nCodecId))
-    {
-        size = 0;
-        SVP_LogMsg5(L"InitFfmpeg Failed");
-        return E_FAIL;
-    }
-
-
-    SVP_LogMsg5(L"nPCMLength1 %d %d size %d buffsize %d srate %d" ,m_pAVCtx->codec_id ,  nPCMLength, size , buffsize);
-    size = avcodec_decode_audio2(m_pAVCtx, (int16_t*)m_pPCMData, &nPCMLength, (const uint8_t*)p, buffsize);
-    SVP_LogMsg5(L"nPCM %x %x %x %x %x %x %x %x %x %x", m_pPCMData[0], m_pPCMData[1], m_pPCMData[2], m_pPCMData[3], m_pPCMData[4], m_pPCMData[5], m_pPCMData[6], m_pPCMData[7], m_pPCMData[8], m_pPCMData[9]);
-    SVP_LogMsg5(L"nPCMLength2 %d size %d buffsize %d %d" , nPCMLength, size , buffsize, m_pAVCtx->sample_fmt);
-
-    size = min (size, buffsize);
-
-    if (size>0 && nPCMLength>0)
-    {
-        WAVEFORMATEX*		wfein = (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-        CAtlArray<float>	pBuff;
-        int					iSpeakerConfig;
-        int					nRemap;
-        float*				pDataOut;
-
-        nRemap = FFGetChannelMap (m_pAVCtx);
-        //iSpeakerConfig  = GetSpeakerConfig(ac3);
-        //nRemap = min (nRemap, iSpeakerConfig);		// <== TODO : correct ??
-
-        if (nRemap >=0)
-        {
-            scmap_t* scmap;
-
-            switch (nCodecId)
-            {
-            case CODEC_ID_EAC3 :
-                scmap = &m_ffmpeg_ac3[FFGetChannelMap(m_pAVCtx)];
-                break;
-            default :
-                scmap = &m_scmap_default[m_pAVCtx->channels-1];
-                break;
-            }
-
-            switch (m_pAVCtx->sample_fmt)
-            {
-            case SAMPLE_FMT_S16 :
-                pBuff.SetCount (nPCMLength / 2);
-                pDataOut = pBuff.GetData();
-
-                for (size_t i=0; i<pBuff.GetCount()/m_pAVCtx->channels; i++)
-                {
-                    for(int ch=0; ch<m_pAVCtx->channels; ch++)
-                    {
-                        *pDataOut = (float)((int16_t*)m_pPCMData) [scmap->ch[ch]+i*m_pAVCtx->channels] / SHRT_MAX;
-                        pDataOut++;
-                    }
-                }
-                break;
-
-            case SAMPLE_FMT_S32 :
-                pBuff.SetCount (nPCMLength / 4);
-                pDataOut = pBuff.GetData();
-
-                for (size_t i=0; i<pBuff.GetCount()/m_pAVCtx->channels; i++)
-                {
-                    for(int ch=0; ch<m_pAVCtx->channels; ch++)
-                    {
-                        *pDataOut = (float)((int32_t*)m_pPCMData) [scmap->ch[ch]+i*m_pAVCtx->channels] / INT_MAX;
-                        //						*pDataOut = (float)((int32_t*)m_pPCMData) [ch+i*m_pAVCtx->channels] / INT_MAX;
-                        pDataOut++;
-                    }
-                }
-                break;
-            default :
-                ASSERT(FALSE);
-                break;
-            }
-            hr = Deliver(pBuff, m_pAVCtx->sample_rate, scmap->nChannels, scmap->dwChannelMask);
-        }
-    }
-
-    return hr;
-#endif
-}
-#endif
-
 bool CMpaDecFilter::InitFfmpeg(int nCodecId)
 {
-	WAVEFORMATEX*	wfein	= (WAVEFORMATEX*)m_pInput->CurrentMediaType().Format();
-	bool			bRet	= false;
+	const uint32_t modernCodec = ModernCodecFromLegacyCodecId(nCodecId);
+	if (!modernCodec) {
+		return false;
+	}
 
-	avcodec_init();
-	avcodec_register_all();
-#if LOGDEBUG
-	av_log_set_callback(LogLibAVCodec);
-#endif
+	ffmpeg_stream_finish();
 
-	if (m_pAVCodec) ffmpeg_stream_finish();
+	PlayasaFfmpegModernAudioOpenParams params = {};
+	m_modernOwnedExtraData.clear();
+	if (!BuildMpaDecAudioOpenParams(m_pInput->CurrentMediaType(), modernCodec, nCodecId, &params, &m_modernOwnedExtraData)) {
+		return false;
+	}
 
-	m_pAVCodec						= avcodec_find_decoder((CodecID)nCodecId);
-	if (m_pAVCodec)
-	{
-		m_pAVCtx						= avcodec_alloc_context();
-		m_pParser				= av_parser_init(nCodecId);
-		
-		if (nCodecId== CODEC_ID_AMR_NB || nCodecId== CODEC_ID_AMR_WB){
-			//m_pAVCtx->frame_size = 160 * (1+ (nCodecId== CODEC_ID_AMR_WB));//	st->codec->frame_size= sc->samples_per_frame;
-					/* force sample rate for amr, stsd in 3gp does not store sample rate 
-			if (!wfein->nSamplesPerSec)
-				wfein->nSamplesPerSec = 8000 * (1+(nCodecId== CODEC_ID_AMR_WB));// / wfein->nChannels;
-			else if(wfein->nSamplesPerSec > 2000 ){
-				if(wfein->nSamplesPerSec == 15750){
-					wfein->nSamplesPerSec = 2000;
-				}
-				//wfein->nSamplesPerSec = wfein->nSamplesPerSec;// /  wfein->nChannels;
-			}
-			else
-				wfein->nSamplesPerSec = 8000;//wfein->nSamplesPerSec *  wfein->nChannels;
+	if (m_modernAudio.Open(modernCodec, &params)) {
+		m_modernLegacyCodecId = nCodecId;
+		return true;
+	}
 
-			m_pAVCtx->sample_rate			= wfein->nSamplesPerSec; 
-			wfein->nChannels = 1;
-			m_pAVCtx->channels = wfein->nChannels; /* really needed */
-			
-		
-		}else{
-			if (nCodecId==CODEC_ID_COOK )
-			{
-				/* this code needs fixing */
-				
-				m_pAVCtx->extradata=m_pInput->CurrentMediaType().Format()+sizeof(WAVEFORMATEX); 
-				m_pAVCtx->extradata_size=m_pInput->CurrentMediaType().FormatLength()-sizeof(WAVEFORMATEX);
-				for (;m_pAVCtx->extradata_size;m_pAVCtx->extradata=(uint8_t*)m_pAVCtx->extradata+1,m_pAVCtx->extradata_size--){
-					if (memcmp(m_pAVCtx->extradata,"cook",4)==0)
-					{
-						m_pAVCtx->extradata=(uint8_t*)m_pAVCtx->extradata+12;
-						m_pAVCtx->extradata_size-=12;
-						break;
-					}
-				}
-               // wfein->nAvgBytesPerSec  = 32041 / 8;
-               // wfein->nBlockAlign = 93;
-
-			}else if (nCodecId==CODEC_ID_QDM2 || nCodecId==CODEC_ID_FLAC)
-            {
-                m_pAVCtx->extradata=m_pInput->CurrentMediaType().Format()+sizeof(WAVEFORMATEX); 
-                m_pAVCtx->extradata_size=m_pInput->CurrentMediaType().FormatLength()-sizeof(WAVEFORMATEX);
-
-            }
-            m_pAVCtx->sample_rate			= wfein->nSamplesPerSec;
-			m_pAVCtx->channels				= wfein->nChannels;
-
-            SVP_LogMsg5(L"channels %d", m_pAVCtx->channels);
-
-
-			m_pAVCtx->bit_rate				= wfein->nAvgBytesPerSec*8;
-            m_pAVCtx->bits_per_coded_sample	= wfein->wBitsPerSample;
-			m_pAVCtx->block_align			= wfein->nBlockAlign;
-            m_pAVCtx->flags				   |= CODEC_FLAG_TRUNCATED;
+	// HACK: splitter doesn't always report correct AMR channel count.
+	if (nCodecId == kMpaDecLegacyCodecAmrNb) {
+		WAVEFORMATEX* wfein = reinterpret_cast<WAVEFORMATEX*>(m_pInput->CurrentMediaType().Format());
+		wfein->nChannels = 1;
+		if (BuildMpaDecAudioOpenParams(m_pInput->CurrentMediaType(), modernCodec, nCodecId, &params, &m_modernOwnedExtraData) &&
+			m_modernAudio.Open(modernCodec, &params)) {
+			m_modernLegacyCodecId = nCodecId;
+			return true;
 		}
-		for( int ii = 0; ii <= 1; ii++){
-			
-			
+	}
 
-			m_pAVCtx->codec_id		= (CodecID)nCodecId;
-			
-			if (avcodec_open(m_pAVCtx,m_pAVCodec)>=0)
-			{
-				m_pPCMData	= (BYTE*)FF_aligned_malloc (AVCODEC_MAX_AUDIO_FRAME_SIZE+FF_INPUT_BUFFER_PADDING_SIZE, 64);
-				bRet		= true;
-
-				if (nCodecId!=CODEC_ID_SIPR && nCodecId!=CODEC_ID_COOK && nCodecId != CODEC_ID_AMR_NB && nCodecId != CODEC_ID_AMR_WB && nCodecId != CODEC_ID_WMAV2 && nCodecId != CODEC_ID_WMAV1){
-					int iSpeakerConfig = GetSpeakerConfig(ac3);
-					if (iSpeakerConfig >= 0)
-					{
-						scmap_t& scmap				= m_scmap_default[iSpeakerConfig&A52_CHANNEL_MASK+ ((iSpeakerConfig&A52_LFE)?(countof(s_scmap_ac3)/2):0)];
-						m_pAVCtx->request_channels	= scmap.nChannels;
-					}
-				}
-				break;
-			}else{
-				if (nCodecId==CODEC_ID_AMR_NB) //HACK: splitter doesn't report correct frequency/number of channels
-				{
-					if(wfein->nChannels > 1){
-						//wfein->nSamplesPerSec= wfein->nSamplesPerSec / wfein->nChannels ;
-						wfein->nChannels = 1;
-					}else{
-						wfein->nChannels = 1;
-						//wfein->nSamplesPerSec=4000;
-					}
-                }else{
-					break;
-				}
-			}
-		}
-    }else{
-        SVP_LogMsg5(L"cant find ffmpeg codec");
-    }
-
-	if (!bRet) ffmpeg_stream_finish();
-
-	return bRet;
-}
-
-void CMpaDecFilter::LogLibAVCodec(void* par,int level,const char *fmt,va_list valist)
-{
-	char		Msg [500];
-	vsnprintf_s (Msg, sizeof(Msg), _TRUNCATE, fmt, valist);
-	//TRACE("AVLIB : %s", Msg);
-	SVP_LogMsg6("AVLIB : %s",Msg);
-	//SVP_LogMsg6(fmt, valist);
+	ffmpeg_stream_finish();
+	return false;
 }
 
 void CMpaDecFilter::ffmpeg_stream_finish()
 {
-	m_pAVCodec	= NULL;
-	if (m_pAVCtx)
-	{
-		__try {
-			avcodec_close (m_pAVCtx);
-			av_free (m_pAVCtx);
-		}__except (EXCEPTION_EXECUTE_HANDLER ) {}
-		m_pAVCtx	= NULL;
-	}
-
-	if (m_pParser)
-	{
-		av_parser_close (m_pParser);
-		m_pParser	= NULL;
-	}
-
-	if (m_pPCMData) {
-		__try {
-			FF_aligned_free (m_pPCMData); //some time this will crash
-		}__except (EXCEPTION_EXECUTE_HANDLER) {}
-	}
-    
+	m_modernAudio.Close();
+	m_modernLegacyCodecId = 0;
+	m_modernOwnedExtraData.clear();
 }
 
 #pragma endregion

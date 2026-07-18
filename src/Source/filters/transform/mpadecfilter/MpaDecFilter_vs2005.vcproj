@@ -377,7 +377,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="libflac/include;../mpcvideodec\ffmpeg\libavcodec;../mpcvideodec/ffmpeg;../../../../include;..\..\BaseClasses"
+				AdditionalIncludeDirectories="libflac/include;../../../../include;..\..\BaseClasses"
 				PreprocessorDefinitions="WIN32;_DEBUG;FLAC__NO_DLL;FLAC__NO_DLL"
 			/>
 			<Tool
@@ -492,7 +492,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="libflac/include;../mpcvideodec\ffmpeg\libavcodec;../mpcvideodec/ffmpeg;../../../../include;..\..\BaseClasses"
+				AdditionalIncludeDirectories="libflac/include;../../../../include;..\..\BaseClasses"
 				PreprocessorDefinitions="WIN32;NDEBUG;FLAC__NO_DLL;FLAC__NO_DLL"
 				EnableEnhancedInstructionSet="0"
 			/>
@@ -507,7 +507,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libfaad2R.lib libmadR.lib libdtsR.lib liba52R.lib libflac.lib libavcodec_gcc.lib libgcc.a libmingwex.a"
+				AdditionalDependencies="libfaad2R.lib libmadR.lib libdtsR.lib liba52R.lib libflac.lib"
 				OutputFile="../../../../lib/$(ProjectName)RU.lib"
 				AdditionalLibraryDirectories="../../../../lib"
 			/>

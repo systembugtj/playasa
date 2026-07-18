@@ -202,8 +202,18 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	int							nOutPOC;
 	REFERENCE_TIME				rtOutStart;
 
-	Nalu.SetBuffer (pDataIn, nSize, m_nNALLength); 
-	FFH264DecodeBuffer (m_pFilter->GetAVCtx(), pDataIn, nSize, &nFramePOC, &nOutPOC, &rtOutStart);			
+	DxvaH264PictureContext		pictureContext;
+
+	Nalu.SetBuffer (pDataIn, nSize, m_nNALLength);
+
+	/* RFC-0033: DecodeBuffer + POC into contract (BuildPicParams runs after NALU loop). */
+	memset(&pictureContext, 0, sizeof(pictureContext));
+	pictureContext.picParams = m_DXVAPicParams;
+	pictureContext.scalingMatrix = m_DXVAScalingMatrix;
+	FFH264DecodeBuffer (m_pFilter->GetAVCtx(), pDataIn, nSize, &pictureContext.framePOC, &pictureContext.outPOC, (REFERENCE_TIME*)&pictureContext.outRtStart);
+	nFramePOC = pictureContext.framePOC;
+	nOutPOC = pictureContext.outPOC;
+	rtOutStart = pictureContext.outRtStart;
 
 	while (Nalu.ReadNext())
 	{
@@ -231,14 +241,20 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 
 	m_nMaxWaiting	= min (max (m_DXVAPicParams.num_ref_frames, 3), 8);
 
-	// If parsing fail (probably no PPS/SPS), continue anyway it may arrived later (happen on truncated streams)
-	if (FAILED (FFH264BuildPicParams (&m_DXVAPicParams, &m_DXVAScalingMatrix, &nFieldType, &nSliceType, m_pFilter->GetAVCtx(), m_pFilter->GetPCIVendor()))){
+	/* BuildPicParams via contract (NULL buffer skips re-decode). Seed from post-NALU state. */
+	pictureContext.picParams = m_DXVAPicParams;
+	pictureContext.scalingMatrix = m_DXVAScalingMatrix;
+	if (FAILED (FFH264ReadPictureContext (&pictureContext, m_pFilter->GetAVCtx(), NULL, 0, m_pFilter->GetPCIVendor()))){
 		SVPASSERT(FALSE);
 		return S_FALSE;
 	}
+	m_DXVAPicParams = pictureContext.picParams;
+	m_DXVAScalingMatrix = pictureContext.scalingMatrix;
+	nFieldType = pictureContext.fieldType;
+	nSliceType = pictureContext.sliceType;
 
 	// Wait I frame after a flush
-	if (m_bFlushed && !m_DXVAPicParams.IntraPicFlag){
+	if (m_bFlushed && !pictureContext.intraPicFlag){
 		SVPASSERT(S_FALSE);
 		return S_FALSE;
 	}

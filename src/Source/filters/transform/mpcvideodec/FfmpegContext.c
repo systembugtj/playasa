@@ -800,6 +800,44 @@ HRESULT FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCo
 
 	return S_OK;
 }
+
+/* RFC-0033: fill DxvaH264PictureContext from legacy H264Context readers.
+ * When pBuffer is non-NULL, runs FFH264DecodeBuffer first (POC metadata).
+ * Always runs FFH264BuildPicParams into the contract. */
+HRESULT FFH264ReadPictureContext (DxvaH264PictureContext* pContext, struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, int nPCIVendor)
+{
+	HRESULT hr;
+
+	if (!pContext || !pAVCtx)
+		return E_POINTER;
+
+	if (pBuffer && nSize > 0)
+		FFH264DecodeBuffer (pAVCtx, pBuffer, nSize, &pContext->framePOC, &pContext->outPOC, (REFERENCE_TIME*)&pContext->outRtStart);
+
+	hr = FFH264BuildPicParams (&pContext->picParams, &pContext->scalingMatrix, &pContext->fieldType, &pContext->sliceType, pAVCtx, nPCIVendor);
+	if (FAILED(hr))
+		return hr;
+
+	pContext->intraPicFlag = pContext->picParams.IntraPicFlag;
+	return S_OK;
+}
+
+/* RFC-0033: fill DxvaVc1PictureContext from legacy VC1Context readers. */
+HRESULT FFVC1ReadPictureContext (DxvaVc1PictureContext* pContext, struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize)
+{
+	HRESULT hr;
+
+	if (!pContext || !pAVCtx)
+		return E_POINTER;
+
+	hr = FFVC1UpdatePictureParam (&pContext->pictureParams, pAVCtx, &pContext->fieldType, &pContext->sliceType, pBuffer, nSize);
+	if (FAILED(hr))
+		return hr;
+
+	pContext->frameSkipped = FFIsSkipped (pAVCtx) ? TRUE : FALSE;
+	return S_OK;
+}
+
 HRESULT FFMpeg2ReadPictureContext (DxvaMpeg2PictureContext* pContext, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize)
 {
     int					i;

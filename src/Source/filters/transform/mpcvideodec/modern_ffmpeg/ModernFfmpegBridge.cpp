@@ -56,6 +56,30 @@ ModernFfmpeg::DecodeCodec ToAdapterCodec(uint32_t codec)
         return ModernFfmpeg::kDecodeCodecRa144;
     case PLAYASA_FFMPEG_MODERN_CODEC_RA288:
         return ModernFfmpeg::kDecodeCodecRa288;
+    case PLAYASA_FFMPEG_MODERN_CODEC_WMAV1:
+        return ModernFfmpeg::kDecodeCodecWmav1;
+    case PLAYASA_FFMPEG_MODERN_CODEC_WMAV2:
+        return ModernFfmpeg::kDecodeCodecWmav2;
+    case PLAYASA_FFMPEG_MODERN_CODEC_AMR_NB:
+        return ModernFfmpeg::kDecodeCodecAmrNb;
+    case PLAYASA_FFMPEG_MODERN_CODEC_AMR_WB:
+        return ModernFfmpeg::kDecodeCodecAmrWb;
+    case PLAYASA_FFMPEG_MODERN_CODEC_NELLYMOSER:
+        return ModernFfmpeg::kDecodeCodecNellymoser;
+    case PLAYASA_FFMPEG_MODERN_CODEC_QDM2:
+        return ModernFfmpeg::kDecodeCodecQdm2;
+    case PLAYASA_FFMPEG_MODERN_CODEC_EAC3:
+        return ModernFfmpeg::kDecodeCodecEac3;
+    case PLAYASA_FFMPEG_MODERN_CODEC_TRUEHD:
+        return ModernFfmpeg::kDecodeCodecTruehd;
+    case PLAYASA_FFMPEG_MODERN_CODEC_MLP:
+        return ModernFfmpeg::kDecodeCodecMlp;
+    case PLAYASA_FFMPEG_MODERN_CODEC_FLAC:
+        return ModernFfmpeg::kDecodeCodecFlac;
+    case PLAYASA_FFMPEG_MODERN_CODEC_PCM_MULAW:
+        return ModernFfmpeg::kDecodeCodecPcmMulaw;
+    case PLAYASA_FFMPEG_MODERN_CODEC_ADPCM_IMA_QT:
+        return ModernFfmpeg::kDecodeCodecAdpcmImaQt;
     default:
         return ModernFfmpeg::kDecodeCodecMpeg4;
     }
@@ -86,6 +110,19 @@ bool IsValidCodec(uint32_t codec)
     case PLAYASA_FFMPEG_MODERN_CODEC_AAC:
     case PLAYASA_FFMPEG_MODERN_CODEC_RA144:
     case PLAYASA_FFMPEG_MODERN_CODEC_RA288:
+        return true;
+    case PLAYASA_FFMPEG_MODERN_CODEC_WMAV1:
+    case PLAYASA_FFMPEG_MODERN_CODEC_WMAV2:
+    case PLAYASA_FFMPEG_MODERN_CODEC_AMR_NB:
+    case PLAYASA_FFMPEG_MODERN_CODEC_AMR_WB:
+    case PLAYASA_FFMPEG_MODERN_CODEC_NELLYMOSER:
+    case PLAYASA_FFMPEG_MODERN_CODEC_QDM2:
+    case PLAYASA_FFMPEG_MODERN_CODEC_EAC3:
+    case PLAYASA_FFMPEG_MODERN_CODEC_TRUEHD:
+    case PLAYASA_FFMPEG_MODERN_CODEC_MLP:
+    case PLAYASA_FFMPEG_MODERN_CODEC_FLAC:
+    case PLAYASA_FFMPEG_MODERN_CODEC_PCM_MULAW:
+    case PLAYASA_FFMPEG_MODERN_CODEC_ADPCM_IMA_QT:
         return true;
     default:
         return false;
@@ -206,6 +243,30 @@ uint32_t ToBridgeCodec(ModernFfmpeg::DecodeCodec codec)
         return PLAYASA_FFMPEG_MODERN_CODEC_RA144;
     case ModernFfmpeg::kDecodeCodecRa288:
         return PLAYASA_FFMPEG_MODERN_CODEC_RA288;
+    case ModernFfmpeg::kDecodeCodecWmav1:
+        return PLAYASA_FFMPEG_MODERN_CODEC_WMAV1;
+    case ModernFfmpeg::kDecodeCodecWmav2:
+        return PLAYASA_FFMPEG_MODERN_CODEC_WMAV2;
+    case ModernFfmpeg::kDecodeCodecAmrNb:
+        return PLAYASA_FFMPEG_MODERN_CODEC_AMR_NB;
+    case ModernFfmpeg::kDecodeCodecAmrWb:
+        return PLAYASA_FFMPEG_MODERN_CODEC_AMR_WB;
+    case ModernFfmpeg::kDecodeCodecNellymoser:
+        return PLAYASA_FFMPEG_MODERN_CODEC_NELLYMOSER;
+    case ModernFfmpeg::kDecodeCodecQdm2:
+        return PLAYASA_FFMPEG_MODERN_CODEC_QDM2;
+    case ModernFfmpeg::kDecodeCodecEac3:
+        return PLAYASA_FFMPEG_MODERN_CODEC_EAC3;
+    case ModernFfmpeg::kDecodeCodecTruehd:
+        return PLAYASA_FFMPEG_MODERN_CODEC_TRUEHD;
+    case ModernFfmpeg::kDecodeCodecMlp:
+        return PLAYASA_FFMPEG_MODERN_CODEC_MLP;
+    case ModernFfmpeg::kDecodeCodecFlac:
+        return PLAYASA_FFMPEG_MODERN_CODEC_FLAC;
+    case ModernFfmpeg::kDecodeCodecPcmMulaw:
+        return PLAYASA_FFMPEG_MODERN_CODEC_PCM_MULAW;
+    case ModernFfmpeg::kDecodeCodecAdpcmImaQt:
+        return PLAYASA_FFMPEG_MODERN_CODEC_ADPCM_IMA_QT;
     default:
         return PLAYASA_FFMPEG_MODERN_CODEC_MPEG4;
     }

@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="modern_ffmpeg">
+      <UniqueIdentifier>{b8e2f4a1-3c5d-4e7f-9a1b-2d3c4e5f6071}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{862025fd-ebb7-46d3-a452-7b6845f3a101}</UniqueIdentifier>
       <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm</Extensions>
@@ -15,6 +18,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="modern_ffmpeg\MpaDecAudioOpenParams.cpp">
+      <Filter>modern_ffmpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="modern_ffmpeg\MpaDecCodecMap.cpp">
+      <Filter>modern_ffmpeg</Filter>
+    </ClCompile>
+    <ClCompile Include="modern_ffmpeg\MpaDecModernDecodeAdapter.cpp">
+      <Filter>modern_ffmpeg</Filter>
+    </ClCompile>
     <ClCompile Include="MpaDecFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -28,6 +40,15 @@
   <ItemGroup>
     <ClInclude Include="IMpaDecFilter.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="modern_ffmpeg\MpaDecAudioOpenParams.h">
+      <Filter>modern_ffmpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="modern_ffmpeg\MpaDecCodecMap.h">
+      <Filter>modern_ffmpeg</Filter>
+    </ClInclude>
+    <ClInclude Include="modern_ffmpeg\MpaDecModernDecodeAdapter.h">
+      <Filter>modern_ffmpeg</Filter>
     </ClInclude>
     <ClInclude Include="MpaDecFilter.h">
       <Filter>Header Files</Filter>
