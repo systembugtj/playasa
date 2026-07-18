@@ -4,7 +4,7 @@
 | --- | --- |
 | **状态** | 执行中 (In Progress) |
 | **创建日期** | 2026-05-17 |
-| **最后更新** | 2026-07-17 |
+| **最后更新** | 2026-07-18 |
 | **负责人** | AI / Playasa |
 | **相关 RFC** | [RFC-0024](./rfc-0024-ffmpeg-modern-island.md)、[RFC-0017](./completed/rfc-0017-ffmpeg-mpcvideodec-upgrade.md)、[RFC-0031](./completed/rfc-0031-mpeg2-playback-path-modernization.md)、[RFC-0032](./completed/rfc-0032-rmvb-realvideo-modern-playback.md)、[RFC-0033](./completed/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md)、[RFC-0034](./completed/rfc-0034-realaudio-modern-playback.md)、[RFC-0044](./completed/rfc-0044-realaudio-legacy-cleanup.md)、[RFC-0045](./completed/rfc-0045-realaudio-remaining-codecs.md)、[RFC-0046](./completed/rfc-0046-mpadecfilter-modern-audio.md) |
 
@@ -18,7 +18,7 @@
 
 | 门禁 | 跟踪 RFC | 状态 |
 | --- | --- | --- |
-| H.264/FLV/WMV/MPEG-4 等 MPCVideoDec modern 稳定 | RFC-0024 | 部分（software bridge 已有；旧 fallback 仍在） |
+| H.264/FLV/WMV/MPEG-4 等 MPCVideoDec modern 稳定 | RFC-0024 | 部分（software bridge + fail-closed；DXVA/FfmpegContext 仍依赖旧树） |
 | MPEG-2 真实路径 modern-only | RFC-0031 | ✓ |
 | RealVideo modern + 时间戳 | RFC-0032 | ✓ |
 | RealAudio modern + legacy 清理 | RFC-0034/0044/0045 | ✓ |
@@ -64,10 +64,12 @@ test-rfc0024-*, test-rfc0031-*, test-rmvb-*, test-rfc0027-*, test-rfc0034-*, tes
 1. ~~运行步骤 1 引用审计~~（已完成）
 2. ~~推进 RFC-0033~~（已完成）
 3. ~~推进 RFC-0046~~（已完成；audit MpaDec 0 hits）
-4. 收窄/移除 MPCVideoDec 旧 software fallback 与 `FfmpegContext` 剩余引用，再删树
-5. 门禁全绿后再删树
+4. ~~Category A 死引用清理~~（2026-07-18）：`MpcAudioRenderer` / WMVSplitter / RealMedia `.vcproj` orphan links；删除未编入工程的 `MPCAudioDecFilter.*`
+5. ~~Category B fail-closed~~（2026-07-18）：bridge codec 在 `!m_bUseDXVA` 时不再 `avcodec_open` / software fallback
+6. 解耦 `EASplitter` 对旧头文件的依赖；长期抽离 `FfmpegContext` DXVA parser（仍是删树主阻塞）
+7. 门禁全绿后再删树
 
-## 8. 当前清单（审计 2026-07-17）
+## 8. 当前清单（审计 2026-07-18）
 
 生成命令：
 
@@ -79,28 +81,32 @@ powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/audit-rfc003
 
 | 指标 | 值 |
 | --- | --- |
-| Total hits | 135 |
-| Distinct files | 26 |
+| Total hits | 97 |
+| Distinct files | 14 |
 
 ### 按主题（阻塞删树）
 
-| 主题 | 约 hits | 说明 |
-| --- | --- | --- |
-| `libavcodec_gcc` | 19 | `MPCVideoDec` / `MpaDecFilter` / `MpcAudioRenderer` 等链接 |
-| `MpaDecFilter` | 27 | 仍调用 `avcodec_decode_audio2` / `avcodec_open` |
-| `FfmpegContext` | 25 | DXVA + legacy software 辅助 |
-| `MPCVideoDecFilter` | 6 | 仍有 `avcodec_decode_video` fallback |
-| `DXVADecoder*` | 5 | 依赖 `FfmpegContext.h` 私有结构 |
+| 主题 | 说明 |
+| --- | --- |
+| `MPCVideoDec` + `libavcodec_gcc` | 仍为活跃链接（DXVA + 非 bridge 的 legacy software） |
+| `FfmpegContext` | DXVA parser glue 仍读私有结构（`AVCodecContext` 命中主力） |
+| `MPCVideoDecFilter` | bridge software 已 fail-closed；DXVA 仍可能 `avcodec_open` |
+| `EASplitter` | 仍 include 旧 `avcodec.h` / `avformat.h` |
 
-### 已清出（相对早期）
+### 已清出
 
 | 项 | 状态 |
 | --- | --- |
 | RealMediaSplitter → legacy avcodec | ✓ RFC-0034/0044 |
-| `RA_FFMPEG` 宏 / Real SDK | ✓ RFC-0044（含 `FGManager` 显示名） |
+| `RA_FFMPEG` / Real SDK | ✓ RFC-0044 |
 | `CMpeg2DecFilter` / libmpeg2 | ✓ RFC-0031 |
 | RealVideo `RV_FFMPEG` | ✓ RFC-0032 |
+| MpaDecFilter → modern bridge | ✓ RFC-0046 |
+| H.264/VC-1 DXVA contract | ✓ RFC-0033 |
+| Orphan `libavcodec_gcc`（MpcAudioRenderer / WMV includes / stale vcproj） | ✓ 2026-07-18 |
+| 未构建 `MPCAudioDecFilter.*` | ✓ 已删除 |
+| Bridge codec software fail-closed | ✓ 2026-07-18 Category B |
 
 ### 结论
 
-**现在仍不能删 `mpcvideodec/ffmpeg`。** RFC-0033 / RFC-0046 门禁已解除；仍需收口 MPCVideoDec 旧 fallback 与其它 `libavcodec_gcc` 消费者后再执行 §5.5 删树。
+**现在仍不能删 `mpcvideodec/ffmpeg`。** 剩余硬依赖集中在 `MPCVideoDec`（DXVA + `FfmpegContext` + 非 bridge legacy codecs）与 `EASplitter`。

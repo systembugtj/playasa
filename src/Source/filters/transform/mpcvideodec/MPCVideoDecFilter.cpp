@@ -1478,6 +1478,12 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 				}
 			}
 			if (!m_bUseModernFfmpegBridge) {
+				// RFC-0035 Category B: bridge-owned codecs fail closed on software path.
+				// DXVA still needs legacy open for FfmpegContext parser glue until that is extracted.
+				if (bUseModernBridgeCodec && !m_bUseDXVA) {
+					ModernFfmpegSelfcheckLog(_T("Modern FFmpeg bridge open failed; fail-closed (no legacy software fallback): codec=%d fourcc=0x%08x"), ffCodecs[m_nCodecNb].nFFCodec, ffCodecs[m_nCodecNb].fourcc);
+					return VFW_E_INVALIDMEDIATYPE;
+				}
 				if (bUseModernBridgeCodec && (m_nThreadNumber > 1) && IsMultiThreadSupported (ffCodecs[m_nCodecNb].nFFCodec))
 					avcodec_thread_init(m_pAVCtx, m_nThreadNumber);
 				int avcRet = avcodec_open(m_pAVCtx, m_pAVCodec);

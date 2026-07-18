@@ -218,7 +218,7 @@
       <PreprocessorDefinitions>REGISTER_FILTER;WIN32;NDEBUG;_USRDLL;INTEGER_SAMPLES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libfaad2R.lib;libmadR.lib;liba52R.lib;libdtsR.lib;libflac.lib;decssRU.lib;dsutilRU.lib;strmbaseRU.lib;Winmm.lib;libavcodec_gcc.lib;libgcc.a;libmingwex.a;zlibR.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libfaad2R.lib;libmadR.lib;liba52R.lib;libdtsR.lib;libflac.lib;decssRU.lib;dsutilRU.lib;strmbaseRU.lib;Winmm.lib;zlibR.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>..\..\..\..\bin\x64\$(ProjectName).ax</OutputFile>
       <AdditionalLibraryDirectories>..\..\..\..\lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>MpcAudioRenderer.def</ModuleDefinitionFile>
