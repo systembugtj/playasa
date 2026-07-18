@@ -51,6 +51,9 @@ void			FFH264UpdateRefFramesList (DXVA_PicParams_H264* pDXVAPicParams, struct AV
 BOOL			FFH264IsRefFrameInUse (int nFrameNum, struct AVCodecContext* pAVCtx);
 void			FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Slice_H264_Long* pSlice, struct AVCodecContext* pAVCtx);
 void			FFH264SetDxvaSliceLong (struct AVCodecContext* pAVCtx, void* pSliceLong);
+/* RFC-0047 phase 1: keep H.264 DXVA decoder TU free of avcodec.h field access. */
+int				FFH264GetNalLengthSize (struct AVCodecContext* pAVCtx);
+void			FFH264ApplyExtradata (struct AVCodecContext* pAVCtx, BYTE* pDataIn, UINT nSize, void* pSliceLong);
 
 // === VC1 functions
 HRESULT			FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize);

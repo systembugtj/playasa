@@ -25,8 +25,6 @@
 #include "DXVADecoderH264.h"
 #include "MPCVideoDecFilter.h"
 #include "VideoDecDXVAAllocator.h"
-#include "PODtypes.h"
-#include "avcodec.h"
 
 extern "C"
 {
@@ -346,10 +344,9 @@ void CDXVADecoderH264::ClearUnusedRefFrames()
 
 void CDXVADecoderH264::SetExtraData (BYTE* pDataIn, UINT nSize)
 {
-	AVCodecContext*		pAVCtx = m_pFilter->GetAVCtx();
-	m_nNALLength	= pAVCtx->nal_length_size;
-	FFH264DecodeBuffer (pAVCtx, pDataIn, nSize, NULL, NULL, NULL);
-	FFH264SetDxvaSliceLong (pAVCtx, m_pSliceLong);
+	/* RFC-0047 phase 1: NAL length + extradata parse stay behind FfmpegContext APIs. */
+	m_nNALLength = FFH264GetNalLengthSize (m_pFilter->GetAVCtx());
+	FFH264ApplyExtradata (m_pFilter->GetAVCtx(), pDataIn, nSize, m_pSliceLong);
 }
 
 

@@ -729,6 +729,21 @@ void FFH264SetDxvaSliceLong (struct AVCodecContext* pAVCtx, void* pSliceLong)
 	h->dxva_slice_long = pSliceLong;
 }
 
+/* RFC-0047 phase 1: expose nal_length_size without requiring decoder TUs to include avcodec.h. */
+int FFH264GetNalLengthSize (struct AVCodecContext* pAVCtx)
+{
+	if (!pAVCtx) {
+		return 0;
+	}
+	return pAVCtx->nal_length_size;
+}
+
+void FFH264ApplyExtradata (struct AVCodecContext* pAVCtx, BYTE* pDataIn, UINT nSize, void* pSliceLong)
+{
+	FFH264DecodeBuffer (pAVCtx, pDataIn, nSize, NULL, NULL, NULL);
+	FFH264SetDxvaSliceLong (pAVCtx, pSliceLong);
+}
+
 HRESULT FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize)
 {
 	VC1Context*		vc1 = (VC1Context*) pAVCtx->priv_data;
