@@ -32,6 +32,9 @@
     <ClInclude Include="EASpliter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EaFfmpegCompat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>

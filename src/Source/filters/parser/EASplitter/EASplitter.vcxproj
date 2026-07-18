@@ -72,7 +72,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalOptions>/I "../../transform/mpcvideodec/ffmpeg" /I "../../transform/mpcvideodec/ffmpeg\libavcodec" /I "../../transform/mpcvideodec/ffmpeg\libavutil" /I "..\..\..\..\include" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/I "..\..\..\..\include" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)Source\filters\BaseClasses;$(SolutionDir)Source\base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
@@ -84,7 +84,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalOptions>/I "../../transform/mpcvideodec/ffmpeg" /I "../../transform/mpcvideodec/ffmpeg\libavcodec" /I "../../transform/mpcvideodec/ffmpeg\libavutil" /I "..\..\..\..\include" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/I "..\..\..\..\include" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)Source\filters\BaseClasses;$(SolutionDir)Source\base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -98,7 +98,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Unicode|Win32'">
     <ClCompile>
-      <AdditionalOptions>/I "../../transform/mpcvideodec/ffmpeg" /I "../../transform/mpcvideodec/ffmpeg\libavcodec" /I "../../transform/mpcvideodec/ffmpeg\libavutil" /I "..\..\..\..\include" %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/I "..\..\..\..\include" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>$(SolutionDir)Source\filters\BaseClasses;$(SolutionDir)Source\base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,6 +118,7 @@
   <ItemGroup>
     <ClInclude Include="EAFile.h" />
     <ClInclude Include="EASpliter.h" />
+    <ClInclude Include="EaFfmpegCompat.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -40,7 +40,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/I &quot;../../transform/mpcvideodec/ffmpeg&quot; /I &quot;../../transform/mpcvideodec/ffmpeg\libavcodec&quot; /I &quot;../../transform/mpcvideodec/ffmpeg\libavutil&quot; /I &quot;..\..\..\..\include&quot;"
+				AdditionalOptions="/I &quot;..\..\..\..\include&quot;"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\BaseClasses"
 				MinimalRebuild="true"
@@ -103,7 +103,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/I &quot;../../transform/mpcvideodec/ffmpeg&quot; /I &quot;../../transform/mpcvideodec/ffmpeg\libavcodec&quot; /I &quot;../../transform/mpcvideodec/ffmpeg\libavutil&quot; /I &quot;..\..\..\..\include&quot;"
+				AdditionalOptions="/I &quot;..\..\..\..\include&quot;"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\BaseClasses"

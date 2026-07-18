@@ -126,7 +126,7 @@ $blocking = @(
   'libavcodec_gcc'
 )
 Write-Host ''
-Write-Host 'Blocking themes still present (until RFC-0033 + MpaDec migration):'
+Write-Host 'Blocking themes still present (legacy tree retirement gates):'
 foreach ($theme in $blocking) {
   $n = @($hits | Where-Object { $_.File -match $theme -or $_.Text -match $theme -or $_.Pattern -match $theme }).Count
   Write-Host ("  {0,-20} {1}" -f $theme, $n)

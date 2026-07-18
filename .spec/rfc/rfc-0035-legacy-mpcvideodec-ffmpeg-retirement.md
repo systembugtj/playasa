@@ -66,8 +66,9 @@ test-rfc0024-*, test-rfc0031-*, test-rmvb-*, test-rfc0027-*, test-rfc0034-*, tes
 3. ~~推进 RFC-0046~~（已完成；audit MpaDec 0 hits）
 4. ~~Category A 死引用清理~~（2026-07-18）：`MpcAudioRenderer` / WMVSplitter / RealMedia `.vcproj` orphan links；删除未编入工程的 `MPCAudioDecFilter.*`
 5. ~~Category B fail-closed~~（2026-07-18）：bridge codec 在 `!m_bUseDXVA` 时不再 `avcodec_open` / software fallback
-6. 解耦 `EASplitter` 对旧头文件的依赖；长期抽离 `FfmpegContext` DXVA parser（仍是删树主阻塞）
-7. 门禁全绿后再删树
+6. ~~解耦 `EASplitter`~~（2026-07-18）：本地 `EaFfmpegCompat.h` + 去掉 ffmpeg `/I`；门禁 `verify-rfc0035-easplitter-no-legacy-ffmpeg.ps1`
+7. 抽离 `FfmpegContext` DXVA parser（删树主阻塞：仍读旧 `AVCodecContext` / 私有结构，`libavcodec_gcc` 11 hits）
+8. 门禁全绿后再删树
 
 ## 8. 当前清单（审计 2026-07-18）
 
@@ -75,23 +76,24 @@ test-rfc0024-*, test-rfc0031-*, test-rmvb-*, test-rfc0027-*, test-rfc0034-*, tes
 
 ```text
 powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/verify-rfc0035-easplitter-no-legacy-ffmpeg.ps1
 ```
 
 产物：`src/Thirdparty/ffmpeg-modern/mpcvideodec-legacy-ffmpeg-refs.txt`
 
 | 指标 | 值 |
 | --- | --- |
-| Total hits | 97 |
-| Distinct files | 14 |
+| Total hits | 93 |
+| Distinct files | 12（全部在 `mpcvideodec`） |
 
 ### 按主题（阻塞删树）
 
 | 主题 | 说明 |
 | --- | --- |
-| `MPCVideoDec` + `libavcodec_gcc` | 仍为活跃链接（DXVA + 非 bridge 的 legacy software） |
+| `MPCVideoDec` + `libavcodec_gcc` | 仍为活跃链接（DXVA + 非 bridge legacy software） |
 | `FfmpegContext` | DXVA parser glue 仍读私有结构（`AVCodecContext` 命中主力） |
-| `MPCVideoDecFilter` | bridge software 已 fail-closed；DXVA 仍可能 `avcodec_open` |
-| `EASplitter` | 仍 include 旧 `avcodec.h` / `avformat.h` |
+| `MPCVideoDecFilter` | bridge software 已 fail-closed；DXVA / 非 bridge 仍可能 `avcodec_open` |
+| `EASplitter` | ✓ 已解耦 |
 
 ### 已清出
 
@@ -106,7 +108,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/audit-rfc003
 | Orphan `libavcodec_gcc`（MpcAudioRenderer / WMV includes / stale vcproj） | ✓ 2026-07-18 |
 | 未构建 `MPCAudioDecFilter.*` | ✓ 已删除 |
 | Bridge codec software fail-closed | ✓ 2026-07-18 Category B |
+| EASplitter 旧 ffmpeg 头 / include paths | ✓ 2026-07-18 |
 
 ### 结论
 
-**现在仍不能删 `mpcvideodec/ffmpeg`。** 剩余硬依赖集中在 `MPCVideoDec`（DXVA + `FfmpegContext` + 非 bridge legacy codecs）与 `EASplitter`。
+**现在仍不能删 `mpcvideodec/ffmpeg`。** 剩余硬依赖已全部收口到 `MPCVideoDec`（`FfmpegContext` DXVA + `libavcodec_gcc` + 非 bridge software）。

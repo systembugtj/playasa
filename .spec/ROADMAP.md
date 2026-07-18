@@ -83,7 +83,7 @@ backlog（体量过大/有依赖，暂不开 RFC）：MainFrm 拆分、PlayerToo
 
 | 优先级 | RFC | 原因 |
 | --- | --- | --- |
-| P0 | **0035** | 旧树退役；A/B 清理与 fail-closed 已落地，剩 DXVA/`FfmpegContext` + EASplitter |
+| P0 | **0035** | 旧树退役；EASplitter 已解耦，剩 `FfmpegContext`/DXVA + `libavcodec_gcc` |
 | P1 | **0038** | UI：快速修复，定位明确 |
 | P1 | **0039** | UI：惠及 4 个宿主表面 |
 | P2 | **0040 / 0041 / 0043** | UI 小范围可独立改动 |
@@ -111,7 +111,7 @@ backlog（体量过大/有依赖，暂不开 RFC）：MainFrm 拆分、PlayerToo
 | 0031 | `test-rfc0031-mpeg2-*.ps1` |
 | 0032 | `setup-rmvb-samples.ps1`, `test-rmvb-seek-selfcheck.ps1` |
 | 0034 | `test-rfc0034-realaudio-selfcheck.ps1` |
-| 0035 | `src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1` |
+| 0035 | `src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1`；`verify-rfc0035-easplitter-no-legacy-ffmpeg.ps1` |
 | 0044/0045 | `test-rfc0045-realaudio-remaining-selfcheck.ps1`（含 cook 回归 + AAC/RA144/RA288 bridge open） |
 | 0046 | `test-rfc0046-mpadec-modern-selfcheck.ps1`；bridge smoke（WMAV2/AMR_NB） |
 

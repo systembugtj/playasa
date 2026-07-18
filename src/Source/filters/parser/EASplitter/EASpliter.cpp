@@ -10,10 +10,7 @@
 #include "../../../svplib/svplib.h"
 
 
-#include "PODtypes.h"
-#include "avcodec.h"
-#include "libavutil/intreadwrite.h"
-#include "libavformat/avformat.h"
+#include "EaFfmpegCompat.h"
 
 #define av_log(s,y,...) SVP_LogMsg6(__VA_ARGS__)
 #define get_byte(x) (BYTE)m_pFile->BitRead(8)

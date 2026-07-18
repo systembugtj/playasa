@@ -85,3 +85,10 @@ static DWORD bswap_32(DWORD x)
 	return x;
 }
 #endif
+
+#if !defined(bswap_16)
+static WORD bswap_16(WORD x)
+{
+	return (WORD)((x >> 8) | (x << 8));
+}
+#endif
