@@ -1,5 +1,7 @@
-#include "stdafx.h"
 #include "H264BitstreamUtils.h"
+
+#include <string.h>
+#include <vector>
 
 namespace PlayasaH264 {
 

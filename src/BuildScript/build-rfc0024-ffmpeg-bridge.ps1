@@ -10,6 +10,9 @@ $ffmpegInstall = Join-Path $repoRoot 'src\Thirdparty\ffmpeg-modern\install'
 $modernFfmpegRoot = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg'
 $packageHeader = Join-Path $repoRoot 'src\Thirdparty\pkg\ffmpeg_modern_bridge.h'
 $adapterSource = Join-Path $modernFfmpegRoot 'ModernFfmpegDecodeAdapter.cpp'
+$dxvaParserSource = Join-Path $modernFfmpegRoot 'ModernFfmpegDxvaH264Parser.cpp'
+$bitstreamUtilsSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\h264_bitstream\H264BitstreamUtils.cpp'
+$ffmpegModernSrc = Join-Path $repoRoot 'src\Thirdparty\ffmpeg-modern\src'
 $bridgeSource = Join-Path $modernFfmpegRoot 'ModernFfmpegBridge.cpp'
 $bridgeDef = Join-Path $modernFfmpegRoot 'playasa_ffmpeg_modern_bridge.def'
 $outputBin = Join-Path $ffmpegInstall 'bin'
@@ -93,6 +96,8 @@ function Get-MsVcLibExe {
 
 Assert-FileExists $packageHeader
 Assert-FileExists $adapterSource
+Assert-FileExists $dxvaParserSource
+Assert-FileExists $bitstreamUtilsSource
 Assert-FileExists $bridgeSource
 Assert-FileExists $bridgeDef
 Assert-FileExists (Join-Path $ffmpegInstall 'include\libavcodec\avcodec.h')
@@ -107,13 +112,16 @@ $msys2Root = Get-Msys2Root
 $ffmpegInstallMsys = Convert-ToMsysPath $ffmpegInstall
 $repoRootMsys = Convert-ToMsysPath $repoRoot
 $adapterSourceMsys = Convert-ToMsysPath $adapterSource
+$dxvaParserSourceMsys = Convert-ToMsysPath $dxvaParserSource
+$bitstreamUtilsSourceMsys = Convert-ToMsysPath $bitstreamUtilsSource
+$ffmpegModernSrcMsys = Convert-ToMsysPath $ffmpegModernSrc
 $bridgeSourceMsys = Convert-ToMsysPath $bridgeSource
 $bridgeDllMsys = Convert-ToMsysPath $bridgeDll
 
 $buildCommand = @"
 export PATH=/mingw32/bin:/usr/bin:`$PATH
 export PKG_CONFIG_PATH='$ffmpegInstallMsys/lib/pkgconfig'
-g++ -std=c++11 -O2 -Wall -Wextra -I'$repoRootMsys/src/Thirdparty/pkg' -shared '$bridgeSourceMsys' '$adapterSourceMsys' -o '$bridgeDllMsys' -static-libgcc -static-libstdc++ `$(pkg-config --cflags --libs libavformat libavcodec libavutil libswscale libswresample)
+g++ -std=c++11 -O2 -Wall -Wextra -I'$repoRootMsys/src/Thirdparty/pkg' -I'$ffmpegModernSrcMsys' -I'$repoRootMsys/src/Source/filters/transform/mpcvideodec' -shared '$bridgeSourceMsys' '$adapterSourceMsys' '$dxvaParserSourceMsys' '$bitstreamUtilsSourceMsys' -o '$bridgeDllMsys' -static-libgcc -static-libstdc++ `$(pkg-config --cflags --libs libavformat libavcodec libavutil libswscale libswresample)
 "@
 
 Invoke-Msys2 -Msys2Root $msys2Root -Command $buildCommand

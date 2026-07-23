@@ -54,6 +54,7 @@ void			FFH264SetDxvaSliceLong (struct AVCodecContext* pAVCtx, void* pSliceLong);
 /* RFC-0047 phase 1: keep H.264 DXVA decoder TU free of avcodec.h field access. */
 int				FFH264GetNalLengthSize (struct AVCodecContext* pAVCtx);
 void			FFH264ApplyExtradata (struct AVCodecContext* pAVCtx, BYTE* pDataIn, UINT nSize, void* pSliceLong);
+BOOL			FFH264IsInterlaced (struct AVCodecContext* pAVCtx);
 
 /* RFC-0047 phase 2: H.264 DXVA session — decoder TU binds once, no GetAVCtx() per frame. */
 DxvaH264DxvaSession*	FFH264CreateDxvaSession (struct AVCodecContext* pAVCtx);

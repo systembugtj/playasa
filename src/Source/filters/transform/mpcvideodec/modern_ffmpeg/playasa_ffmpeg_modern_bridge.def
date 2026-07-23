@@ -16,3 +16,11 @@ EXPORTS
     playasa_ffmpeg_modern_flush
     playasa_ffmpeg_modern_last_error
     playasa_ffmpeg_modern_destroy
+    playasa_dxva_h264_parse_create
+    playasa_dxva_h264_parse_destroy
+    playasa_dxva_h264_parse_open
+    playasa_dxva_h264_parse_buffer
+    playasa_dxva_h264_parse_set_surface_index
+    playasa_dxva_h264_parse_update_ref_frames
+    playasa_dxva_h264_parse_is_ref_in_use
+    playasa_dxva_h264_parse_update_slice_long

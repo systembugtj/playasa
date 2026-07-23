@@ -284,6 +284,9 @@
     <ClCompile Include="DXVADecoderH264.cpp" />
     <ClCompile Include="DXVADecoderMpeg2.cpp" />
     <ClCompile Include="DXVADecoderVC1.cpp" />
+    <ClCompile Include="DxvaH264LegacyGlue.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
     <ClCompile Include="DxvaH264Session.cpp" />
     <ClCompile Include="FfmpegContext.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">CompileAsC</CompileAs>
