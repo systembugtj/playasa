@@ -47,12 +47,17 @@
 3. `ModernFfmpegDecodeAdapter` 复用同一模块，去除重复 H.264 bitstream 逻辑。
 4. 门禁：`test-rfc0047-h264-bitstream-utils.ps1`；`audit-rfc0047-ffmpegcontext-h264-glue.ps1` 跟踪剩余 `H264Context` 读者。
 
-**3b（2026-07-23，进行中）**
+**3c（2026-07-23，本提交）**
 
-1. `DxvaH264LegacyGlue.c`：H.264 私有结构读者从 `FfmpegContext.c` 隔离；主文件不再 `#include "h264.h"`。
-2. island ABI：`ffmpeg_modern_dxva_h264.h` + `ModernFfmpegDxvaH264Parser.cpp`（FFmpeg 8.1 `H264Context` 填 contract）。
-3. 门禁：`test-rfc0047-h264-dxva-legacy-glue-compartment.ps1`。
-4. 待续 3c：`FF264UpdateRefFrameSliceLong` modern 化；`DxvaH264Session` 运行时切换 modern parse；去掉 `libavcodec_gcc`。
+1. `ModernFfmpegDxvaH264BridgeConsumer` 动态加载 `playasa_dxva_h264_parse_*`。
+2. `DxvaH264Session` 在 bridge DLL 可用时走 modern parse，失败则 fallback `DxvaH264LegacyGlue.c`。
+3. 实现 `playasa_dxva_h264_parse_fill_picture_context` 与 `update_slice_long` modern 版。
+4. 门禁：`test-rfc0047-h264-dxva-session-modern-routing.ps1`。
+
+**3d（待办）**
+
+1. 去掉 DXVA 路径对 `libavcodec_gcc` 的链接（需 modern parse 全路径验证）。
+2. 交接 RFC-0035 删树。
 
 ### 阶段 4：验证与交接 RFC-0035
 
@@ -64,7 +69,7 @@
 ```text
 src/Test/Scripts/test-rfc0047-dxva-decoder-no-avcodec.ps1
 src/Test/Scripts/test-rfc0047-h264-bitstream-utils.ps1
-src/Test/Scripts/test-rfc0047-h264-dxva-legacy-glue-compartment.ps1
+src/Test/Scripts/test-rfc0047-h264-dxva-session-modern-routing.ps1
 src/BuildScript/audit-rfc0047-ffmpegcontext-h264-glue.ps1
 src/Test/Scripts/test-rfc0033-h264-dxva-selfcheck.ps1
 src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
@@ -76,5 +81,5 @@ src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
 | --- | --- |
 | 1 H.264 decoder 去 avcodec.h | ✓ 2026-07-18 |
 | 2 ref/surface session contract | ✓ 2026-07-23 |
-| 3 island/parser 替换 | 3a ✓；3b 进行中（legacy glue 隔离 + modern parse ABI） |
+| 3 island/parser 替换 | 3a–3c ✓；3d 去 `libavcodec_gcc` 待办 |
 | 4 交接删树 | 待办 |

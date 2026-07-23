@@ -20,6 +20,7 @@ EXPORTS
     playasa_dxva_h264_parse_destroy
     playasa_dxva_h264_parse_open
     playasa_dxva_h264_parse_buffer
+    playasa_dxva_h264_parse_fill_picture_context
     playasa_dxva_h264_parse_set_surface_index
     playasa_dxva_h264_parse_update_ref_frames
     playasa_dxva_h264_parse_is_ref_in_use

@@ -37,6 +37,10 @@ PLAYASA_FFMPEG_MODERN_API int playasa_dxva_h264_parse_buffer(
 	const uint8_t* data,
 	size_t data_size,
 	PlayasaDxvaH264ParseOutput* output);
+PLAYASA_FFMPEG_MODERN_API int playasa_dxva_h264_parse_fill_picture_context(
+	PlayasaDxvaH264ParseSession* session,
+	int32_t pci_vendor,
+	PlayasaDxvaH264ParseOutput* output);
 PLAYASA_FFMPEG_MODERN_API void playasa_dxva_h264_parse_set_surface_index(PlayasaDxvaH264ParseSession* session, int surface_index);
 PLAYASA_FFMPEG_MODERN_API void playasa_dxva_h264_parse_update_ref_frames(PlayasaDxvaH264ParseSession* session, DXVA_PicParams_H264* pic_params);
 PLAYASA_FFMPEG_MODERN_API int playasa_dxva_h264_parse_is_ref_in_use(PlayasaDxvaH264ParseSession* session, int surface_index);
