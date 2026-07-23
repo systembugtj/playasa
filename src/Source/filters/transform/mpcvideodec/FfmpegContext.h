@@ -55,6 +55,18 @@ void			FFH264SetDxvaSliceLong (struct AVCodecContext* pAVCtx, void* pSliceLong);
 int				FFH264GetNalLengthSize (struct AVCodecContext* pAVCtx);
 void			FFH264ApplyExtradata (struct AVCodecContext* pAVCtx, BYTE* pDataIn, UINT nSize, void* pSliceLong);
 
+/* RFC-0047 phase 2: H.264 DXVA session — decoder TU binds once, no GetAVCtx() per frame. */
+DxvaH264DxvaSession*	FFH264CreateDxvaSession (struct AVCodecContext* pAVCtx);
+void					FFH264DestroyDxvaSession (DxvaH264DxvaSession* pSession);
+void					FFH264DecodeBufferSession (DxvaH264DxvaSession* pSession, BYTE* pBuffer, UINT nSize, DxvaH264PictureContext* pContext);
+HRESULT					FFH264ReadPictureContextSession (DxvaH264DxvaSession* pSession, DxvaH264PictureContext* pContext, BYTE* pBuffer, UINT nSize, int nPCIVendor);
+void					FFH264SetCurrentPictureSession (DxvaH264DxvaSession* pSession, int nIndex, DxvaH264PictureContext* pContext);
+void					FFH264UpdateRefFramesListSession (DxvaH264DxvaSession* pSession, DxvaH264PictureContext* pContext);
+BOOL					FFH264IsRefFrameInUseSession (DxvaH264DxvaSession* pSession, int nFrameNum);
+void					FF264UpdateRefFrameSliceLongSession (DxvaH264DxvaSession* pSession, DxvaH264PictureContext* pContext, DXVA_Slice_H264_Long* pSlice);
+int						FFH264GetNalLengthSizeSession (DxvaH264DxvaSession* pSession);
+void					FFH264ApplyExtradataSession (DxvaH264DxvaSession* pSession, BYTE* pDataIn, UINT nSize, void* pSliceLong);
+
 // === VC1 functions
 HRESULT			FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize);
 HRESULT			FFVC1ReadPictureContext (DxvaVc1PictureContext* pContext, struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize);

@@ -4,7 +4,7 @@
 | --- | --- |
 | **状态** | 执行中 (In Progress) |
 | **创建日期** | 2026-07-18 |
-| **最后更新** | 2026-07-18 |
+| **最后更新** | 2026-07-23 |
 | **负责人** | AI / Playasa |
 | **相关 RFC** | [RFC-0035](./rfc-0035-legacy-mpcvideodec-ffmpeg-retirement.md)、[RFC-0033](./completed/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md)、[RFC-0030](./rfc-0030-mpeg2-dxva-context-modernization.md)、[RFC-0025](./completed/rfc-0025-ffmpeg-dxva-followup.md)、[RFC-0024](./rfc-0024-ffmpeg-modern-island.md) |
 
@@ -32,10 +32,11 @@
 2. `DXVADecoderH264.cpp` 删除 `#include "avcodec.h"` / `PODtypes.h`。
 3. 门禁：`test-rfc0047-dxva-decoder-no-avcodec.ps1`。
 
-### 阶段 2：表面 / 参考帧生命周期合同
+### 阶段 2（2026-07-23）：表面 / 参考帧生命周期合同
 
-1. 扩展 `DxvaH264PictureContext`（或并列 `DxvaH264RefState`）覆盖 `SetCurrentPicture` / `UpdateRefFramesList` / `IsRefFrameInUse` / slice-long 更新所需字段。
-2. decoder 只写/读 contract；`FfmpegContext.c` 仍可从旧 `H264Context` 填充。
+1. 新增 opaque `DxvaH264DxvaSession` + `FFH264*Session` API。
+2. `DXVADecoderH264` 在 `Init()` 绑定一次 session；帧路径不再调用 `GetAVCtx()`。
+3. 门禁：`test-rfc0047-dxva-decoder-no-avcodec.ps1`（扩展 session 断言）。
 
 ### 阶段 3：parser 替换数据源
 
@@ -60,6 +61,6 @@ src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
 | 阶段 | 状态 |
 | --- | --- |
 | 1 H.264 decoder 去 avcodec.h | ✓ 2026-07-18 |
-| 2 ref/surface contract | 待办 |
+| 2 ref/surface session contract | ✓ 2026-07-23 |
 | 3 island/parser 替换 | 待办 |
 | 4 交接删树 | 待办 |

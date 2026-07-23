@@ -48,10 +48,13 @@ CDXVADecoderH264::CDXVADecoderH264 (CMPCVideoDecFilter* pFilter, IDirectXVideoDe
 
 CDXVADecoderH264::~CDXVADecoderH264()
 {
+	FFH264DestroyDxvaSession (m_pDxvaSession);
+	m_pDxvaSession = NULL;
 }
 
 void CDXVADecoderH264::Init()
 {
+	m_pDxvaSession = FFH264CreateDxvaSession (m_pFilter->GetAVCtx());
 	memset (&m_DXVAPicParams,	0, sizeof (m_DXVAPicParams));
 	memset (&m_DXVAPicParams,   0, sizeof (DXVA_PicParams_H264));
 	memset (&m_pSliceLong,	    0, sizeof (DXVA_Slice_H264_Long) *MAX_SLICES);
@@ -204,11 +207,11 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 
 	Nalu.SetBuffer (pDataIn, nSize, m_nNALLength);
 
-	/* RFC-0033: DecodeBuffer + POC into contract (BuildPicParams runs after NALU loop). */
+	/* RFC-0033/0047: DecodeBuffer + POC into contract (BuildPicParams runs after NALU loop). */
 	memset(&pictureContext, 0, sizeof(pictureContext));
 	pictureContext.picParams = m_DXVAPicParams;
 	pictureContext.scalingMatrix = m_DXVAScalingMatrix;
-	FFH264DecodeBuffer (m_pFilter->GetAVCtx(), pDataIn, nSize, &pictureContext.framePOC, &pictureContext.outPOC, (REFERENCE_TIME*)&pictureContext.outRtStart);
+	FFH264DecodeBufferSession (m_pDxvaSession, pDataIn, nSize, &pictureContext);
 	nFramePOC = pictureContext.framePOC;
 	nOutPOC = pictureContext.outPOC;
 	rtOutStart = pictureContext.outRtStart;
@@ -224,7 +227,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 					m_pSliceLong[nSlices].BSNALunitDataLocation	= nNalOffset;
 					m_pSliceLong[nSlices].SliceBytesInBuffer	= Nalu.GetDataLength()+3; //.GetRoundedDataLength();
 					m_pSliceLong[nSlices].slice_id				= nSlices;
-					FF264UpdateRefFrameSliceLong(&m_DXVAPicParams, &m_pSliceLong[nSlices], m_pFilter->GetAVCtx());
+					FF264UpdateRefFrameSliceLongSession (m_pDxvaSession, &pictureContext, &m_pSliceLong[nSlices]);
 
 					if (nSlices>0)
 						m_pSliceLong[nSlices-1].NumMbsForSlice = m_pSliceLong[nSlices].NumMbsForSlice = m_pSliceLong[nSlices].first_mb_in_slice - m_pSliceLong[nSlices-1].first_mb_in_slice;
@@ -242,7 +245,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 	/* BuildPicParams via contract (NULL buffer skips re-decode). Seed from post-NALU state. */
 	pictureContext.picParams = m_DXVAPicParams;
 	pictureContext.scalingMatrix = m_DXVAScalingMatrix;
-	if (FAILED (FFH264ReadPictureContext (&pictureContext, m_pFilter->GetAVCtx(), NULL, 0, m_pFilter->GetPCIVendor()))){
+	if (FAILED (FFH264ReadPictureContextSession (m_pDxvaSession, &pictureContext, NULL, 0, m_pFilter->GetPCIVendor()))){
 		SVPASSERT(FALSE);
 		return S_FALSE;
 	}
@@ -259,7 +262,7 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 
 	
 	CHECK_HR (GetFreeSurfaceIndex (nSurfaceIndex, &pSampleToDeliver, rtStart, rtStop));
-	FFH264SetCurrentPicture (nSurfaceIndex, &m_DXVAPicParams, m_pFilter->GetAVCtx());
+	FFH264SetCurrentPictureSession (m_pDxvaSession, nSurfaceIndex, &pictureContext);
 
 	CHECK_HR (BeginFrame(nSurfaceIndex, pSampleToDeliver));
 	
@@ -298,7 +301,8 @@ HRESULT CDXVADecoderH264::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME
 								  m_DXVAPicParams.field_pic_flag, (FF_FIELD_TYPE)nFieldType, 
 								  (FF_SLICE_TYPE)nSliceType, nFramePOC);
 
-	FFH264UpdateRefFramesList (&m_DXVAPicParams, m_pFilter->GetAVCtx());
+	FFH264UpdateRefFramesListSession (m_pDxvaSession, &pictureContext);
+	m_DXVAPicParams = pictureContext.picParams;
 	ClearUnusedRefFrames();
 
 	if (bAdded) 
@@ -337,16 +341,16 @@ void CDXVADecoderH264::ClearUnusedRefFrames()
 	for (int i=0; i<m_nPicEntryNumber; i++)
 	{
 		if (m_pPictureStore[i].bRefPicture && m_pPictureStore[i].bDisplayed)
-			if (!FFH264IsRefFrameInUse (i, m_pFilter->GetAVCtx()))
+			if (!FFH264IsRefFrameInUseSession (m_pDxvaSession, i))
 				RemoveRefFrame (i);
 	}
 }
 
 void CDXVADecoderH264::SetExtraData (BYTE* pDataIn, UINT nSize)
 {
-	/* RFC-0047 phase 1: NAL length + extradata parse stay behind FfmpegContext APIs. */
-	m_nNALLength = FFH264GetNalLengthSize (m_pFilter->GetAVCtx());
-	FFH264ApplyExtradata (m_pFilter->GetAVCtx(), pDataIn, nSize, m_pSliceLong);
+	/* RFC-0047: NAL length + extradata parse via opaque DXVA session. */
+	m_nNALLength = FFH264GetNalLengthSizeSession (m_pDxvaSession);
+	FFH264ApplyExtradataSession (m_pDxvaSession, pDataIn, nSize, m_pSliceLong);
 }
 
 

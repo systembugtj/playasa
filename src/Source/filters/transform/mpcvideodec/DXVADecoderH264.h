@@ -58,6 +58,7 @@ private:
 	int						m_nOutPOC;
 	REFERENCE_TIME			m_rtOutStart;
 	REFERENCE_TIME			m_rtLastFrameDisplayed;
+	DxvaH264DxvaSession*	m_pDxvaSession;
 
 	// Private functions
 	void					Init();

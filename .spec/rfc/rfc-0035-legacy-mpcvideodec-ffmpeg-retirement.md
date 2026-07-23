@@ -68,8 +68,9 @@ test-rfc0024-*, test-rfc0031-*, test-rmvb-*, test-rfc0027-*, test-rfc0034-*, tes
 5. ~~Category B fail-closed~~（2026-07-18）：bridge codec 在 `!m_bUseDXVA` 时不再 `avcodec_open` / software fallback
 6. ~~解耦 `EASplitter`~~（2026-07-18）：本地 `EaFfmpegCompat.h` + 去掉 ffmpeg `/I`；门禁 `verify-rfc0035-easplitter-no-legacy-ffmpeg.ps1`
 7. ~~RFC-0047 阶段 1~~（2026-07-18）：`DXVADecoderH264` 去 `avcodec.h`；`FFH264GetNalLengthSize` / `FFH264ApplyExtradata`
-8. 继续 [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md) 阶段 2+（ref/surface contract → parser 替换 → 去 `libavcodec_gcc`）
-9. 门禁全绿后再删树
+8. ~~RFC-0047 阶段 2~~（2026-07-23）：`DxvaH264DxvaSession` + `FFH264*Session`；decoder 帧路径不再 `GetAVCtx()`
+9. 继续 [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md) 阶段 3（parser 替换 → 去 `libavcodec_gcc`）
+10. 门禁全绿后再删树
 
 ## 8. 当前清单（审计 2026-07-18）
 
@@ -109,6 +110,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/verify-rfc00
 | Bridge codec software fail-closed | ✓ 2026-07-18 Category B |
 | EASplitter 旧 ffmpeg 头 / include paths | ✓ 2026-07-18 |
 | H.264 DXVA decoder TU 去 `avcodec.h` | ✓ RFC-0047 阶段 1 |
+| H.264 DXVA ref/surface session contract | ✓ RFC-0047 阶段 2 |
 
 ### 结论
 

@@ -35,6 +35,9 @@ typedef struct DxvaH264PictureContext {
 	BOOL intraPicFlag;
 } DxvaH264PictureContext;
 
+/* RFC-0047: opaque H.264 DXVA session; legacy AVCodecContext stays in FfmpegContext.c. */
+typedef struct DxvaH264DxvaSession DxvaH264DxvaSession;
+
 /* RFC-0033: VC-1 DXVA picture contract. */
 typedef struct DxvaVc1PictureContext {
 	DXVA_PictureParameters pictureParams;
