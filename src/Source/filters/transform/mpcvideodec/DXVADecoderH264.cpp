@@ -54,7 +54,9 @@ CDXVADecoderH264::~CDXVADecoderH264()
 
 void CDXVADecoderH264::Init()
 {
-	m_pDxvaSession = FFH264CreateDxvaSession (m_pFilter->GetAVCtx());
+	/* RFC-0047 phase 3d: modern parse session needs no AVCodecContext at bind time. */
+	m_pDxvaSession = FFH264CreateDxvaSession (
+		FFH264IsModernDxvaParseAvailable () ? NULL : m_pFilter->GetAVCtx ());
 	memset (&m_DXVAPicParams,	0, sizeof (m_DXVAPicParams));
 	memset (&m_DXVAPicParams,   0, sizeof (DXVA_PicParams_H264));
 	memset (&m_pSliceLong,	    0, sizeof (DXVA_Slice_H264_Long) *MAX_SLICES);

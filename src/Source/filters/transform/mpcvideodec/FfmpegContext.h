@@ -53,10 +53,13 @@ void			FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Sl
 void			FFH264SetDxvaSliceLong (struct AVCodecContext* pAVCtx, void* pSliceLong);
 /* RFC-0047 phase 1: keep H.264 DXVA decoder TU free of avcodec.h field access. */
 int				FFH264GetNalLengthSize (struct AVCodecContext* pAVCtx);
+void			FFH264ReadAvctxExtradata (struct AVCodecContext* pAVCtx, const uint8_t** ppData, int* pSize);
 void			FFH264ApplyExtradata (struct AVCodecContext* pAVCtx, BYTE* pDataIn, UINT nSize, void* pSliceLong);
 BOOL			FFH264IsInterlaced (struct AVCodecContext* pAVCtx);
 
 /* RFC-0047 phase 2: H.264 DXVA session — decoder TU binds once, no GetAVCtx() per frame. */
+/* RFC-0047 phase 3d: pAVCtx may be NULL when modern parse bridge is available. */
+int				FFH264IsModernDxvaParseAvailable (void);
 DxvaH264DxvaSession*	FFH264CreateDxvaSession (struct AVCodecContext* pAVCtx);
 void					FFH264DestroyDxvaSession (DxvaH264DxvaSession* pSession);
 void					FFH264DecodeBufferSession (DxvaH264DxvaSession* pSession, BYTE* pBuffer, UINT nSize, DxvaH264PictureContext* pContext);

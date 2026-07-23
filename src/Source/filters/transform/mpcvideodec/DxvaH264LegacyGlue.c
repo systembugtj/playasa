@@ -612,6 +612,24 @@ void FFH264SetDxvaSliceLong (struct AVCodecContext* pAVCtx, void* pSliceLong)
 	h->dxva_slice_long = pSliceLong;
 }
 
+/* RFC-0047 phase 3d: read extradata from AVCodecContext without avcodec.h in session TU. */
+void FFH264ReadAvctxExtradata (struct AVCodecContext* pAVCtx, const uint8_t** ppData, int* pSize)
+{
+	if (ppData) {
+		*ppData = NULL;
+	}
+	if (pSize) {
+		*pSize = 0;
+	}
+	if (!pAVCtx || !ppData || !pSize) {
+		return;
+	}
+	if (pAVCtx->extradata && pAVCtx->extradata_size > 0) {
+		*ppData = pAVCtx->extradata;
+		*pSize = pAVCtx->extradata_size;
+	}
+}
+
 /* RFC-0047 phase 1: expose nal_length_size without requiring decoder TUs to include avcodec.h. */
 int FFH264GetNalLengthSize (struct AVCodecContext* pAVCtx)
 {

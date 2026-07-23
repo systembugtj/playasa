@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include <cstdlib>
+#include <cstring>
 #include <vector>
 
 #include "DxvaCodecContext.h"
@@ -7,11 +9,8 @@
 #include "h264_bitstream/H264BitstreamUtils.h"
 #include "modern_ffmpeg/ModernFfmpegDxvaH264BridgeConsumer.h"
 
-extern "C" {
-#include "avcodec.h"
-}
-
 // RFC-0047 phase 3c: session routes to modern island parse when bridge DLL is available.
+// RFC-0047 phase 3d: modern path does not require AVCodecContext (no avcodec.h in this TU).
 struct DxvaH264DxvaSession {
 	AVCodecContext* avctx;
 	std::vector<uint8_t> extradata;
@@ -35,15 +34,16 @@ static void DxvaH264SessionCacheExtradata(DxvaH264DxvaSession* session, const ui
 
 static void DxvaH264SessionSeedFromAvctx(DxvaH264DxvaSession* session)
 {
+	const uint8_t* extraData = NULL;
+	int extraDataSize = 0;
+
 	if (!session || !session->avctx) {
 		return;
 	}
 
-	if (session->avctx->extradata && session->avctx->extradata_size > 0) {
-		DxvaH264SessionCacheExtradata(
-			session,
-			session->avctx->extradata,
-			static_cast<size_t>(session->avctx->extradata_size));
+	FFH264ReadAvctxExtradata(session->avctx, &extraData, &extraDataSize);
+	if (extraData && extraDataSize > 0) {
+		DxvaH264SessionCacheExtradata(session, extraData, static_cast<size_t>(extraDataSize));
 	}
 }
 
@@ -82,15 +82,21 @@ static void DxvaH264SessionApplyOutput(const PlayasaDxvaH264ParseOutput& output,
 
 extern "C" {
 
+int FFH264IsModernDxvaParseAvailable(void)
+{
+	return ModernFfmpegDxvaBridge::Consumer::Instance().IsAvailable() ? 1 : 0;
+}
+
 DxvaH264DxvaSession* FFH264CreateDxvaSession(struct AVCodecContext* pAVCtx)
 {
-	DxvaH264DxvaSession* session;
+	DxvaH264DxvaSession* session = NULL;
+	const bool modernAvailable = ModernFfmpegDxvaBridge::Consumer::Instance().IsAvailable();
 
-	if (!pAVCtx) {
+	if (!pAVCtx && !modernAvailable) {
 		return NULL;
 	}
 
-	session = (DxvaH264DxvaSession*)av_mallocz(sizeof(DxvaH264DxvaSession));
+	session = (DxvaH264DxvaSession*)calloc(1, sizeof(DxvaH264DxvaSession));
 	if (!session) {
 		return NULL;
 	}
@@ -101,10 +107,14 @@ DxvaH264DxvaSession* FFH264CreateDxvaSession(struct AVCodecContext* pAVCtx)
 	session->modern_session = NULL;
 	DxvaH264SessionSeedFromAvctx(session);
 
-	ModernFfmpegDxvaBridge::Consumer& bridge = ModernFfmpegDxvaBridge::Consumer::Instance();
-	if (bridge.IsAvailable() && bridge.Create(&session->modern_session) && session->modern_session) {
+	if (modernAvailable && ModernFfmpegDxvaBridge::Consumer::Instance().Create(&session->modern_session) && session->modern_session) {
 		session->use_modern = true;
 		DxvaH264SessionTryOpenModern(session);
+	}
+
+	if (!session->use_modern && !session->avctx) {
+		FFH264DestroyDxvaSession(session);
+		return NULL;
 	}
 
 	return session;
@@ -122,7 +132,7 @@ void FFH264DestroyDxvaSession(DxvaH264DxvaSession* pSession)
 	}
 
 	pSession->extradata.clear();
-	av_free(pSession);
+	free(pSession);
 }
 
 void FFH264DecodeBufferSession(DxvaH264DxvaSession* pSession, BYTE* pBuffer, UINT nSize, DxvaH264PictureContext* pContext)
@@ -138,6 +148,10 @@ void FFH264DecodeBufferSession(DxvaH264DxvaSession* pSession, BYTE* pBuffer, UIN
 			DxvaH264SessionApplyOutput(output, pContext);
 			return;
 		}
+	}
+
+	if (!pSession->avctx) {
+		return;
 	}
 
 	FFH264DecodeBuffer(pSession->avctx, pBuffer, nSize, &pContext->framePOC, &pContext->outPOC, (REFERENCE_TIME*)&pContext->outRtStart);
@@ -165,6 +179,10 @@ HRESULT FFH264ReadPictureContextSession(DxvaH264DxvaSession* pSession, DxvaH264P
 		return S_OK;
 	}
 
+	if (!pSession->avctx) {
+		return E_FAIL;
+	}
+
 	return FFH264ReadPictureContext(pContext, pSession->avctx, pBuffer, nSize, nPCIVendor);
 }
 
@@ -176,6 +194,10 @@ void FFH264SetCurrentPictureSession(DxvaH264DxvaSession* pSession, int nIndex, D
 
 	if (pSession->use_modern && pSession->modern_session) {
 		ModernFfmpegDxvaBridge::Consumer::Instance().SetSurfaceIndex(pSession->modern_session, nIndex);
+		return;
+	}
+
+	if (!pSession->avctx) {
 		return;
 	}
 
@@ -193,6 +215,10 @@ void FFH264UpdateRefFramesListSession(DxvaH264DxvaSession* pSession, DxvaH264Pic
 		return;
 	}
 
+	if (!pSession->avctx) {
+		return;
+	}
+
 	FFH264UpdateRefFramesList(&pContext->picParams, pSession->avctx);
 }
 
@@ -204,6 +230,10 @@ BOOL FFH264IsRefFrameInUseSession(DxvaH264DxvaSession* pSession, int nFrameNum)
 
 	if (pSession->use_modern && pSession->modern_session) {
 		return ModernFfmpegDxvaBridge::Consumer::Instance().IsRefInUse(pSession->modern_session, nFrameNum) ? TRUE : FALSE;
+	}
+
+	if (!pSession->avctx) {
+		return FALSE;
 	}
 
 	return FFH264IsRefFrameInUse(nFrameNum, pSession->avctx);
@@ -220,6 +250,10 @@ void FF264UpdateRefFrameSliceLongSession(DxvaH264DxvaSession* pSession, DxvaH264
 		return;
 	}
 
+	if (!pSession->avctx) {
+		return;
+	}
+
 	FF264UpdateRefFrameSliceLong(&pContext->picParams, pSlice, pSession->avctx);
 }
 
@@ -231,6 +265,10 @@ int FFH264GetNalLengthSizeSession(DxvaH264DxvaSession* pSession)
 
 	if (pSession->nal_length_size != PlayasaH264::kUnknownNalLengthSize) {
 		return pSession->nal_length_size;
+	}
+
+	if (!pSession->avctx) {
+		return 0;
 	}
 
 	return FFH264GetNalLengthSize(pSession->avctx);
@@ -246,6 +284,10 @@ void FFH264ApplyExtradataSession(DxvaH264DxvaSession* pSession, BYTE* pDataIn, U
 	DxvaH264SessionTryOpenModern(pSession);
 
 	if (pSession->use_modern && pSession->modern_session) {
+		return;
+	}
+
+	if (!pSession->avctx) {
 		return;
 	}
 

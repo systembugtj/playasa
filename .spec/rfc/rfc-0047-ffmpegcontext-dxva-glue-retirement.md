@@ -54,10 +54,14 @@
 3. 实现 `playasa_dxva_h264_parse_fill_picture_context` 与 `update_slice_long` modern 版。
 4. 门禁：`test-rfc0047-h264-dxva-session-modern-routing.ps1`。
 
-**3d（待办）**
+**3d（2026-07-23，本提交）**
 
-1. 去掉 DXVA 路径对 `libavcodec_gcc` 的链接（需 modern parse 全路径验证）。
-2. 交接 RFC-0035 删树。
+1. `FFH264IsModernDxvaParseAvailable` + `FFH264CreateDxvaSession(NULL)` 当 bridge 可用时不再绑定 `AVCodecContext`。
+2. `DxvaH264Session.cpp` 去除 `avcodec.h`；`FFH264ReadAvctxExtradata` 留在 legacy glue。
+3. 门禁：`test-rfc0047-h264-dxva-session-no-avctx.ps1`。
+4. 待续：从 `MPCVideoDec.vcxproj` 移除 `libavcodec_gcc`（VC-1/MPEG-2 仍阻塞）。
+
+**3e（待办）**
 
 ### 阶段 4：验证与交接 RFC-0035
 
@@ -70,6 +74,7 @@
 src/Test/Scripts/test-rfc0047-dxva-decoder-no-avcodec.ps1
 src/Test/Scripts/test-rfc0047-h264-bitstream-utils.ps1
 src/Test/Scripts/test-rfc0047-h264-dxva-session-modern-routing.ps1
+src/Test/Scripts/test-rfc0047-h264-dxva-session-no-avctx.ps1
 src/BuildScript/audit-rfc0047-ffmpegcontext-h264-glue.ps1
 src/Test/Scripts/test-rfc0033-h264-dxva-selfcheck.ps1
 src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
@@ -81,5 +86,5 @@ src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
 | --- | --- |
 | 1 H.264 decoder 去 avcodec.h | ✓ 2026-07-18 |
 | 2 ref/surface session contract | ✓ 2026-07-23 |
-| 3 island/parser 替换 | 3a–3c ✓；3d 去 `libavcodec_gcc` 待办 |
+| 3 island/parser 替换 | 3a–3d ✓；3e 去 `libavcodec_gcc` 待办（VC-1/MPEG-2 阻塞） |
 | 4 交接删树 | 待办 |
