@@ -15,6 +15,7 @@ $vc1Cpp = Join-Path $mpcvideodec 'DXVADecoderVC1.cpp'
 $mpeg2Cpp = Join-Path $mpcvideodec 'DXVADecoderMpeg2.cpp'
 $ffmpegHeader = Join-Path $mpcvideodec 'FfmpegContext.h'
 $ffmpegC = Join-Path $mpcvideodec 'FfmpegContext.c'
+$sessionCpp = Join-Path $mpcvideodec 'DxvaH264Session.cpp'
 
 function Assert-FileContains([string]$Path, [string]$Pattern, [string]$Message) {
   if (-not (Test-Path -LiteralPath $Path)) {
@@ -38,8 +39,9 @@ function Assert-FileNotContains([string]$Path, [string]$Pattern, [string]$Messag
 
 Assert-FileContains $ffmpegHeader 'FFH264CreateDxvaSession' 'FfmpegContext.h must declare FFH264CreateDxvaSession'
 Assert-FileContains $ffmpegHeader 'FFH264ReadPictureContextSession' 'FfmpegContext.h must declare session-based ReadPictureContext'
-Assert-FileContains $ffmpegC 'FFH264CreateDxvaSession' 'FfmpegContext.c must implement FFH264CreateDxvaSession'
-Assert-FileContains $ffmpegC 'FFH264ReadPictureContextSession' 'FfmpegContext.c must implement session APIs'
+Assert-FileContains $sessionCpp 'FFH264CreateDxvaSession' 'DxvaH264Session.cpp must implement FFH264CreateDxvaSession'
+Assert-FileContains $sessionCpp 'FFH264ReadPictureContextSession' 'DxvaH264Session.cpp must implement session APIs'
+Assert-FileNotContains $ffmpegC 'FFH264CreateDxvaSession' 'FfmpegContext.c must not implement session APIs (moved to DxvaH264Session.cpp)'
 Assert-FileContains $h264Cpp 'FFH264CreateDxvaSession' 'DXVADecoderH264 must create DXVA session'
 Assert-FileContains $h264Cpp 'FFH264ReadPictureContextSession' 'DXVADecoderH264 must use session ReadPictureContext'
 Assert-FileContains $h264Cpp 'FFH264SetCurrentPictureSession' 'DXVADecoderH264 must use session SetCurrentPicture'

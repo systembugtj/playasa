@@ -38,10 +38,19 @@
 2. `DXVADecoderH264` 在 `Init()` 绑定一次 session；帧路径不再调用 `GetAVCtx()`。
 3. 门禁：`test-rfc0047-dxva-decoder-no-avcodec.ps1`（扩展 session 断言）。
 
-### 阶段 3：parser 替换数据源
+### 阶段 3（2026-07-23）：parser 替换数据源 — 3a 已落地
 
-1. 用 island 侧公开 bitstream 解析（或项目自有 NAL/SPS 解析）填充 contract。
-2. `FfmpegContext.c` 不再编译进旧树头文件；`MPCVideoDec` 去掉 `libavcodec_gcc`（DXVA 路径）。
+**3a（本提交）**
+
+1. 抽取 `h264_bitstream/H264BitstreamUtils`（extradata / length-prefixed NAL 纯函数，无 legacy 头）。
+2. `DxvaH264Session.cpp` 承接 `FFH264*Session`；session 缓存 extradata + `nal_length_size`。
+3. `ModernFfmpegDecodeAdapter` 复用同一模块，去除重复 H.264 bitstream 逻辑。
+4. 门禁：`test-rfc0047-h264-bitstream-utils.ps1`；`audit-rfc0047-ffmpegcontext-h264-glue.ps1` 跟踪剩余 `H264Context` 读者。
+
+**3b（待办）**
+
+1. island 侧 H.264 DXVA parse ABI 替代 `av_h264_decode_frame` / `FFH264DecodeBuffer`。
+2. `FfmpegContext.c` 不再 `#include` 旧 `h264.h`；`MPCVideoDec` 去掉 `libavcodec_gcc`（DXVA 路径）。
 
 ### 阶段 4：验证与交接 RFC-0035
 
@@ -52,6 +61,8 @@
 
 ```text
 src/Test/Scripts/test-rfc0047-dxva-decoder-no-avcodec.ps1
+src/Test/Scripts/test-rfc0047-h264-bitstream-utils.ps1
+src/BuildScript/audit-rfc0047-ffmpegcontext-h264-glue.ps1
 src/Test/Scripts/test-rfc0033-h264-dxva-selfcheck.ps1
 src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
 ```
@@ -62,5 +73,5 @@ src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
 | --- | --- |
 | 1 H.264 decoder 去 avcodec.h | ✓ 2026-07-18 |
 | 2 ref/surface session contract | ✓ 2026-07-23 |
-| 3 island/parser 替换 | 待办 |
+| 3 island/parser 替换 | 3a ✓ 2026-07-23；3b 待办 |
 | 4 交接删树 | 待办 |

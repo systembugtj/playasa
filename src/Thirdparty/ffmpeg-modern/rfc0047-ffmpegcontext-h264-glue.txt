@@ -1,0 +1,28 @@
+﻿# RFC-0047 FfmpegContext H.264 glue inventory
+# Generated: 2026-07-23T14:43:51.8202342-07:00
+# Source: C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c
+# Hit count: 23
+
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:38: #include "h264.h"
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:43: int av_h264_decode_frame(struct AVCodecContext* avctx, uint8_t *buf, int buf_size);
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:154: void FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart)
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:158: H264Context*	h	= (H264Context*) pAVCtx->priv_data;
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:159: av_h264_decode_frame (pAVCtx, pBuffer, nSize);
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:203: H264Context*	pContext	= (H264Context*) pAVCtx->priv_data;
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:215: av_h264_decode_frame(pAVCtx, pBuffer, nSize);
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:302: H264Context*	pContext	= (H264Context*) pAVCtx->priv_data;
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:312: av_h264_decode_frame(pAVCtx, pBuffer, nSize);
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:442: HRESULT FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, struct AVCodecContext* pAVCtx, int nPCIVendor)
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:444: H264Context*			h			= (H264Context*) pAVCtx->priv_data;
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:568: H264Context*	h			= (H264Context*) pAVCtx->priv_data;
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:579: H264Context*	h			= (H264Context*) pAVCtx->priv_data;
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:635: H264Context*	h			= (H264Context*) pAVCtx->priv_data;
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:656: H264Context*			h			= (H264Context*) pAVCtx->priv_data;
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:728: H264Context*	h = (H264Context*) pAVCtx->priv_data;
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:743: FFH264DecodeBuffer (pAVCtx, pDataIn, nSize, NULL, NULL, NULL);
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:819: /* RFC-0033: fill DxvaH264PictureContext from legacy H264Context readers.
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:820: * When pBuffer is non-NULL, runs FFH264DecodeBuffer first (POC metadata).
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:821: * Always runs FFH264BuildPicParams into the contract. */
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:830: FFH264DecodeBuffer (pAVCtx, pBuffer, nSize, &pContext->framePOC, &pContext->outPOC, (REFERENCE_TIME*)&pContext->outRtStart);
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:832: hr = FFH264BuildPicParams (&pContext->picParams, &pContext->scalingMatrix, &pContext->fieldType, &pContext->sliceType, pAVCtx, nPCIVendor);
+C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c:999: H264Context*	h		= (H264Context*) pAVCtx->priv_data;

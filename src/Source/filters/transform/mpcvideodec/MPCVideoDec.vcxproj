@@ -284,9 +284,11 @@
     <ClCompile Include="DXVADecoderH264.cpp" />
     <ClCompile Include="DXVADecoderMpeg2.cpp" />
     <ClCompile Include="DXVADecoderVC1.cpp" />
+    <ClCompile Include="DxvaH264Session.cpp" />
     <ClCompile Include="FfmpegContext.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClCompile Include="h264_bitstream\H264BitstreamUtils.cpp" />
     <ClCompile Include="MPCFfmpegDec.cpp" />
     <ClCompile Include="MPCVideoDecFilter.cpp" />
     <ClCompile Include="MPCVideoDecSettingsWnd.cpp" />
@@ -315,6 +317,7 @@
     <ClInclude Include="DXVADecoderMpeg2.h" />
     <ClInclude Include="DXVADecoderVC1.h" />
     <ClInclude Include="FfmpegContext.h" />
+    <ClInclude Include="h264_bitstream\H264BitstreamUtils.h" />
     <ClInclude Include="H264QuantizationMatrix.h" />
     <ClInclude Include="IMPCVideoDecFilter.h" />
     <ClInclude Include="intrin_fixed.h" />
