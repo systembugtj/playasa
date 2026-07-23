@@ -61,7 +61,13 @@
 3. 门禁：`test-rfc0047-h264-dxva-session-no-avctx.ps1`。
 4. 待续：从 `MPCVideoDec.vcxproj` 移除 `libavcodec_gcc`（VC-1/MPEG-2 仍阻塞）。
 
-**3e（待办）**
+**3e（2026-07-23，本提交）**
+
+1. `DxvaVc1LegacyGlue.c`：VC-1 私有结构读者从 `FfmpegContext.c` / `DxvaH264LegacyGlue.c` 隔离；主文件不再 `#include "vc1.h"`。
+2. 门禁：`test-rfc0047-vc1-dxva-legacy-glue-compartment.ps1`。
+3. 待续：MPEG-2 glue 隔离；`MPCVideoDec.vcxproj` 去 `libavcodec_gcc`。
+
+**3f（待办）**
 
 ### 阶段 4：验证与交接 RFC-0035
 
@@ -75,6 +81,7 @@ src/Test/Scripts/test-rfc0047-dxva-decoder-no-avcodec.ps1
 src/Test/Scripts/test-rfc0047-h264-bitstream-utils.ps1
 src/Test/Scripts/test-rfc0047-h264-dxva-session-modern-routing.ps1
 src/Test/Scripts/test-rfc0047-h264-dxva-session-no-avctx.ps1
+src/Test/Scripts/test-rfc0047-vc1-dxva-legacy-glue-compartment.ps1
 src/BuildScript/audit-rfc0047-ffmpegcontext-h264-glue.ps1
 src/Test/Scripts/test-rfc0033-h264-dxva-selfcheck.ps1
 src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
@@ -86,5 +93,5 @@ src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
 | --- | --- |
 | 1 H.264 decoder 去 avcodec.h | ✓ 2026-07-18 |
 | 2 ref/surface session contract | ✓ 2026-07-23 |
-| 3 island/parser 替换 | 3a–3d ✓；3e 去 `libavcodec_gcc` 待办（VC-1/MPEG-2 阻塞） |
+| 3 island/parser 替换 | 3a–3e ✓；3f MPEG-2 + 去 `libavcodec_gcc` 待办 |
 | 4 交接删树 | 待办 |

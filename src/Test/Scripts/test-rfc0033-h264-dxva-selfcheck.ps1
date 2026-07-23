@@ -13,6 +13,7 @@ $dxvaHeader = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\Dxva
 $ffmpegHeader = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\FfmpegContext.h'
 $ffmpegC = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\FfmpegContext.c'
 $h264LegacyGlueC = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\DxvaH264LegacyGlue.c'
+$vc1LegacyGlueC = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\DxvaVc1LegacyGlue.c'
 $h264Cpp = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\DXVADecoderH264.cpp'
 $vc1Cpp = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp'
 $auditScript = Join-Path $repoRoot 'src\BuildScript\audit-rfc0033-dxva-h264-vc1-refs.ps1'
@@ -25,7 +26,7 @@ function Assert-Contains {
   }
 }
 
-foreach ($path in @($dxvaHeader, $ffmpegHeader, $ffmpegC, $h264LegacyGlueC, $h264Cpp, $vc1Cpp)) {
+foreach ($path in @($dxvaHeader, $ffmpegHeader, $ffmpegC, $h264LegacyGlueC, $vc1LegacyGlueC, $h264Cpp, $vc1Cpp)) {
   if (-not (Test-Path -LiteralPath $path)) {
     throw "Missing required file: $path"
   }
@@ -37,7 +38,8 @@ Assert-Contains -Path $ffmpegHeader -Pattern 'FFH264ReadPictureContext' -Descrip
 Assert-Contains -Path $ffmpegHeader -Pattern 'FFVC1ReadPictureContext' -Description 'FFVC1ReadPictureContext declaration'
 # RFC-0047 phase 3b moved H.264 readers into DxvaH264LegacyGlue.c; VC-1 remains in FfmpegContext.c.
 Assert-Contains -Path $h264LegacyGlueC -Pattern 'FFH264ReadPictureContext' -Description 'FFH264ReadPictureContext implementation'
-Assert-Contains -Path $ffmpegC -Pattern 'FFVC1ReadPictureContext' -Description 'FFVC1ReadPictureContext implementation'
+# RFC-0047 phase 3e moved VC-1 readers into DxvaVc1LegacyGlue.c.
+Assert-Contains -Path $vc1LegacyGlueC -Pattern 'FFVC1ReadPictureContext' -Description 'FFVC1ReadPictureContext implementation'
 Assert-Contains -Path $h264Cpp -Pattern 'FFH264ReadPictureContext' -Description 'H.264 decoder contract consumption'
 Assert-Contains -Path $vc1Cpp -Pattern 'FFVC1ReadPictureContext' -Description 'VC-1 decoder contract consumption'
 

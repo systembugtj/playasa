@@ -35,11 +35,6 @@
 #include "mpegvideo.h"
 #include "golomb.h"
 
-#include "vc1.h"
-
-
-int av_vc1_decode_frame(AVCodecContext *avctx, uint8_t *buf, int buf_size);
-
 
 const byte ZZ_SCAN[16]  =
 {  0,  1,  4,  8,  5,  2,  3,  6,  9, 12, 13, 10,  7, 11, 14, 15
@@ -112,22 +107,6 @@ inline MpegEncContext* GetMpegEncContext(struct AVCodecContext* pAVCtx)
     return s;
 }
 
-
-/* RFC-0033: fill DxvaVc1PictureContext from legacy VC1Context readers. */
-HRESULT FFVC1ReadPictureContext (DxvaVc1PictureContext* pContext, struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize)
-{
-	HRESULT hr;
-
-	if (!pContext || !pAVCtx)
-		return E_POINTER;
-
-	hr = FFVC1UpdatePictureParam (&pContext->pictureParams, pAVCtx, &pContext->fieldType, &pContext->sliceType, pBuffer, nSize);
-	if (FAILED(hr))
-		return hr;
-
-	pContext->frameSkipped = FFIsSkipped (pAVCtx) ? TRUE : FALSE;
-	return S_OK;
-}
 
 HRESULT FFMpeg2ReadPictureContext (DxvaMpeg2PictureContext* pContext, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize)
 {
@@ -262,12 +241,6 @@ unsigned long FFGetMBNumber(struct AVCodecContext* pAVCtx)
     return (s != NULL) ? s->mb_num : 0;
 }
 
-int FFIsSkipped(struct AVCodecContext* pAVCtx)
-{
-	VC1Context*		vc1 = (VC1Context*) pAVCtx->priv_data;
-	return vc1->p_frame_skipped;
-}
-
 int FFIsInterlaced(struct AVCodecContext* pAVCtx, int nHeight)
 {
 	if (pAVCtx->codec_id == CODEC_ID_H264)
@@ -276,8 +249,7 @@ int FFIsInterlaced(struct AVCodecContext* pAVCtx, int nHeight)
 	}
 	else if (pAVCtx->codec_id == CODEC_ID_VC1)
 	{
-		VC1Context*		vc1 = (VC1Context*) pAVCtx->priv_data;
-		return vc1->interlace;
+		return FFVC1IsInterlaced(pAVCtx) ? 1 : 0;
 	}
 
 	return 0;

@@ -75,6 +75,7 @@ void					FFH264ApplyExtradataSession (DxvaH264DxvaSession* pSession, BYTE* pData
 HRESULT			FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize);
 HRESULT			FFVC1ReadPictureContext (DxvaVc1PictureContext* pContext, struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize);
 int				FFIsSkipped(struct AVCodecContext* pAVCtx);
+int				FFVC1IsInterlaced(struct AVCodecContext* pAVCtx);
 
 // === Mpeg2 functions
 HRESULT			FFMpeg2ReadPictureContext (DxvaMpeg2PictureContext* pContext, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize);
