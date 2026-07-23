@@ -69,6 +69,9 @@
 
 **3f（待办）**
 
+1. MPEG-2 glue 隔离（`FfmpegContext.c` 仅剩 MPEG-2 + 公共辅助）。
+2. 从 `MPCVideoDec.vcxproj` 移除 `libavcodec_gcc`；交接 RFC-0035 删树。
+
 ### 阶段 4：验证与交接 RFC-0035
 
 1. H.264/VC-1/MPEG-2 DXVA 样本回归。
