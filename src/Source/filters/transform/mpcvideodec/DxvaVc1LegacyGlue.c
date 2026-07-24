@@ -9,6 +9,11 @@
 #include "mpegvideo.h"
 #include "vc1.h"
 
+BOOL FFAvctxIsVc1(struct AVCodecContext* pAVCtx)
+{
+	return pAVCtx && pAVCtx->codec_id == CODEC_ID_VC1;
+}
+
 int av_vc1_decode_frame(struct AVCodecContext* avctx, uint8_t* buf, int buf_size);
 
 HRESULT FFVC1UpdatePictureParam(DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize)

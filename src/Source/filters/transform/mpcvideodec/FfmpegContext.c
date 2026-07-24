@@ -29,7 +29,6 @@
 #include <winnt.h>
 #include <vfwmsgs.h>
 #include "FfmpegContext.h"
-#include "avcodec.h"
 
 
 int IsVista()
@@ -60,10 +59,10 @@ unsigned long FFGetMBNumber(struct AVCodecContext* pAVCtx)
 	if (!pAVCtx) {
 		return 0;
 	}
-	if (pAVCtx->codec_id == CODEC_ID_MPEG2VIDEO) {
+	if (FFAvctxIsMpeg2Video(pAVCtx)) {
 		return FFGetMpeg2MBNumber(pAVCtx);
 	}
-	if (pAVCtx->codec_id == CODEC_ID_H264 || pAVCtx->codec_id == CODEC_ID_VC1) {
+	if (FFAvctxIsH264(pAVCtx) || FFAvctxIsVc1(pAVCtx)) {
 		return FFGetMpegEncMBNumber(pAVCtx);
 	}
 	return 0;
@@ -71,11 +70,11 @@ unsigned long FFGetMBNumber(struct AVCodecContext* pAVCtx)
 
 int FFIsInterlaced(struct AVCodecContext* pAVCtx, int nHeight)
 {
-	if (pAVCtx->codec_id == CODEC_ID_H264)
+	if (FFAvctxIsH264(pAVCtx))
 	{
 		return FFH264IsInterlaced(pAVCtx) ? 1 : 0;
 	}
-	else if (pAVCtx->codec_id == CODEC_ID_VC1)
+	else if (FFAvctxIsVc1(pAVCtx))
 	{
 		return FFVC1IsInterlaced(pAVCtx) ? 1 : 0;
 	}
@@ -88,10 +87,10 @@ int FFGetCodedPicture(struct AVCodecContext* pAVCtx)
 	if (!pAVCtx) {
 		return 0;
 	}
-	if (pAVCtx->codec_id == CODEC_ID_MPEG2VIDEO) {
+	if (FFAvctxIsMpeg2Video(pAVCtx)) {
 		return FFGetMpeg2CodedPicture(pAVCtx);
 	}
-	if (pAVCtx->codec_id == CODEC_ID_H264 || pAVCtx->codec_id == CODEC_ID_VC1) {
+	if (FFAvctxIsH264(pAVCtx) || FFAvctxIsVc1(pAVCtx)) {
 		return FFGetMpegEncCodedPicture(pAVCtx);
 	}
 	return 0;
@@ -102,10 +101,10 @@ BOOL FFGetAlternateScan(struct AVCodecContext* pAVCtx)
 	if (!pAVCtx) {
 		return 0;
 	}
-	if (pAVCtx->codec_id == CODEC_ID_MPEG2VIDEO) {
+	if (FFAvctxIsMpeg2Video(pAVCtx)) {
 		return FFGetMpeg2AlternateScan(pAVCtx);
 	}
-	if (pAVCtx->codec_id == CODEC_ID_H264 || pAVCtx->codec_id == CODEC_ID_VC1) {
+	if (FFAvctxIsH264(pAVCtx) || FFAvctxIsVc1(pAVCtx)) {
 		return FFGetMpegEncAlternateScan(pAVCtx);
 	}
 	return 0;

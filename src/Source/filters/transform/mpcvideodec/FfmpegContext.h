@@ -56,6 +56,9 @@ int				FFH264GetNalLengthSize (struct AVCodecContext* pAVCtx);
 void			FFH264ReadAvctxExtradata (struct AVCodecContext* pAVCtx, const uint8_t** ppData, int* pSize);
 void			FFH264ApplyExtradata (struct AVCodecContext* pAVCtx, BYTE* pDataIn, UINT nSize, void* pSliceLong);
 BOOL			FFH264IsInterlaced (struct AVCodecContext* pAVCtx);
+BOOL			FFAvctxIsH264 (struct AVCodecContext* pAVCtx);
+BOOL			FFAvctxIsVc1 (struct AVCodecContext* pAVCtx);
+BOOL			FFAvctxIsMpeg2Video (struct AVCodecContext* pAVCtx);
 
 /* RFC-0047 phase 2: H.264 DXVA session — decoder TU binds once, no GetAVCtx() per frame. */
 /* RFC-0047 phase 3d: pAVCtx may be NULL when modern parse bridge is available. */

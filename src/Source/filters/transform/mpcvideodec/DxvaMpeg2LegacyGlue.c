@@ -8,6 +8,11 @@
 #include "avcodec.h"
 #include "mpegvideo.h"
 
+BOOL FFAvctxIsMpeg2Video(struct AVCodecContext* pAVCtx)
+{
+	return pAVCtx && pAVCtx->codec_id == CODEC_ID_MPEG2VIDEO;
+}
+
 /* FIXME: remove duplicate declaration with ffmpeg ?? */
 typedef struct Mpeg1Context {
 	MpegEncContext mpeg_enc_ctx;

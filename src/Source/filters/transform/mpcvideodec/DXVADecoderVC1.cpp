@@ -94,7 +94,7 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 
 	DxvaVc1PictureContext		pictureContext;
 
-	/* RFC-0033: VC-1 DXVA params via project-owned contract (private codec state stays in FfmpegContext.c). */
+	/* RFC-0033: VC-1 DXVA params via project-owned contract (private codec state in DxvaVc1LegacyGlue.c). */
 	memset(&pictureContext, 0, sizeof(pictureContext));
 	pictureContext.pictureParams = m_PictureParams;
 	if (FAILED (FFVC1ReadPictureContext (&pictureContext, m_pFilter->GetAVCtx(), pDataIn, nSize)))

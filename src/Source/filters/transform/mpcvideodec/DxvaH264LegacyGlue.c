@@ -12,6 +12,11 @@
 #include "h264.h"
 #include "h264data.h"
 
+BOOL FFAvctxIsH264(struct AVCodecContext* pAVCtx)
+{
+	return pAVCtx && pAVCtx->codec_id == CODEC_ID_H264;
+}
+
 int av_h264_decode_frame(struct AVCodecContext* avctx, uint8_t *buf, int buf_size);
 
 const byte ZZ_SCAN[16]  =
