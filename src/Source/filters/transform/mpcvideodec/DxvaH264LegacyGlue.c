@@ -674,3 +674,22 @@ BOOL FFH264IsInterlaced(struct AVCodecContext* pAVCtx)
 		return TRUE;
 	return FALSE;
 }
+
+/* RFC-0047 phase 3f: MpegEncContext accessors for H.264/VC-1 (keeps mpegvideo.h out of FfmpegContext.c). */
+unsigned long FFGetMpegEncMBNumber(struct AVCodecContext* pAVCtx)
+{
+	MpegEncContext* s = pAVCtx ? (MpegEncContext*)pAVCtx->priv_data : NULL;
+	return (s != NULL) ? s->mb_num : 0;
+}
+
+int FFGetMpegEncCodedPicture(struct AVCodecContext* pAVCtx)
+{
+	MpegEncContext* s = pAVCtx ? (MpegEncContext*)pAVCtx->priv_data : NULL;
+	return (s != NULL) ? s->current_picture.coded_picture_number : 0;
+}
+
+BOOL FFGetMpegEncAlternateScan(struct AVCodecContext* pAVCtx)
+{
+	MpegEncContext* s = pAVCtx ? (MpegEncContext*)pAVCtx->priv_data : NULL;
+	return (s != NULL) ? s->alternate_scan : 0;
+}

@@ -290,6 +290,9 @@
     <ClCompile Include="DxvaVc1LegacyGlue.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">CompileAsC</CompileAs>
     </ClCompile>
+    <ClCompile Include="DxvaMpeg2LegacyGlue.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release Unicode|Win32'">CompileAsC</CompileAs>
+    </ClCompile>
     <ClCompile Include="DxvaH264Session.cpp" />
     <ClCompile Include="modern_ffmpeg\ModernFfmpegDxvaH264BridgeConsumer.cpp" />
     <ClCompile Include="FfmpegContext.c">

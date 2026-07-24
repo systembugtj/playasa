@@ -81,6 +81,12 @@ int				FFVC1IsInterlaced(struct AVCodecContext* pAVCtx);
 HRESULT			FFMpeg2ReadPictureContext (DxvaMpeg2PictureContext* pContext, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize);
 HRESULT			FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* m_QMatrixData, DXVA_SliceInfo* pSliceInfo, int* nSliceCount,
 struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* nNextCodecIndex, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize);
+unsigned long	FFGetMpeg2MBNumber(struct AVCodecContext* pAVCtx);
+int				FFGetMpeg2CodedPicture(struct AVCodecContext* pAVCtx);
+BOOL			FFGetMpeg2AlternateScan(struct AVCodecContext* pAVCtx);
+unsigned long	FFGetMpegEncMBNumber(struct AVCodecContext* pAVCtx);
+int				FFGetMpegEncCodedPicture(struct AVCodecContext* pAVCtx);
+BOOL			FFGetMpegEncAlternateScan(struct AVCodecContext* pAVCtx);
 
 // === Common functions
 int				IsVista();
