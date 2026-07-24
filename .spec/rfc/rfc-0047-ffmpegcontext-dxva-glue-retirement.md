@@ -82,10 +82,13 @@
 2. 统一审计：`audit-rfc0047-ffmpegcontext-dxva-glue.ps1`（0 hits）。
 3. 门禁：`test-rfc0047-ffmpegcontext-public-only.ps1`。
 
-**4b（待办）**
+**4b（2026-07-23，本提交）**
 
-1. `MPCVideoDecFilter` 去 legacy `avcodec_open` / `avcodec_decode_video`（DXVA + modern bridge 路径）。
-2. 从 `MPCVideoDec.vcxproj` 移除 `libavcodec_gcc`；交接 RFC-0035 删树。
+1. `MPCVideoDecFilter`：H.264 DXVA + modern parse 时跳过 `avcodec_open` / `FFH264CheckCompatibility`（`m_bLegacyAvcodecOpened` 跟踪）。
+2. 门禁：`test-rfc0047-mpcvideodec-dxva-skip-legacy-avcodec-open.ps1`。
+3. 待续：VC-1/MPEG-2 DXVA 去 `avcodec_open`；`MPCVideoDec.vcxproj` 去 `libavcodec_gcc`。
+
+**4c（待办）**
 
 **阶段 5（待办）**
 
@@ -102,6 +105,7 @@ src/Test/Scripts/test-rfc0047-h264-dxva-session-no-avctx.ps1
 src/Test/Scripts/test-rfc0047-vc1-dxva-legacy-glue-compartment.ps1
 src/Test/Scripts/test-rfc0047-mpeg2-dxva-legacy-glue-compartment.ps1
 src/Test/Scripts/test-rfc0047-ffmpegcontext-public-only.ps1
+src/Test/Scripts/test-rfc0047-mpcvideodec-dxva-skip-legacy-avcodec-open.ps1
 src/BuildScript/audit-rfc0047-ffmpegcontext-dxva-glue.ps1
 src/Test/Scripts/test-rfc0033-h264-dxva-selfcheck.ps1
 src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
@@ -114,5 +118,5 @@ src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
 | 1 H.264 decoder 去 avcodec.h | ✓ 2026-07-18 |
 | 2 ref/surface session contract | ✓ 2026-07-23 |
 | 3 island/parser 替换 | 3a–3f ✓ |
-| 4 FfmpegContext 公共层 | 4a ✓；4b 去 `libavcodec_gcc` 待办 |
+| 4 FfmpegContext 公共层 | 4a ✓；4b H.264 DXVA 跳过 legacy open ✓；4c 去 `libavcodec_gcc` 待办 |
 | 5 交接删树 | 待办 |

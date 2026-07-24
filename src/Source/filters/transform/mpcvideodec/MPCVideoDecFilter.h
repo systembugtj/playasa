@@ -131,6 +131,7 @@ protected:
 	bool									m_bUseDXVA;
 	bool									m_bUseFFmpeg;				
 	bool									m_bUseModernFfmpegBridge;
+	bool									m_bLegacyAvcodecOpened;
 	ModernFfmpegBridge::Consumer			m_modernFfmpegBridge;
 	int										m_modernFfmpegDecodeLogCount;
 	bool									m_modernFfmpegLoggedFirstFrame;

@@ -700,6 +700,18 @@ bool IsModernFfmpegBridgeCodec(enum CodecID codec, int fourcc)
 	}
 }
 
+/* RFC-0047 phase 4b: DXVA H.264 may skip legacy avcodec_open when modern parse bridge is available. */
+static bool NeedsLegacyAvcodecOpen(bool useModernFfmpegBridge, bool useDxva, enum CodecID codecId)
+{
+	if (useModernFfmpegBridge) {
+		return false;
+	}
+	if (useDxva && codecId == CODEC_ID_H264 && FFH264IsModernDxvaParseAvailable()) {
+		return false;
+	}
+	return true;
+}
+
 void SetModernFfmpegProgressiveSampleFlags(IMediaSample* sample)
 {
 	if (CComQIPtr<IMediaSample2> sample2 = sample) {
@@ -833,6 +845,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	m_bUseDXVA = true;
 	m_bUseFFmpeg = true;
 	m_bUseModernFfmpegBridge = false;
+	m_bLegacyAvcodecOpened = false;
 	m_modernFfmpegDecodeLogCount = 0;
 	m_modernFfmpegLoggedFirstFrame = false;
 	
@@ -1156,6 +1169,7 @@ void CMPCVideoDecFilter::Cleanup()
 	const bool wasUsingModernFfmpegBridge = m_bUseModernFfmpegBridge;
 	m_modernFfmpegBridge.Close();
 	m_bUseModernFfmpegBridge = false;
+	m_bLegacyAvcodecOpened = false;
 	m_modernFfmpegDecodeLogCount = 0;
 	m_modernFfmpegLoggedFirstFrame = false;
 
@@ -1168,9 +1182,11 @@ void CMPCVideoDecFilter::Cleanup()
 		if (m_pFFBuffer)					free(m_pFFBuffer);
 
 		if (m_pAVCtx->slice_offset)			av_free(m_pAVCtx->slice_offset);
-		if (m_pAVCtx->codec)				avcodec_close(m_pAVCtx);
+		if (m_bLegacyAvcodecOpened && m_pAVCtx->codec) {
+			avcodec_close(m_pAVCtx);
+		}
 
-		if (!wasUsingModernFfmpegBridge && (m_nThreadNumber > 1) && IsMultiThreadSupported (ffCodecs[m_nCodecNb].nFFCodec))
+		if (m_bLegacyAvcodecOpened && !wasUsingModernFfmpegBridge && (m_nThreadNumber > 1) && IsMultiThreadSupported (ffCodecs[m_nCodecNb].nFFCodec))
 			avcodec_thread_free (m_pAVCtx);
 
 		av_free(m_pAVCtx);
@@ -1479,23 +1495,32 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			}
 			if (!m_bUseModernFfmpegBridge) {
 				// RFC-0035 Category B: bridge-owned codecs fail closed on software path.
-				// DXVA still needs legacy open for FfmpegContext parser glue until that is extracted.
 				if (bUseModernBridgeCodec && !m_bUseDXVA) {
 					ModernFfmpegSelfcheckLog(_T("Modern FFmpeg bridge open failed; fail-closed (no legacy software fallback): codec=%d fourcc=0x%08x"), ffCodecs[m_nCodecNb].nFFCodec, ffCodecs[m_nCodecNb].fourcc);
 					return VFW_E_INVALIDMEDIATYPE;
 				}
-				if (bUseModernBridgeCodec && (m_nThreadNumber > 1) && IsMultiThreadSupported (ffCodecs[m_nCodecNb].nFFCodec))
-					avcodec_thread_init(m_pAVCtx, m_nThreadNumber);
-				int avcRet = avcodec_open(m_pAVCtx, m_pAVCodec);
-				if (avcRet<0){
-					SVP_LogMsg2(_T("AVCOPEN FAIL %d") , avcRet);
-					return VFW_E_INVALIDMEDIATYPE;
+				m_bLegacyAvcodecOpened = false;
+				if (NeedsLegacyAvcodecOpen(m_bUseModernFfmpegBridge, m_bUseDXVA, ffCodecs[m_nCodecNb].nFFCodec)) {
+					if (bUseModernBridgeCodec && (m_nThreadNumber > 1) && IsMultiThreadSupported (ffCodecs[m_nCodecNb].nFFCodec))
+						avcodec_thread_init(m_pAVCtx, m_nThreadNumber);
+					int avcRet = avcodec_open(m_pAVCtx, m_pAVCodec);
+					if (avcRet<0){
+						SVP_LogMsg2(_T("AVCOPEN FAIL %d") , avcRet);
+						return VFW_E_INVALIDMEDIATYPE;
+					}
+					m_bLegacyAvcodecOpened = true;
+				} else {
+					ModernFfmpegSelfcheckLog(_T("RFC-0047: skip legacy avcodec_open (DXVA modern parse): codec=%d fourcc=0x%08x"),
+						ffCodecs[m_nCodecNb].nFFCodec, ffCodecs[m_nCodecNb].fourcc);
 				}
 			}
 			CString osd_msg;
 			if (ffCodecs[m_nCodecNb].nFFCodec == CODEC_ID_H264 && !m_bUseModernFfmpegBridge)
 			{
-				int		nCompat, refFrames = 0;
+				int		nCompat = 0, refFrames = 0;
+				if (m_bUseDXVA && FFH264IsModernDxvaParseAvailable()) {
+					ModernFfmpegSelfcheckLog(_T("RFC-0047: skip FFH264CheckCompatibility (DXVA modern parse path)"));
+				} else {
 				nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, (BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, &refFrames);
 				SVP_LogMsg6("Got Ref Frame Count %d %d Driver %d %d %d %d Vendor %x",nCompat, refFrames, HIWORD(m_VideoDriverVersion.HighPart), LOWORD(m_VideoDriverVersion.HighPart),HIWORD(m_VideoDriverVersion.LowPart),LOWORD(m_VideoDriverVersion.LowPart), m_nPCIVendor);
                 switch (nCompat)
@@ -1526,6 +1551,7 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 					if((nCompat == 2) && (m_ref_frame_count_check_skip)) m_bDXVACompatible = true;
 				#endif
 
+				}
             }else if(ffCodecs[m_nCodecNb].nFFCodec ==  CODEC_ID_MPEG2VIDEO && !m_bUseModernFfmpegBridge){
                 // DSP is disable for DXVA decoding (to keep default idct_permutation)
                 m_pAVCtx->dsp_mask ^= FF_MM_FORCE;
@@ -1533,9 +1559,11 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction,const CMediaTyp
 			
 				
 
-			// Force single thread for DXVA !
+			// Force single thread for DXVA when legacy decoder is opened.
 			if (IsDXVASupported()){
-				avcodec_thread_init(m_pAVCtx, 1);
+				if (m_bLegacyAvcodecOpened) {
+					avcodec_thread_init(m_pAVCtx, 1);
+				}
 			}else if (m_bUseDXVA){
 				return VFW_E_INVALIDMEDIATYPE;
 			}
@@ -1880,7 +1908,7 @@ HRESULT CMPCVideoDecFilter::NewSegment(REFERENCE_TIME rtStart, REFERENCE_TIME rt
 
     ResetBuffer();
 
-	if (m_pAVCtx && !m_bUseModernFfmpegBridge)
+	if (m_pAVCtx && m_bLegacyAvcodecOpened && !m_bUseModernFfmpegBridge)
 		avcodec_flush_buffers (m_pAVCtx);
 	if (m_bUseModernFfmpegBridge) {
 		if (m_pAVCtx && IS_REALVIDEO(m_pAVCtx->codec_id)) {
