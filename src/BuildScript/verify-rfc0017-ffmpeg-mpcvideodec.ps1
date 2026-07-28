@@ -12,6 +12,7 @@ $configFile = Join-Path $mpcVideoDecDir 'ffmpeg\config.h'
 $avcodecHeader = Join-Path $mpcVideoDecDir 'ffmpeg\libavcodec\avcodec.h'
 $avutilHeader = Join-Path $mpcVideoDecDir 'ffmpeg\libavutil\avutil.h'
 $projectFile = Join-Path $mpcVideoDecDir 'MPCVideoDec.vcxproj'
+$legacyGlueProjectFile = Join-Path $mpcVideoDecDir 'MPCVideoDecLegacyGlue.vcxproj'
 $defFile = Join-Path $mpcVideoDecDir 'MPCVideoDec.def'
 $filterFile = Join-Path $mpcVideoDecDir 'MPCVideoDecFilter.cpp'
 
@@ -34,7 +35,7 @@ function Assert-Text {
   }
 }
 
-foreach ($file in @($expectedFile, $configFile, $avcodecHeader, $avutilHeader, $projectFile, $defFile, $filterFile)) {
+foreach ($file in @($expectedFile, $configFile, $avcodecHeader, $avutilHeader, $projectFile, $legacyGlueProjectFile, $defFile, $filterFile)) {
   Assert-FileExists $file
 }
 
@@ -63,8 +64,13 @@ Assert-Text $projectFile "<ConfigurationType>StaticLibrary</ConfigurationType>" 
 Assert-Text $projectFile '<PlatformToolset>v145</PlatformToolset>' 'MPCVideoDec toolset pin changed'
 Assert-Text $projectFile '<UseOfMfc>Static</UseOfMfc>' 'MFC static pin changed'
 Assert-Text $projectFile '<CharacterSet>Unicode</CharacterSet>' 'Unicode character set pin changed'
-Assert-Text $projectFile 'libavcodec_gcc\.lib;libgcc\.a;libmingwex\.a' 'Win32 Release Unicode libavcodec dependency pin changed'
+Assert-Text $projectFile 'MPCVideoDecLegacyGlue\.vcxproj' 'MPCVideoDec must reference legacy glue static lib (RFC-0047 4c-i)'
 Assert-Text $projectFile 'ffmpeg;ffmpeg\\libavcodec;ffmpeg\\libavutil' 'FFmpeg include path pin changed'
+if ((Get-Content -LiteralPath $projectFile -Raw) -match 'libavcodec_gcc') {
+  throw 'RFC-0017 gate failed: MPCVideoDec.vcxproj must not link libavcodec_gcc directly (use MPCVideoDecLegacyGlue)'
+}
+Assert-Text $legacyGlueProjectFile 'libavcodec_gcc\.lib;libgcc\.a;libmingwex\.a' 'legacy glue Win32 Release Unicode libavcodec dependency pin changed'
+Assert-Text $legacyGlueProjectFile 'ffmpeg;ffmpeg\\libavcodec;ffmpeg\\libavutil' 'legacy glue FFmpeg include path pin changed'
 if ((Get-Content -LiteralPath $projectFile -Raw) -match 'ProjectReference Include="..\\mpadecfilter\\libflac\\src\\libFLAC\\libflac\.vcxproj"') {
   throw 'RFC-0017 gate failed: stale libflac ProjectReference must not return'
 }

@@ -24,7 +24,8 @@ MPCVideoDec Win32 Release Unicode project pins:
 - PlatformToolset=v145
 - UseOfMfc=Static
 - CharacterSet=Unicode
-- Additional libraries include libavcodec_gcc.lib, libgcc.a, libmingwex.a
+- MPCVideoDec.vcxproj links MPCVideoDecLegacyGlue via ProjectReference (RFC-0047 4c-i); no direct libavcodec_gcc on filter project
+- MPCVideoDecLegacyGlue.vcxproj owns libavcodec_gcc.lib, libgcc.a, libmingwex.a and Dxva*LegacyGlue.c + FfmpegContext.c
 - Include directories include ffmpeg, ffmpeg/libavcodec, ffmpeg/libavutil
 - Stale libflac ProjectReference removed; standalone MPCVideoDec project build must not depend on libflac project configuration
 

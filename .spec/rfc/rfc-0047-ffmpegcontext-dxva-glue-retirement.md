@@ -88,11 +88,21 @@
 2. 门禁：`test-rfc0047-mpcvideodec-dxva-skip-legacy-avcodec-open.ps1`。
 3. 待续：VC-1/MPEG-2 DXVA 去 `avcodec_open`；`MPCVideoDec.vcxproj` 去 `libavcodec_gcc`。
 
-**4c（待办）**
+**4c（进行中）**
 
-1. **4c-i（链接隔离）**：将 `libavcodec_gcc` / `libgcc` / `libmingwex` 从 `MPCVideoDec.vcxproj` 主链接行移入独立 legacy glue 静态库（`Dxva*LegacyGlue.c` + 仍依赖旧树的 TU），使 `audit-rfc0035` 对 vcxproj 的 `libavcodec_gcc` 命中降为 0。
-2. **4c-ii（VC-1/MPEG-2 modern parse）**：仿 H.264 `playasa_dxva_h264_parse_*`，在 modern bridge 导出 VC-1/MPEG-2 picture-context parse；门禁 `test-rfc0047-dxva-vc1-mpeg2-legacy-open-contract.ps1` 跟踪「未实现前不得 skip open」。
-3. **4c-iii**：`NeedsLegacyAvcodecOpen` 扩展 VC-1/MPEG-2 skip（与 4c-ii 同批）；`MPCVideoDec.vcxproj` 去 `libavcodec_gcc`（软件路径与 glue 库仍可在最终链接解析）。
+**4c-i（本提交）**
+
+1. 新增 `MPCVideoDecLegacyGlue.vcxproj`：`Dxva*LegacyGlue.c` + `FfmpegContext.c` 独占 `libavcodec_gcc` 链接。
+2. `MPCVideoDec.vcxproj` 通过 `ProjectReference` 消费 glue 库；`audit-rfc0035` 对 filter vcxproj 的 `libavcodec_gcc` 命中为 0。
+3. 门禁：`test-rfc0047-legacy-glue-link-isolation.ps1`；更新 `verify-rfc0017`。
+
+**4c-ii（待办）**
+
+1. 仿 H.264 `playasa_dxva_h264_parse_*`，在 modern bridge 导出 VC-1/MPEG-2 picture-context parse；门禁 `test-rfc0047-dxva-vc1-mpeg2-legacy-open-contract.ps1` 跟踪「未实现前不得 skip open」。
+
+**4c-iii（待办）**
+
+1. `NeedsLegacyAvcodecOpen` 扩展 VC-1/MPEG-2 skip（与 4c-ii 同批）；软件路径仍经 glue 库在最终链接解析 legacy 符号。
 
 **阶段 5（待办）**
 
@@ -110,6 +120,7 @@ src/Test/Scripts/test-rfc0047-vc1-dxva-legacy-glue-compartment.ps1
 src/Test/Scripts/test-rfc0047-mpeg2-dxva-legacy-glue-compartment.ps1
 src/Test/Scripts/test-rfc0047-ffmpegcontext-public-only.ps1
 src/Test/Scripts/test-rfc0047-mpcvideodec-dxva-skip-legacy-avcodec-open.ps1
+src/Test/Scripts/test-rfc0047-legacy-glue-link-isolation.ps1
 src/Test/Scripts/test-rfc0047-dxva-vc1-mpeg2-legacy-open-contract.ps1
 src/BuildScript/audit-rfc0047-ffmpegcontext-dxva-glue.ps1
 src/Test/Scripts/test-rfc0033-h264-dxva-selfcheck.ps1
@@ -123,5 +134,5 @@ src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
 | 1 H.264 decoder 去 avcodec.h | ✓ 2026-07-18 |
 | 2 ref/surface session contract | ✓ 2026-07-23 |
 | 3 island/parser 替换 | 3a–3f ✓ |
-| 4 FfmpegContext 公共层 | 4a ✓；4b H.264 DXVA 跳过 legacy open ✓；4c 去 `libavcodec_gcc`（4c-i 链接隔离 / 4c-ii VC-1+MPEG-2 parse）待办 |
+| 4 FfmpegContext 公共层 | 4a ✓；4b H.264 DXVA 跳过 legacy open ✓；4c-i glue 链接隔离 ✓；4c-ii VC-1+MPEG-2 parse 待办 |
 | 5 交接删树 | 待办 |
