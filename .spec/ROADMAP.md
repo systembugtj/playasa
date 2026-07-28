@@ -10,7 +10,7 @@
 
 `.spec/rfc/` 跟踪 Playasa/SPlayer 现代化工作。**金规则**：实现与 RFC 声明对齐；完成后归档到 `.spec/rfc/completed/` 并修正全仓链接。
 
-最后更新：**2026-07-18**（新增 RFC-0047）
+最后更新：**2026-07-23**（Rust RFC 轨道收口；RFC-0047 阶段 4b）
 
 ### 编号与状态一览
 
@@ -21,7 +21,7 @@
 | 0017 | FFmpeg / mpcvideodec 升级审计 | 已完成 | [.spec/rfc/completed/rfc-0017-ffmpeg-mpcvideodec-upgrade.md](.spec/rfc/completed/rfc-0017-ffmpeg-mpcvideodec-upgrade.md) |
 | 0018 | Boost 头文件树渐进消化 | 提案 | [.spec/rfc/rfc-0018-boost-header-tree-digestion.md](.spec/rfc/rfc-0018-boost-header-tree-digestion.md) |
 | 0019 | 第三方 CRT/MFC 链接契约 | 提案 | [.spec/rfc/rfc-0019-thirdparty-crt-mfc-linkage-contract.md](.spec/rfc/rfc-0019-thirdparty-crt-mfc-linkage-contract.md) |
-| 0020–0023 | Rust playlist / sphash / subtitle / ZIP | 已完成 | [.spec/rfc/completed/](.spec/rfc/completed/) |
+| 0013–0016, 0020–0023 | Rust 原生模块（sphash / playlist / subtitle / ZIP） | 已完成 | [.spec/rfc/completed/](.spec/rfc/completed/)；门禁 `verify-rfc-rust-crates.ps1` |
 | 0024 | FFmpeg 8.1 modern island（父级） | **执行中** | [.spec/rfc/rfc-0024-ffmpeg-modern-island.md](.spec/rfc/rfc-0024-ffmpeg-modern-island.md) |
 | 0025 | FFmpeg DXVA / FfmpegContext 审计 | 已完成（审计） | [.spec/rfc/completed/rfc-0025-ffmpeg-dxva-followup.md](.spec/rfc/completed/rfc-0025-ffmpeg-dxva-followup.md) |
 | 0026 | MKV 短期 playback contract | 已完成 | [.spec/rfc/completed/rfc-0026-mkv-support-modernization.md](.spec/rfc/completed/rfc-0026-mkv-support-modernization.md) |
@@ -106,6 +106,7 @@ backlog（体量过大/有依赖，暂不开 RFC）：MainFrm 拆分、PlayerToo
 
 | RFC | 脚本（相对 `src/Test/Scripts/`） |
 | --- | --- |
+| 0013–0023 | `src/BuildScript/verify-rfc-rust-crates.ps1`（`cargo test --workspace` + props 契约） |
 | 0024 | `test-rfc0024-*-smoke.ps1`；`src/BuildScript/verify-rfc0024-ffmpeg-modern.ps1` |
 | 0027/0028 | `test-rfc0027-mkv-seek-selfcheck.ps1`, `test-rfc0027-uia-tree-selfcheck.ps1`, `test-rfc0028-uia-video-selfcheck.ps1`, `test-rfc0028-mkv-seek-uia-selfcheck.ps1` |
 | 0030 | `test-rfc0030-mpeg2-dxva-selfcheck.ps1` |

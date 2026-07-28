@@ -41,6 +41,10 @@ enum PCI_Vendors
 #define DXVA_TOO_MUCH_REF_FRAMES 2
 #define DXVA_INCOMPATIBLE_SAR    4
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // === H264 functions
 void			FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart);
 HRESULT			FFH264BuildPicParams (DXVA_PicParams_H264* pDXVAPicParams, DXVA_Qmatrix_H264* pDXVAScalingMatrix, int* nFieldType, int* nSliceType, struct AVCodecContext* pAVCtx, int nPCIVendor);
@@ -53,7 +57,7 @@ void			FF264UpdateRefFrameSliceLong(DXVA_PicParams_H264* pDXVAPicParams, DXVA_Sl
 void			FFH264SetDxvaSliceLong (struct AVCodecContext* pAVCtx, void* pSliceLong);
 /* RFC-0047 phase 1: keep H.264 DXVA decoder TU free of avcodec.h field access. */
 int				FFH264GetNalLengthSize (struct AVCodecContext* pAVCtx);
-void			FFH264ReadAvctxExtradata (struct AVCodecContext* pAVCtx, const uint8_t** ppData, int* pSize);
+void			FFH264ReadAvctxExtradata (struct AVCodecContext* pAVCtx, const unsigned char** ppData, int* pSize);
 void			FFH264ApplyExtradata (struct AVCodecContext* pAVCtx, BYTE* pDataIn, UINT nSize, void* pSliceLong);
 BOOL			FFH264IsInterlaced (struct AVCodecContext* pAVCtx);
 BOOL			FFAvctxIsH264 (struct AVCodecContext* pAVCtx);
@@ -100,3 +104,7 @@ unsigned long	FFGetMBNumber(struct AVCodecContext* pAVCtx);
 //BOOL			FFSoftwareCheckCompatibility(struct AVCodecContext* pAVCtx);
 int				FFGetCodedPicture(struct AVCodecContext* pAVCtx);
 BOOL			FFGetAlternateScan(struct AVCodecContext* pAVCtx);
+
+#ifdef __cplusplus
+}
+#endif

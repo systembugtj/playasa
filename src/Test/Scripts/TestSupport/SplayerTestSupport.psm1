@@ -94,6 +94,37 @@ function Wait-SplayerLogNeedle {
   throw $TimeoutMessage
 }
 
+function Wait-SplayerLogAnyNeedle {
+  param(
+    [Parameter(Mandatory = $true)][System.Diagnostics.Process]$Process,
+    [Parameter(Mandatory = $true)][string[]]$Needles,
+    [Parameter(Mandatory = $true)][datetime]$Deadline,
+    [Parameter(Mandatory = $true)][string]$TimeoutMessage,
+    [string[]]$FailureNeedles = @()
+  )
+
+  while ((Get-Date) -lt $Deadline) {
+    Start-Sleep -Milliseconds 250
+    if ($Process.HasExited) {
+      throw "splayer exited early with code $($Process.ExitCode)"
+    }
+
+    $logText = Get-SplayerLogText
+    foreach ($failureNeedle in $FailureNeedles) {
+      if ($logText -match [regex]::Escape($failureNeedle)) {
+        throw "splayer failure log found: $failureNeedle; inspect $(Get-SplayerLogPath)"
+      }
+    }
+    foreach ($needle in $Needles) {
+      if ($logText -match [regex]::Escape($needle)) {
+        return $needle
+      }
+    }
+  }
+
+  throw $TimeoutMessage
+}
+
 function Get-SplayerLogMatchCount {
   param(
     [Parameter(Mandatory = $true)][string]$Needle,

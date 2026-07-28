@@ -69,8 +69,9 @@ test-rfc0024-*, test-rfc0031-*, test-rmvb-*, test-rfc0027-*, test-rfc0034-*, tes
 6. ~~解耦 `EASplitter`~~（2026-07-18）：本地 `EaFfmpegCompat.h` + 去掉 ffmpeg `/I`；门禁 `verify-rfc0035-easplitter-no-legacy-ffmpeg.ps1`
 7. ~~RFC-0047 阶段 1~~（2026-07-18）：`DXVADecoderH264` 去 `avcodec.h`；`FFH264GetNalLengthSize` / `FFH264ApplyExtradata`
 8. ~~RFC-0047 阶段 2~~（2026-07-23）：`DxvaH264DxvaSession` + `FFH264*Session`；decoder 帧路径不再 `GetAVCtx()`
-9. 继续 [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md) 阶段 3（parser 替换 → 去 `libavcodec_gcc`）
-10. 门禁全绿后再删树
+9. ~~RFC-0047 阶段 3~~（2026-07-23）：H.264/VC-1/MPEG-2 legacy glue 全部分离；`FfmpegContext.c` 公共层 4a ✓
+10. 继续 [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md) 阶段 4b（`MPCVideoDecFilter` 去 legacy avcodec → 去 `libavcodec_gcc`）
+11. 门禁全绿后再删树
 
 ## 8. 当前清单（审计 2026-07-18）
 

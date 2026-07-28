@@ -1,5 +1,5 @@
-﻿# RFC-0047 FfmpegContext H.264 glue inventory
-# Generated: 2026-07-23T17:06:30.9707797-07:00
+﻿# RFC-0047 FfmpegContext DXVA glue inventory
+# Generated: 2026-07-27T20:50:48.8237433-07:00
 # Source: C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec\FfmpegContext.c
 # Hit count: 0
 

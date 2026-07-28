@@ -78,7 +78,7 @@ Assert-Text $filterFile 'Mplayerc is free software; you can redistribute it and/
 
 $licenseFiles = Get-ChildItem -LiteralPath $mpcVideoDecDir -File -ErrorAction SilentlyContinue |
   Where-Object { $_.Name -in @('COPYING', 'LICENSE', 'LICENSE.txt', 'COPYING.txt') }
-if ($licenseFiles.Count -ne 0) {
+if (@($licenseFiles).Count -ne 0) {
   throw "RFC-0017 expected no top-level FFmpeg license file in mpcvideodec tree; update audit before changing this state."
 }
 

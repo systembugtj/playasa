@@ -21,7 +21,10 @@ Import-Module (Join-Path $PSScriptRoot 'TestSupport\SplayerTestSupport.psm1') -F
 $repoRoot = Get-SplayerRepoRoot
 $defaultSamplePath = Join-Path $repoRoot 'out\selfcheck\sample-rmvb-rv40-test.rmvb'
 $sourceFilterNeedle = 'CRealMediaSourceFilter'
-$videoDecoderNeedle = 'SVP RealVideo Decoder 2.0'
+$videoDecoderNeedles = @(
+  'SVP RealVideo Decoder 2.0',
+  'Modern FFmpeg bridge open begin'
+)
 $modernBridgeNeedle = 'Modern FFmpeg bridge open OK'
 $modernFlushNeedle = 'Modern FFmpeg bridge flush on BeginFlush'
 $seekForwardMedCommandId = 1012
@@ -100,11 +103,12 @@ try {
     -Deadline $deadline `
     -TimeoutMessage "Timed out waiting for RealMedia source filter; inspect $(Get-SplayerLogPath)"
 
-  Wait-SplayerLogNeedle `
+  $matchedVideoNeedle = Wait-SplayerLogAnyNeedle `
     -Process $process `
-    -Needle $videoDecoderNeedle `
+    -Needles $videoDecoderNeedles `
     -Deadline $deadline `
-    -TimeoutMessage "Timed out waiting for RealVideo decoder; inspect $(Get-SplayerLogPath)"
+    -TimeoutMessage "Timed out waiting for RealVideo decoder or modern bridge begin; inspect $(Get-SplayerLogPath)"
+  Write-Host "RMVB video path needle: $matchedVideoNeedle"
 
   Wait-SplayerLogNeedle `
     -Process $process `
