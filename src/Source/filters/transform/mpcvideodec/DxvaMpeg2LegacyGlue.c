@@ -69,6 +69,16 @@ BOOL FFGetMpeg2AlternateScan(struct AVCodecContext* pAVCtx)
 	return (s != NULL) ? s->alternate_scan : 0;
 }
 
+void FFMpeg2ReadAvctxExtradata(struct AVCodecContext* pAVCtx, const unsigned char** ppData, int* pSize)
+{
+	if (!pAVCtx || !ppData || !pSize) {
+		return;
+	}
+
+	*ppData = pAVCtx->extradata;
+	*pSize = pAVCtx->extradata_size;
+}
+
 HRESULT FFMpeg2ReadPictureContext(DxvaMpeg2PictureContext* pContext, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize)
 {
 	int i;

@@ -22,6 +22,7 @@ Assert-FileContains $filterHeader 'm_bLegacyAvcodecOpened' 'filter must track le
 Assert-FileContains $filterCpp 'NeedsLegacyAvcodecOpen' 'filter must gate legacy avcodec_open'
 Assert-FileContains $filterCpp 'FFH264IsModernDxvaParseAvailable' 'filter must probe modern DXVA parse before skipping open'
 Assert-FileContains $filterCpp 'FFVC1IsModernDxvaParseAvailable' 'filter must probe VC-1 modern DXVA parse before skipping open'
+Assert-FileContains $filterCpp 'FFMpeg2IsModernDxvaParseAvailable' 'filter must probe MPEG-2 modern DXVA parse before skipping open'
 Assert-FileContains $filterCpp 'm_bLegacyAvcodecOpened' 'filter must guard avcodec_close/flush with open flag'
 Assert-FileContains $filterCpp 'case MODE_SOFTWARE\s*:\s*\r?\n\s*hr = SoftwareDecode' 'DXVA path must not call SoftwareDecode directly'
 Assert-FileContains $filterCpp 'skip legacy avcodec_open \(DXVA modern parse\)' 'filter must log skipped legacy open'

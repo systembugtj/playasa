@@ -48,6 +48,24 @@ typedef struct PLAYASA_DXVA_PictureParameters {
 	uint8_t bBitstreamConcealmentMethod;
 } DXVA_PictureParameters;
 
+typedef struct PLAYASA_DXVA_QmatrixData {
+	uint8_t bNewQmatrix[4];
+	uint16_t Qmatrix[4][64];
+} DXVA_QmatrixData;
+
+typedef struct PLAYASA_DXVA_SliceInfo {
+	uint16_t wHorizontalPosition;
+	uint16_t wVerticalPosition;
+	uint32_t dwSliceBitsInBuffer;
+	uint32_t dwSliceDataLocation;
+	uint8_t bStartCodeBitOffset;
+	uint8_t bReservedBits;
+	uint16_t wMBbitOffset;
+	uint16_t wNumberMBsInSlice;
+	uint16_t wQuantizerScaleCode;
+	uint16_t wBadSliceChopping;
+} DXVA_SliceInfo;
+
 typedef struct PLAYASA_DXVA_PicEntry_H264 {
 	union {
 		struct {

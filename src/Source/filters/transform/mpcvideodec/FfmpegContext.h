@@ -93,7 +93,15 @@ HRESULT					FFVC1ReadPictureContextSession (DxvaVc1DxvaSession* pSession, DxvaVc
 void					FFVC1ApplyExtradataSession (DxvaVc1DxvaSession* pSession, BYTE* pDataIn, UINT nSize);
 
 // === Mpeg2 functions
+void			FFMpeg2ReadAvctxExtradata (struct AVCodecContext* pAVCtx, const unsigned char** ppData, int* pSize);
 HRESULT			FFMpeg2ReadPictureContext (DxvaMpeg2PictureContext* pContext, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize);
+
+/* RFC-0047 phase 4c-ii: MPEG-2 DXVA session — decoder TU binds once, no GetAVCtx() per frame when modern parse is available. */
+int				FFMpeg2IsModernDxvaParseAvailable (void);
+DxvaMpeg2DxvaSession*	FFMpeg2CreateDxvaSession (struct AVCodecContext* pAVCtx);
+void					FFMpeg2DestroyDxvaSession (DxvaMpeg2DxvaSession* pSession);
+HRESULT					FFMpeg2ReadPictureContextSession (DxvaMpeg2DxvaSession* pSession, DxvaMpeg2PictureContext* pContext, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize);
+void					FFMpeg2ApplyExtradataSession (DxvaMpeg2DxvaSession* pSession, BYTE* pDataIn, UINT nSize);
 HRESULT			FFMpeg2DecodeFrame (DXVA_PictureParameters* pPicParams, DXVA_QmatrixData* m_QMatrixData, DXVA_SliceInfo* pSliceInfo, int* nSliceCount,
 struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, int* nNextCodecIndex, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize);
 unsigned long	FFGetMpeg2MBNumber(struct AVCodecContext* pAVCtx);

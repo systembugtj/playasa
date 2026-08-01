@@ -53,6 +53,7 @@ private:
 	int							m_nSliceCount;
 
 	int							m_nNextCodecIndex;
+	DxvaMpeg2DxvaSession*		m_pDxvaSession;
 
 	// Private functions
 	void					Init();

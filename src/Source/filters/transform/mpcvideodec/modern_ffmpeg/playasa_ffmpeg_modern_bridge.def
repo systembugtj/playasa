@@ -29,3 +29,7 @@ EXPORTS
     playasa_dxva_vc1_parse_destroy
     playasa_dxva_vc1_parse_open
     playasa_dxva_vc1_parse_buffer
+    playasa_dxva_mpeg2_parse_create
+    playasa_dxva_mpeg2_parse_destroy
+    playasa_dxva_mpeg2_parse_open
+    playasa_dxva_mpeg2_parse_buffer

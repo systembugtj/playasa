@@ -53,11 +53,16 @@ CDXVADecoderMpeg2::CDXVADecoderMpeg2 (CMPCVideoDecFilter* pFilter, IDirectXVideo
 
 CDXVADecoderMpeg2::~CDXVADecoderMpeg2(void)
 {
+	FFMpeg2DestroyDxvaSession(m_pDxvaSession);
+	m_pDxvaSession = NULL;
 	Flush();
 }
 
 void CDXVADecoderMpeg2::Init()
 {
+	/* RFC-0047 phase 4c-ii: modern parse session needs no AVCodecContext at bind time. */
+	m_pDxvaSession = FFMpeg2CreateDxvaSession(
+		FFMpeg2IsModernDxvaParseAvailable() ? NULL : m_pFilter->GetAVCtx());
 	memset (&m_PictureParams, 0, sizeof(m_PictureParams));
 	memset (&m_SliceInfo,     0, sizeof(m_SliceInfo));
 	memset (&m_QMatrixData,	  0, sizeof(m_QMatrixData));
@@ -91,7 +96,7 @@ HRESULT CDXVADecoderMpeg2::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIM
 	memcpy(pictureContext.sliceInfo, m_SliceInfo, sizeof(DXVA_SliceInfo) * m_nSliceCount);
 	pictureContext.sliceCount = m_nSliceCount;
 	pictureContext.nextCodecIndex = m_nNextCodecIndex;
-	CHECK_HR(FFMpeg2ReadPictureContext(&pictureContext, m_pFilter->GetAVCtx(), m_pFilter->GetFrame(), pDataIn, nSize));
+	CHECK_HR(FFMpeg2ReadPictureContextSession(m_pDxvaSession, &pictureContext, m_pFilter->GetFrame(), pDataIn, nSize));
 	m_PictureParams = pictureContext.pictureParams;
 	m_QMatrixData = pictureContext.qmatrixData;
 	memcpy(m_SliceInfo, pictureContext.sliceInfo, sizeof(DXVA_SliceInfo) * pictureContext.sliceCount);
@@ -188,6 +193,7 @@ void CDXVADecoderMpeg2::SetExtraData (BYTE* pDataIn, UINT nSize)
 {
 	m_PictureParams.wPicWidthInMBminus1				= m_pFilter->PictWidth()  - 1;
 	m_PictureParams.wPicHeightInMBminus1			= m_pFilter->PictHeight() - 1;
+	FFMpeg2ApplyExtradataSession(m_pDxvaSession, pDataIn, nSize);
 }
 
 

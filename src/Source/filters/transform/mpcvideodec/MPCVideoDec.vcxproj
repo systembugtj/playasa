@@ -281,8 +281,10 @@
     <ClCompile Include="DXVADecoderVC1.cpp" />
     <ClCompile Include="DxvaH264Session.cpp" />
     <ClCompile Include="DxvaVc1Session.cpp" />
+    <ClCompile Include="DxvaMpeg2Session.cpp" />
     <ClCompile Include="modern_ffmpeg\ModernFfmpegDxvaH264BridgeConsumer.cpp" />
     <ClCompile Include="modern_ffmpeg\ModernFfmpegDxvaVc1BridgeConsumer.cpp" />
+    <ClCompile Include="modern_ffmpeg\ModernFfmpegDxvaMpeg2BridgeConsumer.cpp" />
     <ClCompile Include="h264_bitstream\H264BitstreamUtils.cpp" />
     <ClCompile Include="MPCFfmpegDec.cpp" />
     <ClCompile Include="MPCVideoDecFilter.cpp" />

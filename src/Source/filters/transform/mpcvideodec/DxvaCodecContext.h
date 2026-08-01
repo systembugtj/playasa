@@ -48,3 +48,6 @@ typedef struct DxvaVc1PictureContext {
 
 /* RFC-0047 phase 4c-ii: opaque VC-1 DXVA session; AVCodecContext optional when modern parse bridge is available. */
 typedef struct DxvaVc1DxvaSession DxvaVc1DxvaSession;
+
+/* RFC-0047 phase 4c-ii: opaque MPEG-2 DXVA session; AVCodecContext optional when modern parse bridge is available. */
+typedef struct DxvaMpeg2DxvaSession DxvaMpeg2DxvaSession;
