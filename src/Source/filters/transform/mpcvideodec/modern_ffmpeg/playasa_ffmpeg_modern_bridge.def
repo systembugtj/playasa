@@ -25,3 +25,7 @@ EXPORTS
     playasa_dxva_h264_parse_update_ref_frames
     playasa_dxva_h264_parse_is_ref_in_use
     playasa_dxva_h264_parse_update_slice_long
+    playasa_dxva_vc1_parse_create
+    playasa_dxva_vc1_parse_destroy
+    playasa_dxva_vc1_parse_open
+    playasa_dxva_vc1_parse_buffer

@@ -7,7 +7,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#if defined(PLAYASA_FFMPEG_MODERN_BRIDGE_EXPORTS)
+#include "playasa_dxva_types.h"
+#else
 #include <dxva.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {

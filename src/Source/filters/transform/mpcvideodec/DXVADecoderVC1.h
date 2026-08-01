@@ -97,6 +97,7 @@ public:
 protected :
 
 private:
+	DxvaVc1DxvaSession*			m_pDxvaSession;
 	DXVA_PictureParameters		m_PictureParams;
 	DXVA_SliceInfo				m_SliceInfo;
 	WORD						m_wRefPictureIndex[2];

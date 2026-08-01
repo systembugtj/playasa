@@ -701,13 +701,16 @@ bool IsModernFfmpegBridgeCodec(enum CodecID codec, int fourcc)
 }
 
 /* RFC-0047 phase 4b: DXVA H.264 may skip legacy avcodec_open when modern parse bridge is available.
- * Phase 4c-ii: VC-1/MPEG-2 still require open until playasa_dxva_vc1/mpeg2_parse_* exist (see gate test). */
+ * Phase 4c-ii: VC-1 may skip when playasa_dxva_vc1_parse_* is available; MPEG-2 still requires open. */
 static bool NeedsLegacyAvcodecOpen(bool useModernFfmpegBridge, bool useDxva, enum CodecID codecId)
 {
 	if (useModernFfmpegBridge) {
 		return false;
 	}
 	if (useDxva && codecId == CODEC_ID_H264 && FFH264IsModernDxvaParseAvailable()) {
+		return false;
+	}
+	if (useDxva && codecId == CODEC_ID_VC1 && FFVC1IsModernDxvaParseAvailable()) {
 		return false;
 	}
 	return true;

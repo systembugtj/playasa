@@ -10,9 +10,11 @@ $ffmpegInstall = Join-Path $repoRoot 'src\Thirdparty\ffmpeg-modern\install'
 $modernFfmpegRoot = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg'
 $packageHeader = Join-Path $repoRoot 'src\Thirdparty\pkg\ffmpeg_modern_bridge.h'
 $adapterSource = Join-Path $modernFfmpegRoot 'ModernFfmpegDecodeAdapter.cpp'
-$dxvaParserSource = Join-Path $modernFfmpegRoot 'ModernFfmpegDxvaH264Parser.cpp'
+$dxvaParserSource = Join-Path $modernFfmpegRoot 'ModernFfmpegDxvaH264Parser.c'
+$dxvaVc1ParserSource = Join-Path $modernFfmpegRoot 'ModernFfmpegDxvaVc1Parser.c'
 $bitstreamUtilsSource = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\h264_bitstream\H264BitstreamUtils.cpp'
 $ffmpegModernSrc = Join-Path $repoRoot 'src\Thirdparty\ffmpeg-modern\src'
+$ffmpegModernBuild = Join-Path $repoRoot 'src\Thirdparty\ffmpeg-modern\build'
 $bridgeSource = Join-Path $modernFfmpegRoot 'ModernFfmpegBridge.cpp'
 $bridgeDef = Join-Path $modernFfmpegRoot 'playasa_ffmpeg_modern_bridge.def'
 $outputBin = Join-Path $ffmpegInstall 'bin'
@@ -97,12 +99,14 @@ function Get-MsVcLibExe {
 Assert-FileExists $packageHeader
 Assert-FileExists $adapterSource
 Assert-FileExists $dxvaParserSource
+Assert-FileExists $dxvaVc1ParserSource
 Assert-FileExists $bitstreamUtilsSource
 Assert-FileExists $bridgeSource
 Assert-FileExists $bridgeDef
 Assert-FileExists (Join-Path $ffmpegInstall 'include\libavcodec\avcodec.h')
 Assert-FileExists (Join-Path $ffmpegInstall 'lib\libavcodec.a')
 Assert-FileExists (Join-Path $ffmpegInstall 'lib\pkgconfig\libavcodec.pc')
+Assert-FileExists (Join-Path $ffmpegModernBuild 'config.h')
 
 New-Item -ItemType Directory -Force -Path $outputBin | Out-Null
 New-Item -ItemType Directory -Force -Path $outputLib | Out-Null
@@ -113,15 +117,24 @@ $ffmpegInstallMsys = Convert-ToMsysPath $ffmpegInstall
 $repoRootMsys = Convert-ToMsysPath $repoRoot
 $adapterSourceMsys = Convert-ToMsysPath $adapterSource
 $dxvaParserSourceMsys = Convert-ToMsysPath $dxvaParserSource
+$dxvaVc1ParserSourceMsys = Convert-ToMsysPath $dxvaVc1ParserSource
 $bitstreamUtilsSourceMsys = Convert-ToMsysPath $bitstreamUtilsSource
 $ffmpegModernSrcMsys = Convert-ToMsysPath $ffmpegModernSrc
+$ffmpegModernBuildMsys = Convert-ToMsysPath $ffmpegModernBuild
 $bridgeSourceMsys = Convert-ToMsysPath $bridgeSource
 $bridgeDllMsys = Convert-ToMsysPath $bridgeDll
+$h264ParserObjMsys = Convert-ToMsysPath (Join-Path $outputBin '_dxva_h264_parser.o')
+$vc1ParserObjMsys = Convert-ToMsysPath (Join-Path $outputBin '_dxva_vc1_parser.o')
 
 $buildCommand = @"
 export PATH=/mingw32/bin:/usr/bin:`$PATH
 export PKG_CONFIG_PATH='$ffmpegInstallMsys/lib/pkgconfig'
-g++ -std=c++11 -O2 -Wall -Wextra -I'$repoRootMsys/src/Thirdparty/pkg' -I'$ffmpegModernSrcMsys' -I'$repoRootMsys/src/Source/filters/transform/mpcvideodec' -shared '$bridgeSourceMsys' '$adapterSourceMsys' '$dxvaParserSourceMsys' '$bitstreamUtilsSourceMsys' -o '$bridgeDllMsys' -static-libgcc -static-libstdc++ `$(pkg-config --cflags --libs libavformat libavcodec libavutil libswscale libswresample)
+PKG_CFLAGS=`$(pkg-config --cflags libavformat libavcodec libavutil libswscale libswresample)
+PKG_LIBS=`$(pkg-config --libs libavformat libavcodec libavutil libswscale libswresample)
+COMMON_INC='-I$repoRootMsys/src/Thirdparty/pkg -I$ffmpegModernBuildMsys -I$ffmpegModernSrcMsys -I$repoRootMsys/src/Source/filters/transform/mpcvideodec'
+gcc -std=c11 -O2 -Wall `$PKG_CFLAGS `$COMMON_INC -c '$dxvaParserSourceMsys' -o '$h264ParserObjMsys'
+gcc -std=c11 -O2 -Wall `$PKG_CFLAGS `$COMMON_INC -c '$dxvaVc1ParserSourceMsys' -o '$vc1ParserObjMsys'
+g++ -std=c++11 -O2 -Wall -I'$repoRootMsys/src/Thirdparty/pkg' -I'$ffmpegModernBuildMsys' -I'$ffmpegModernSrcMsys' -I'$repoRootMsys/src/Source/filters/transform/mpcvideodec' -shared '$bridgeSourceMsys' '$adapterSourceMsys' '$bitstreamUtilsSourceMsys' '$h264ParserObjMsys' '$vc1ParserObjMsys' -o '$bridgeDllMsys' -static-libgcc -static-libstdc++ `$PKG_LIBS
 "@
 
 Invoke-Msys2 -Msys2Root $msys2Root -Command $buildCommand

@@ -12,7 +12,7 @@ $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..\..')
 $ffmpegC = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\FfmpegContext.c'
 $glueC = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\DxvaH264LegacyGlue.c'
 $dxvaHeader = Join-Path $repoRoot 'src\Thirdparty\pkg\ffmpeg_modern_dxva_h264.h'
-$parserCpp = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg\ModernFfmpegDxvaH264Parser.cpp'
+$parserCpp = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\modern_ffmpeg\ModernFfmpegDxvaH264Parser.c'
 
 function Assert-FileContains([string]$Path, [string]$Pattern, [string]$Message) {
   if (-not (Test-Path -LiteralPath $Path)) { throw "missing $Path" }

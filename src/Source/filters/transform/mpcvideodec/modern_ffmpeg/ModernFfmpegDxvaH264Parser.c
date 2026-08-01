@@ -2,23 +2,24 @@
 
 #include "ffmpeg_modern_dxva_h264.h"
 
-#include "../h264_bitstream/H264BitstreamUtils.h"
-
-extern "C" {
 #include "libavcodec/avcodec.h"
 #include "libavutil/imgutils.h"
 #include "libavutil/mem.h"
-}
-
 #include "libavcodec/h264dec.h"
 #include "libavcodec/h264_ps.h"
 #include "libavcodec/h264_sei.h"
 #include "libavcodec/mpegutils.h"
-
+#include <stddef.h>
+#include <stdint.h>
 #include <string.h>
-#include <vector>
 
-namespace {
+static int H264NalLengthSizeFromExtradata(const uint8_t* extraData, size_t extraDataSize)
+{
+	if (!extraData || extraDataSize < 5 || extraData[0] != 1) {
+		return 0;
+	}
+	return (extraData[4] & 0x03) + 1;
+}
 
 const uint8_t kZzScan[16] = {
     0, 1, 4, 8, 5, 2, 3, 6, 9, 12, 13, 10, 7, 11, 14, 15
@@ -31,7 +32,7 @@ const uint8_t kZzScan8[64] = {
     58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61, 54, 47, 55, 62, 63
 };
 
-const UINT kUsedForReferenceFlags[] = {
+static const uint32_t kUsedForReferenceFlags[] = {
     0x00000000, 0x00000001, 0x00000003, 0x00000007, 0x0000000F, 0x0000001F, 0x0000003F, 0x0000007F,
     0x000000FF, 0x000001FF, 0x000003FF, 0x000007FF, 0x00000FFF, 0x00001FFF, 0x00003FFF, 0x00007FFF,
     0x0000FFFF, 0x0001FFFF, 0x0003FFFF, 0x0007FFFF, 0x000FFFFF, 0x001FFFFF, 0x003FFFFF, 0x007FFFFF,
@@ -46,9 +47,14 @@ struct DxvaH264ParseSession {
     int outputed_poc;
     int64_t outputed_rtstart;
     int pci_vendor;
+    int nal_length_size;
 };
 
-int DxvaH264GetBuffer2(AVCodecContext* avctx, AVFrame* frame, int flags)
+typedef struct DxvaH264ParseSession DxvaH264ParseSession;
+
+static uint16_t FindRefFrameIndex(uint16_t frameNum, const DXVA_PicParams_H264* picParams);
+
+static int DxvaH264GetBuffer2(AVCodecContext* avctx, AVFrame* frame, int flags)
 {
     (void)flags;
     frame->format = AV_PIX_FMT_YUV420P;
@@ -58,7 +64,7 @@ int DxvaH264GetBuffer2(AVCodecContext* avctx, AVFrame* frame, int flags)
     return av_frame_get_buffer(frame, 32);
 }
 
-void CopyScalingMatrix(DXVA_Qmatrix_H264* dest, const uint8_t scaling4[6][16], const uint8_t scaling8[6][64], int pciVendor)
+static void CopyScalingMatrix(DXVA_Qmatrix_H264* dest, const uint8_t scaling4[6][16], const uint8_t scaling8[6][64], int pciVendor)
 {
     if (pciVendor == 4098) {
         memcpy(dest->bScalingLists4x4, scaling4, sizeof(dest->bScalingLists4x4));
@@ -78,7 +84,7 @@ void CopyScalingMatrix(DXVA_Qmatrix_H264* dest, const uint8_t scaling4[6][16], c
     }
 }
 
-int BuildPicParams(const H264Context* h, DXVA_PicParams_H264* picParams, DXVA_Qmatrix_H264* scalingMatrix, int* fieldType, int* sliceType, int pciVendor)
+static int BuildPicParams(const H264Context* h, DXVA_PicParams_H264* picParams, DXVA_Qmatrix_H264* scalingMatrix, int* fieldType, int* sliceType, int pciVendor)
 {
     const SPS* sps = h->ps.sps;
     const PPS* pps = h->ps.pps;
@@ -91,7 +97,7 @@ int BuildPicParams(const H264Context* h, DXVA_PicParams_H264* picParams, DXVA_Qm
 
     *fieldType = h->picture_structure;
     if (sps->pic_struct_present_flag && h->sei.picture_timing.present) {
-        switch (h->sei.pic_struct) {
+        switch (h->sei.picture_timing.pic_struct) {
         case H264_SEI_PIC_STRUCT_TOP_FIELD:
         case H264_SEI_PIC_STRUCT_TOP_BOTTOM:
         case H264_SEI_PIC_STRUCT_TOP_BOTTOM_TOP:
@@ -171,12 +177,12 @@ int BuildPicParams(const H264Context* h, DXVA_PicParams_H264* picParams, DXVA_Qm
     return 1;
 }
 
-void UpdateRefFramesList(const H264Context* h, DXVA_PicParams_H264* picParams)
+static void UpdateRefFramesList(const H264Context* h, DXVA_PicParams_H264* picParams)
 {
     int useRefIndex = h->short_ref_count * 2;
     for (int i = 0; i < 16; ++i) {
         const H264Picture* pic = NULL;
-        UCHAR associatedFlag = 0;
+        uint8_t associatedFlag = 0;
         if (i < h->short_ref_count) {
             pic = h->short_ref[h->short_ref_count - i - 1];
             associatedFlag = 0;
@@ -190,7 +196,7 @@ void UpdateRefFramesList(const H264Context* h, DXVA_PicParams_H264* picParams)
             picParams->FieldOrderCntList[i][0] = pic->field_poc[0] != INT_MAX ? pic->field_poc[0] : 0;
             picParams->FieldOrderCntList[i][1] = pic->field_poc[1] != INT_MAX ? pic->field_poc[1] : 0;
             picParams->RefFrameList[i].AssociatedFlag = associatedFlag;
-            picParams->RefFrameList[i].Index7Bits = (UCHAR)(intptr_t)pic->f->opaque;
+            picParams->RefFrameList[i].Index7Bits = (uint8_t)(intptr_t)pic->f->opaque;
         } else {
             picParams->FrameNumList[i] = 0;
             picParams->FieldOrderCntList[i][0] = 0;
@@ -202,7 +208,7 @@ void UpdateRefFramesList(const H264Context* h, DXVA_PicParams_H264* picParams)
     picParams->UsedForReferenceFlags = kUsedForReferenceFlags[useRefIndex];
 }
 
-USHORT FindRefFrameIndex(USHORT frameNum, const DXVA_PicParams_H264* picParams)
+static uint16_t FindRefFrameIndex(uint16_t frameNum, const DXVA_PicParams_H264* picParams)
 {
     for (int i = 0; i < picParams->num_ref_frames; ++i) {
         if (picParams->FrameNumList[i] == frameNum) {
@@ -212,7 +218,7 @@ USHORT FindRefFrameIndex(USHORT frameNum, const DXVA_PicParams_H264* picParams)
     return 127;
 }
 
-void UpdateSliceLong(const H264Context* h, DXVA_PicParams_H264* picParams, DXVA_Slice_H264_Long* slice)
+static void UpdateSliceLong(const H264Context* h, DXVA_PicParams_H264* picParams, DXVA_Slice_H264_Long* slice)
 {
     if (!h || !picParams || !slice || !h->slice_ctx) {
         return;
@@ -236,12 +242,12 @@ void UpdateSliceLong(const H264Context* h, DXVA_PicParams_H264* picParams, DXVA_
             if (!refPic) {
                 continue;
             }
-            slice->RefPicList[0][i].Index7Bits = FindRefFrameIndex((USHORT)refPic->frame_num, picParams);
+            slice->RefPicList[0][i].Index7Bits = FindRefFrameIndex((uint16_t)refPic->frame_num, picParams);
             slice->RefPicList[0][i].AssociatedFlag = 0;
             if (h->picture_structure != PICT_FRAME) {
-                if (h->sei.pic_struct == H264_SEI_PIC_STRUCT_BOTTOM_FIELD ||
-                    h->sei.pic_struct == H264_SEI_PIC_STRUCT_TOP_BOTTOM ||
-                    h->sei.pic_struct == H264_SEI_PIC_STRUCT_TOP_BOTTOM_TOP) {
+                if (h->sei.picture_timing.pic_struct == H264_SEI_PIC_STRUCT_BOTTOM_FIELD ||
+                    h->sei.picture_timing.pic_struct == H264_SEI_PIC_STRUCT_TOP_BOTTOM ||
+                    h->sei.picture_timing.pic_struct == H264_SEI_PIC_STRUCT_TOP_BOTTOM_TOP) {
                     slice->RefPicList[0][i].AssociatedFlag = 1;
                 }
             }
@@ -256,12 +262,12 @@ void UpdateSliceLong(const H264Context* h, DXVA_PicParams_H264* picParams, DXVA_
             if (!refPic) {
                 continue;
             }
-            slice->RefPicList[1][i].Index7Bits = FindRefFrameIndex((USHORT)refPic->frame_num, picParams);
+            slice->RefPicList[1][i].Index7Bits = FindRefFrameIndex((uint16_t)refPic->frame_num, picParams);
             slice->RefPicList[1][i].AssociatedFlag = 0;
             if (h->picture_structure != PICT_FRAME) {
-                if (h->sei.pic_struct == H264_SEI_PIC_STRUCT_BOTTOM_FIELD ||
-                    h->sei.pic_struct == H264_SEI_PIC_STRUCT_TOP_BOTTOM ||
-                    h->sei.pic_struct == H264_SEI_PIC_STRUCT_TOP_BOTTOM_TOP) {
+                if (h->sei.picture_timing.pic_struct == H264_SEI_PIC_STRUCT_BOTTOM_FIELD ||
+                    h->sei.picture_timing.pic_struct == H264_SEI_PIC_STRUCT_TOP_BOTTOM ||
+                    h->sei.picture_timing.pic_struct == H264_SEI_PIC_STRUCT_TOP_BOTTOM_TOP) {
                     slice->RefPicList[1][i].AssociatedFlag = 1;
                 }
             }
@@ -284,7 +290,7 @@ void UpdateSliceLong(const H264Context* h, DXVA_PicParams_H264* picParams, DXVA_
     }
 }
 
-int FillOutputFromContext(const DxvaH264ParseSession* parseSession, PlayasaDxvaH264ParseOutput* output)
+static int FillOutputFromContext(const DxvaH264ParseSession* parseSession, PlayasaDxvaH264ParseOutput* output)
 {
     const H264Context* h = (const H264Context*)parseSession->avctx->priv_data;
     if (!BuildPicParams(h, &output->pic_params, &output->scaling_matrix, &output->field_type, &output->slice_type, parseSession->pci_vendor)) {
@@ -300,9 +306,7 @@ int FillOutputFromContext(const DxvaH264ParseSession* parseSession, PlayasaDxvaH
     return 1;
 }
 
-} // namespace
 
-extern "C" {
 
 int playasa_dxva_h264_parse_create(PlayasaDxvaH264ParseSession** session)
 {
@@ -374,11 +378,11 @@ int playasa_dxva_h264_parse_open(
         parseSession->avctx->extradata_size = (int)extra_data_size;
     }
 
-    const int parsedNalLengthSize = PlayasaH264::NalLengthSizeFromExtradata(extra_data, extra_data_size);
+    const int parsedNalLengthSize = H264NalLengthSizeFromExtradata(extra_data, extra_data_size);
     if (nal_length_size > 0) {
-        parseSession->avctx->nal_length_size = nal_length_size;
-    } else if (parsedNalLengthSize != PlayasaH264::kUnknownNalLengthSize) {
-        parseSession->avctx->nal_length_size = parsedNalLengthSize;
+        parseSession->nal_length_size = nal_length_size;
+    } else if (parsedNalLengthSize > 0) {
+        parseSession->nal_length_size = parsedNalLengthSize;
     }
 
     return avcodec_open2(parseSession->avctx, codec, NULL) >= 0 ? 1 : 0;
@@ -437,7 +441,7 @@ void playasa_dxva_h264_parse_set_surface_index(PlayasaDxvaH264ParseSession* sess
     H264Context* h = (H264Context*)parseSession->avctx->priv_data;
     if (h && h->cur_pic_ptr && h->cur_pic_ptr->f) {
         h->cur_pic_ptr->f->opaque = (void*)(intptr_t)surface_index;
-        h->cur_pic_ptr->f->reordered_opaque = surface_index;
+        h->cur_pic_ptr->f->opaque = (void*)(intptr_t)surface_index;
     }
 }
 
@@ -485,4 +489,3 @@ void playasa_dxva_h264_parse_update_slice_long(
     UpdateSliceLong((const H264Context*)parseSession->avctx->priv_data, pic_params, slice);
 }
 
-} // extern "C"

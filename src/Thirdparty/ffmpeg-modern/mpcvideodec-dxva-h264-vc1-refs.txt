@@ -1,7 +1,7 @@
 ﻿# RFC-0033 DXVA H.264 / VC-1 private-struct inventory
-# Generated: 2026-07-27 20:50:54
+# Generated: 2026-08-01 10:12:34
 # Scan root: C:\Users\alber\ws\prj\playasa\playasa\src\Source\filters\transform\mpcvideodec
-# Hits: 160  Files: 14
+# Hits: 180  Files: 15
 # Next: design DxvaH264PictureContext / DxvaVc1PictureContext mirroring DxvaMpeg2PictureContext
 
 src\Source\filters\transform\mpcvideodec\DxvaH264LegacyGlue.c:42: [FFH264*] void FFH264DecodeBuffer (struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize, int* pFramePOC, int* pOutPOC, REFERENCE_TIME* pOutrtStart)
@@ -47,6 +47,7 @@ src\Source\filters\transform\mpcvideodec\DxvaVc1LegacyGlue.c:79: [FFVC1*] hr = F
 src\Source\filters\transform\mpcvideodec\DxvaVc1LegacyGlue.c:90: [VC1Context] VC1Context* vc1 = (VC1Context*)pAVCtx->priv_data;
 src\Source\filters\transform\mpcvideodec\DxvaVc1LegacyGlue.c:94: [FFVC1*] int FFVC1IsInterlaced(struct AVCodecContext* pAVCtx)
 src\Source\filters\transform\mpcvideodec\DxvaVc1LegacyGlue.c:96: [VC1Context] VC1Context* vc1 = (VC1Context*)pAVCtx->priv_data;
+src\Source\filters\transform\mpcvideodec\DxvaVc1LegacyGlue.c:101: [FFVC1*] void FFVC1ReadAvctxExtradata(struct AVCodecContext* pAVCtx, const uint8_t** ppData, int* pSize)
 src\Source\filters\transform\mpcvideodec\FfmpegContext.c:75: [FFH264*] return FFH264IsInterlaced(pAVCtx) ? 1 : 0;
 src\Source\filters\transform\mpcvideodec\FfmpegContext.c:79: [FFVC1*] return FFVC1IsInterlaced(pAVCtx) ? 1 : 0;
 src\Source\filters\transform\mpcvideodec\DXVADecoder.cpp:26: [DXVADecoderH264] #include "DXVADecoderH264.h"
@@ -89,16 +90,20 @@ src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:24: [DXVADecoderVC1]
 src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:48: [DXVADecoderVC1] CDXVADecoderVC1::CDXVADecoderVC1 (CMPCVideoDecFilter* pFilter, IAMVideoAccelerator*  pAMVideoAccelerator, DXVAMode nMode, int nPicEntryNumber)
 src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:55: [DXVADecoderVC1] CDXVADecoderVC1::CDXVADecoderVC1 (CMPCVideoDecFilter* pFilter, IDirectXVideoDecoder* pDirectXVideoDec, DXVAMode nMode, int nPicEntryNumber, DXVA2_ConfigPictureDecode* pDXVA2Config)
 src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:62: [DXVADecoderVC1] CDXVADecoderVC1::~CDXVADecoderVC1(void)
-src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:67: [DXVADecoderVC1] void CDXVADecoderVC1::Init()
-src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:87: [DXVADecoderVC1] HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
-src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:100: [FFVC1*] if (FAILED (FFVC1ReadPictureContext (&pictureContext, m_pFilter->GetAVCtx(), pDataIn, nSize)))
-src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:142: [DXVADecoderVC1] TRACE_VC1("CDXVADecoderVC1 : Decode frame %i\n", m_PictureParams.bPicScanMethod);
-src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:195: [DXVADecoderVC1] void CDXVADecoderVC1::SetExtraData (BYTE* pDataIn, UINT nSize)
-src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:228: [DXVADecoderVC1] BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
-src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:267: [DXVADecoderVC1] void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
-src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:301: [DXVADecoderVC1] void CDXVADecoderVC1::Flush()
-src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:316: [DXVADecoderVC1] HRESULT CDXVADecoderVC1::DisplayStatus()
-src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:327: [DXVADecoderVC1] TRACE_VC1 ("CDXVADecoderVC1 : Status for the frame %u : bBufType = %u, bStatus = %u, wNumMbsAffected = %u\n",
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:64: [FFVC1*] FFVC1DestroyDxvaSession (m_pDxvaSession);
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:69: [DXVADecoderVC1] void CDXVADecoderVC1::Init()
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:72: [FFVC1*] m_pDxvaSession = FFVC1CreateDxvaSession (
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:73: [FFVC1*] FFVC1IsModernDxvaParseAvailable () ? NULL : m_pFilter->GetAVCtx ());
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:92: [DXVADecoderVC1] HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME rtStart, REFERENCE_TIME rtStop)
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:105: [FFVC1*] if (FAILED (FFVC1ReadPictureContextSession (m_pDxvaSession, &pictureContext, pDataIn, nSize)))
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:147: [DXVADecoderVC1] TRACE_VC1("CDXVADecoderVC1 : Decode frame %i\n", m_PictureParams.bPicScanMethod);
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:200: [DXVADecoderVC1] void CDXVADecoderVC1::SetExtraData (BYTE* pDataIn, UINT nSize)
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:231: [FFVC1*] FFVC1ApplyExtradataSession (m_pDxvaSession, pDataIn, nSize);
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:235: [DXVADecoderVC1] BYTE* CDXVADecoderVC1::FindNextStartCode(BYTE* pBuffer, UINT nSize, UINT& nPacketSize)
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:274: [DXVADecoderVC1] void CDXVADecoderVC1::CopyBitstream(BYTE* pDXVABuffer, BYTE* pBuffer, UINT& nSize)
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:308: [DXVADecoderVC1] void CDXVADecoderVC1::Flush()
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:323: [DXVADecoderVC1] HRESULT CDXVADecoderVC1::DisplayStatus()
+src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp:334: [DXVADecoderVC1] TRACE_VC1 ("CDXVADecoderVC1 : Status for the frame %u : bBufType = %u, bStatus = %u, wNumMbsAffected = %u\n",
 src\Source\filters\transform\mpcvideodec\DxvaH264Session.cpp:44: [FFH264*] FFH264ReadAvctxExtradata(session->avctx, &extraData, &extraDataSize);
 src\Source\filters\transform\mpcvideodec\DxvaH264Session.cpp:85: [FFH264*] int FFH264IsModernDxvaParseAvailable(void)
 src\Source\filters\transform\mpcvideodec\DxvaH264Session.cpp:90: [FFH264*] DxvaH264DxvaSession* FFH264CreateDxvaSession(struct AVCodecContext* pAVCtx)
@@ -118,11 +123,20 @@ src\Source\filters\transform\mpcvideodec\DxvaH264Session.cpp:260: [FFH264*] int 
 src\Source\filters\transform\mpcvideodec\DxvaH264Session.cpp:274: [FFH264*] return FFH264GetNalLengthSize(pSession->avctx);
 src\Source\filters\transform\mpcvideodec\DxvaH264Session.cpp:277: [FFH264*] void FFH264ApplyExtradataSession(DxvaH264DxvaSession* pSession, BYTE* pDataIn, UINT nSize, void* pSliceLong)
 src\Source\filters\transform\mpcvideodec\DxvaH264Session.cpp:294: [FFH264*] FFH264ApplyExtradata(pSession->avctx, pDataIn, nSize, pSliceLong);
+src\Source\filters\transform\mpcvideodec\DxvaVc1Session.cpp:40: [FFVC1*] FFVC1ReadAvctxExtradata(session->avctx, &extraData, &extraDataSize);
+src\Source\filters\transform\mpcvideodec\DxvaVc1Session.cpp:97: [FFVC1*] int FFVC1IsModernDxvaParseAvailable(void)
+src\Source\filters\transform\mpcvideodec\DxvaVc1Session.cpp:102: [FFVC1*] DxvaVc1DxvaSession* FFVC1CreateDxvaSession(struct AVCodecContext* pAVCtx)
+src\Source\filters\transform\mpcvideodec\DxvaVc1Session.cpp:127: [FFVC1*] FFVC1DestroyDxvaSession(session);
+src\Source\filters\transform\mpcvideodec\DxvaVc1Session.cpp:134: [FFVC1*] void FFVC1DestroyDxvaSession(DxvaVc1DxvaSession* pSession)
+src\Source\filters\transform\mpcvideodec\DxvaVc1Session.cpp:149: [FFVC1*] HRESULT FFVC1ReadPictureContextSession(
+src\Source\filters\transform\mpcvideodec\DxvaVc1Session.cpp:179: [FFVC1*] return FFVC1ReadPictureContext(pContext, pSession->avctx, pBuffer, nSize);
+src\Source\filters\transform\mpcvideodec\DxvaVc1Session.cpp:182: [FFVC1*] void FFVC1ApplyExtradataSession(DxvaVc1DxvaSession* pSession, BYTE* pDataIn, UINT nSize)
 src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp:51: [DXVADecoderH264] #include "DXVADecoderH264.h"
-src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp:709: [FFH264*] if (useDxva && codecId == CODEC_ID_H264 && FFH264IsModernDxvaParseAvailable()) {
-src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp:1521: [FFH264*] if (m_bUseDXVA && FFH264IsModernDxvaParseAvailable()) {
-src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp:1522: [FFH264*] ModernFfmpegSelfcheckLog(_T("RFC-0047: skip FFH264CheckCompatibility (DXVA modern parse path)"));
-src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp:1524: [FFH264*] nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, (BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, &refFrames);
+src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp:710: [FFH264*] if (useDxva && codecId == CODEC_ID_H264 && FFH264IsModernDxvaParseAvailable()) {
+src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp:713: [FFVC1*] if (useDxva && codecId == CODEC_ID_VC1 && FFVC1IsModernDxvaParseAvailable()) {
+src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp:1525: [FFH264*] if (m_bUseDXVA && FFH264IsModernDxvaParseAvailable()) {
+src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp:1526: [FFH264*] ModernFfmpegSelfcheckLog(_T("RFC-0047: skip FFH264CheckCompatibility (DXVA modern parse path)"));
+src\Source\filters\transform\mpcvideodec\MPCVideoDecFilter.cpp:1528: [FFH264*] nCompat = FFH264CheckCompatibility (PictWidthRounded(), PictHeightRounded(), m_pAVCtx, (BYTE*)m_pAVCtx->extradata, m_pAVCtx->extradata_size, m_nPCIVendor, m_nPCIDevice, m_VideoDriverVersion, &refFrames);
 src\Source\filters\transform\mpcvideodec\DxvaCodecContext.h:14: [DxvaMpeg2PictureContext] typedef struct DxvaMpeg2PictureContext {
 src\Source\filters\transform\mpcvideodec\DxvaCodecContext.h:24: [DxvaMpeg2PictureContext] } DxvaMpeg2PictureContext;
 src\Source\filters\transform\mpcvideodec\DxvaCodecContext.h:28: [DXVA_PicParams_H264] DXVA_PicParams_H264 picParams;
@@ -162,5 +176,11 @@ src\Source\filters\transform\mpcvideodec\FfmpegContext.h:78: [FFH264*] int						
 src\Source\filters\transform\mpcvideodec\FfmpegContext.h:79: [FFH264*] void					FFH264ApplyExtradataSession (DxvaH264DxvaSession* pSession, BYTE* pDataIn, UINT nSize, void* pSliceLong);
 src\Source\filters\transform\mpcvideodec\FfmpegContext.h:82: [FFVC1*] HRESULT			FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize);
 src\Source\filters\transform\mpcvideodec\FfmpegContext.h:83: [FFVC1*] HRESULT			FFVC1ReadPictureContext (DxvaVc1PictureContext* pContext, struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize);
-src\Source\filters\transform\mpcvideodec\FfmpegContext.h:85: [FFVC1*] int				FFVC1IsInterlaced(struct AVCodecContext* pAVCtx);
-src\Source\filters\transform\mpcvideodec\FfmpegContext.h:88: [DxvaMpeg2PictureContext] HRESULT			FFMpeg2ReadPictureContext (DxvaMpeg2PictureContext* pContext, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize);
+src\Source\filters\transform\mpcvideodec\FfmpegContext.h:84: [FFVC1*] void			FFVC1ReadAvctxExtradata (struct AVCodecContext* pAVCtx, const unsigned char** ppData, int* pSize);
+src\Source\filters\transform\mpcvideodec\FfmpegContext.h:86: [FFVC1*] int				FFVC1IsInterlaced(struct AVCodecContext* pAVCtx);
+src\Source\filters\transform\mpcvideodec\FfmpegContext.h:89: [FFVC1*] int				FFVC1IsModernDxvaParseAvailable (void);
+src\Source\filters\transform\mpcvideodec\FfmpegContext.h:90: [FFVC1*] DxvaVc1DxvaSession*	FFVC1CreateDxvaSession (struct AVCodecContext* pAVCtx);
+src\Source\filters\transform\mpcvideodec\FfmpegContext.h:91: [FFVC1*] void					FFVC1DestroyDxvaSession (DxvaVc1DxvaSession* pSession);
+src\Source\filters\transform\mpcvideodec\FfmpegContext.h:92: [FFVC1*] HRESULT					FFVC1ReadPictureContextSession (DxvaVc1DxvaSession* pSession, DxvaVc1PictureContext* pContext, BYTE* pBuffer, UINT nSize);
+src\Source\filters\transform\mpcvideodec\FfmpegContext.h:93: [FFVC1*] void					FFVC1ApplyExtradataSession (DxvaVc1DxvaSession* pSession, BYTE* pDataIn, UINT nSize);
+src\Source\filters\transform\mpcvideodec\FfmpegContext.h:96: [DxvaMpeg2PictureContext] HRESULT			FFMpeg2ReadPictureContext (DxvaMpeg2PictureContext* pContext, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize);

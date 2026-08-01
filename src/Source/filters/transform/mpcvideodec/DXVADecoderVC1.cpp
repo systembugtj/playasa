@@ -61,11 +61,16 @@ CDXVADecoderVC1::CDXVADecoderVC1 (CMPCVideoDecFilter* pFilter, IDirectXVideoDeco
 
 CDXVADecoderVC1::~CDXVADecoderVC1(void)
 {
+	FFVC1DestroyDxvaSession (m_pDxvaSession);
+	m_pDxvaSession = NULL;
 	Flush();
 }
 
 void CDXVADecoderVC1::Init()
 {
+	/* RFC-0047 phase 4c-ii: modern parse session needs no AVCodecContext at bind time. */
+	m_pDxvaSession = FFVC1CreateDxvaSession (
+		FFVC1IsModernDxvaParseAvailable () ? NULL : m_pFilter->GetAVCtx ());
 	memset (&m_PictureParams, 0, sizeof(m_PictureParams));
 	memset (&m_SliceInfo,     0, sizeof(m_SliceInfo));
 
@@ -94,10 +99,10 @@ HRESULT CDXVADecoderVC1::DecodeFrame (BYTE* pDataIn, UINT nSize, REFERENCE_TIME 
 
 	DxvaVc1PictureContext		pictureContext;
 
-	/* RFC-0033: VC-1 DXVA params via project-owned contract (private codec state in DxvaVc1LegacyGlue.c). */
+	/* RFC-0047 phase 4c-ii: VC-1 DXVA params via session (modern island or legacy glue). */
 	memset(&pictureContext, 0, sizeof(pictureContext));
 	pictureContext.pictureParams = m_PictureParams;
-	if (FAILED (FFVC1ReadPictureContext (&pictureContext, m_pFilter->GetAVCtx(), pDataIn, nSize)))
+	if (FAILED (FFVC1ReadPictureContextSession (m_pDxvaSession, &pictureContext, pDataIn, nSize)))
 		return S_FALSE;
 	m_PictureParams = pictureContext.pictureParams;
 	nFieldType = pictureContext.fieldType;
@@ -222,6 +227,8 @@ void CDXVADecoderVC1::SetExtraData (BYTE* pDataIn, UINT nSize)
 	m_PictureParams.bBidirectionalAveragingMode	= (1 << 7) |
 												  (GetConfigIntraResidUnsigned()    <<6) |	// i9IRU
 												  (GetConfigResidDiffAccelerator()  <<5);	// iOHIT
+
+	FFVC1ApplyExtradataSession (m_pDxvaSession, pDataIn, nSize);
 }
 
 

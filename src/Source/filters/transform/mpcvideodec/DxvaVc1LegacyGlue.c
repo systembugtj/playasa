@@ -96,3 +96,21 @@ int FFVC1IsInterlaced(struct AVCodecContext* pAVCtx)
 	VC1Context* vc1 = (VC1Context*)pAVCtx->priv_data;
 	return vc1->interlace;
 }
+
+/* RFC-0047 phase 4c-ii: read extradata from AVCodecContext without avcodec.h in session TU. */
+void FFVC1ReadAvctxExtradata(struct AVCodecContext* pAVCtx, const uint8_t** ppData, int* pSize)
+{
+	if (ppData) {
+		*ppData = NULL;
+	}
+	if (pSize) {
+		*pSize = 0;
+	}
+	if (!pAVCtx || !ppData || !pSize) {
+		return;
+	}
+	if (pAVCtx->extradata && pAVCtx->extradata_size > 0) {
+		*ppData = pAVCtx->extradata;
+		*pSize = pAVCtx->extradata_size;
+	}
+}

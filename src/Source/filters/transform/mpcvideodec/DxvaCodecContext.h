@@ -45,3 +45,6 @@ typedef struct DxvaVc1PictureContext {
 	int sliceType;
 	BOOL frameSkipped;
 } DxvaVc1PictureContext;
+
+/* RFC-0047 phase 4c-ii: opaque VC-1 DXVA session; AVCodecContext optional when modern parse bridge is available. */
+typedef struct DxvaVc1DxvaSession DxvaVc1DxvaSession;

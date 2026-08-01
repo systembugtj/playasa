@@ -81,8 +81,16 @@ void					FFH264ApplyExtradataSession (DxvaH264DxvaSession* pSession, BYTE* pData
 // === VC1 functions
 HRESULT			FFVC1UpdatePictureParam (DXVA_PictureParameters* pPicParams, struct AVCodecContext* pAVCtx, int* nFieldType, int* nSliceType, BYTE* pBuffer, UINT nSize);
 HRESULT			FFVC1ReadPictureContext (DxvaVc1PictureContext* pContext, struct AVCodecContext* pAVCtx, BYTE* pBuffer, UINT nSize);
+void			FFVC1ReadAvctxExtradata (struct AVCodecContext* pAVCtx, const unsigned char** ppData, int* pSize);
 int				FFIsSkipped(struct AVCodecContext* pAVCtx);
 int				FFVC1IsInterlaced(struct AVCodecContext* pAVCtx);
+
+/* RFC-0047 phase 4c-ii: VC-1 DXVA session — decoder TU binds once, no GetAVCtx() per frame. */
+int				FFVC1IsModernDxvaParseAvailable (void);
+DxvaVc1DxvaSession*	FFVC1CreateDxvaSession (struct AVCodecContext* pAVCtx);
+void					FFVC1DestroyDxvaSession (DxvaVc1DxvaSession* pSession);
+HRESULT					FFVC1ReadPictureContextSession (DxvaVc1DxvaSession* pSession, DxvaVc1PictureContext* pContext, BYTE* pBuffer, UINT nSize);
+void					FFVC1ApplyExtradataSession (DxvaVc1DxvaSession* pSession, BYTE* pDataIn, UINT nSize);
 
 // === Mpeg2 functions
 HRESULT			FFMpeg2ReadPictureContext (DxvaMpeg2PictureContext* pContext, struct AVCodecContext* pAVCtx, struct AVFrame* pFrame, BYTE* pBuffer, UINT nSize);
