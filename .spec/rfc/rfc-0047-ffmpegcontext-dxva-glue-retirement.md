@@ -108,9 +108,11 @@
 2. `NeedsLegacyAvcodecOpen` 在 MPEG-2 + modern parse 可用时跳过 `avcodec_open`。
 3. 门禁：`test-rfc0047-mpeg2-dxva-session-modern-routing.ps1`、`test-rfc0047-mpeg2-dxva-session-no-avctx.ps1`；更新 `test-rfc0047-dxva-vc1-mpeg2-legacy-open-contract.ps1`。
 
-**4c-iii（待办）**
+**4c-iii（本提交）**
 
-1. 全 codec DXVA skip open 回归；软件路径仍经 glue 库在最终链接解析 legacy 符号。
+1. H.264/VC-1/MPEG-2 DXVA 在 modern parse 可用时统一跳过 `avcodec_open`；`m_bLegacyAvcodecOpened` 守卫 close/flush/thread-init。
+2. 软件与 legacy fallback 符号仍由 `MPCVideoDecLegacyGlue` + `libavcodec_gcc` 解析，`MPCVideoDec` 不直接链接旧库。
+3. 门禁：`test-rfc0047-dxva-skip-open-all-codecs.ps1`（汇总 skip-open + session + glue 链接合同）。
 
 **阶段 5（待办）**
 
@@ -133,6 +135,7 @@ src/Test/Scripts/test-rfc0047-vc1-dxva-session-modern-routing.ps1
 src/Test/Scripts/test-rfc0047-vc1-dxva-session-no-avctx.ps1
 src/Test/Scripts/test-rfc0047-mpeg2-dxva-session-modern-routing.ps1
 src/Test/Scripts/test-rfc0047-mpeg2-dxva-session-no-avctx.ps1
+src/Test/Scripts/test-rfc0047-dxva-skip-open-all-codecs.ps1
 src/Test/Scripts/test-rfc0047-dxva-vc1-mpeg2-legacy-open-contract.ps1
 src/BuildScript/audit-rfc0047-ffmpegcontext-dxva-glue.ps1
 src/Test/Scripts/test-rfc0033-h264-dxva-selfcheck.ps1
@@ -146,5 +149,5 @@ src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
 | 1 H.264 decoder 去 avcodec.h | ✓ 2026-07-18 |
 | 2 ref/surface session contract | ✓ 2026-07-23 |
 | 3 island/parser 替换 | 3a–3f ✓ |
-| 4 FfmpegContext 公共层 | 4a ✓；4b H.264 DXVA 跳过 legacy open ✓；4c-i glue 链接隔离 ✓；4c-ii H.264/VC-1/MPEG-2 parse ✓ |
+| 4 FfmpegContext 公共层 | 4a ✓；4b H.264 DXVA 跳过 legacy open ✓；4c-i glue 链接隔离 ✓；4c-ii H.264/VC-1/MPEG-2 parse ✓；4c-iii 全 codec skip-open ✓ |
 | 5 交接删树 | 待办 |

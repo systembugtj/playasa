@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-  RFC-0047 phase 4b: MPCVideoDec DXVA H.264 may skip legacy avcodec_open when modern parse is available.
+  RFC-0047 phase 4b/4c-iii: MPCVideoDec DXVA may skip legacy avcodec_open when modern parse is available (H.264/VC-1/MPEG-2).
 #>
 [CmdletBinding()]
 param()
