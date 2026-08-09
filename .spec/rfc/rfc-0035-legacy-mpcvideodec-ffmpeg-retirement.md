@@ -58,6 +58,7 @@ verify-rfc0017-ffmpeg-mpcvideodec.ps1: 更新后 PASS
 verify-rfc0024-ffmpeg-modern.ps1: PASS
 test-rfc0024-*, test-rfc0031-*, test-rmvb-*, test-rfc0027-*, test-rfc0034-*, test-rfc0045-* : PASS
 test-rfc0035-mpcvideodec-include-boundary.ps1: PASS
+test-rfc0035-legacy-only-codec-contract.ps1: PASS
 ```
 
 ## 7. 下一步行动
@@ -73,7 +74,9 @@ test-rfc0035-mpcvideodec-include-boundary.ps1: PASS
 9. ~~RFC-0047 阶段 3~~（2026-07-23）：H.264/VC-1/MPEG-2 legacy glue 全部分离；`FfmpegContext.c` 公共层 4a ✓
 10. ~~RFC-0047 阶段 4~~（2026-07-23）：H.264/VC-1/MPEG-2 modern parse + skip-open + glue 链接隔离 ✓
 11. ~~RFC-0047 阶段 5~~（2026-07-23）：runtime parse smoke + optional GPU handoff ✓
-12. `audit-rfc0035` `libavcodec_gcc` 降为 0 后删树；`MPCVideoDecFilter` legacy software decode 退役
+12. legacy-only codec 清单 + 门禁（`audit-rfc0035-legacy-only-codecs.ps1`）✓
+13. 迁移/移除 legacy-only codecs 或退役 `MPCVideoDecFilter` software decode 路径
+14. `audit-rfc0035` `libavcodec_gcc` 降为 0 后删 `mpcvideodec/ffmpeg`；更新 `verify-rfc0017`
 
 ## 8. 当前清单（审计 2026-08-08）
 
@@ -81,6 +84,7 @@ test-rfc0035-mpcvideodec-include-boundary.ps1: PASS
 
 ```text
 powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/audit-rfc0035-legacy-only-codecs.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File src/Test/Scripts/test-rfc0035-mpcvideodec-include-boundary.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/verify-rfc0035-easplitter-no-legacy-ffmpeg.ps1
 ```
@@ -100,6 +104,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/verify-rfc00
 | `MPCVideoDecFilter` legacy software | 8 | `avcodec_decode_video` / `avcodec_open` 非 bridge 路径 |
 | `FfmpegContext.h` API 面 | 41 | 公共分发层仍暴露 `AVCodecContext*` 合同 |
 | `TlibavcodecExt` | 14 | buffer 回调仍接 legacy `AVCodecContext` |
+| Legacy-only codecs | 17 ids | VP5/MSMPEG4*/AMV/SVQ*/H263/THEORA/MPEG1/MJPEG 等（见 `rfc0035-legacy-only-codecs.txt`） |
 | `ffmpeg/` include paths | 16+ | `MPCVideoDec.vcxproj` + glue 仍 `#include` 旧树头 |
 
 ### 已清出

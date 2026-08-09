@@ -55,6 +55,12 @@ Invoke-TestStep 'test-rfc0035-mpcvideodec-include-boundary' {
     & (Join-Path $repoRoot 'src\Test\Scripts\test-rfc0035-mpcvideodec-include-boundary.ps1')
 }
 
+Get-ChildItem (Join-Path $repoRoot 'src\Test\Scripts\test-rfc0035-*.ps1') | Sort-Object Name | ForEach-Object {
+    if ($_.Name -eq 'test-rfc0035-mpcvideodec-include-boundary.ps1') { return }
+    $stepName = $_.Name
+    Invoke-TestStep $stepName { & $_.FullName }
+}
+
 Invoke-TestStep 'audit-rfc0047' {
     & (Join-Path $repoRoot 'src\BuildScript\audit-rfc0047-ffmpegcontext-dxva-glue.ps1')
 }

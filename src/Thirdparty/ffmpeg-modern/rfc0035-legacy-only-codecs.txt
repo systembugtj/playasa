@@ -1,0 +1,44 @@
+﻿# RFC-0035 legacy-only codec inventory
+# Generated: 2026-08-08 20:53:57
+# Source: MPCVideoDecFilter.cpp ffCodecs[]
+#
+# Distinct codec ids in ffCodecs: 32
+# Modern-bridge-capable ids: 15
+# Legacy-only ids (still block libavcodec_gcc removal): 17
+
+## Modern-bridge-capable (software via bridge or DXVA modern parse)
+CODEC_ID_FLV1
+CODEC_ID_H264
+CODEC_ID_MPEG2VIDEO
+CODEC_ID_MPEG4
+CODEC_ID_RV10
+CODEC_ID_RV20
+CODEC_ID_RV30
+CODEC_ID_RV40
+CODEC_ID_VC1
+CODEC_ID_VP6
+CODEC_ID_VP6A
+CODEC_ID_VP6F
+CODEC_ID_WMV1
+CODEC_ID_WMV2
+CODEC_ID_WMV3
+
+## Legacy-only (still require mpcvideodec/ffmpeg + libavcodec_gcc)
+CODEC_ID_AMV
+CODEC_ID_CINEPAK
+CODEC_ID_FRAPS
+CODEC_ID_H263
+CODEC_ID_HUFFYUV
+CODEC_ID_MJPEG
+CODEC_ID_MPEG1VIDEO
+CODEC_ID_MSMPEG4V1
+CODEC_ID_MSMPEG4V2
+CODEC_ID_MSMPEG4V3
+CODEC_ID_QTRLE
+CODEC_ID_SMC
+CODEC_ID_SVQ1
+CODEC_ID_SVQ3
+CODEC_ID_THEORA
+CODEC_ID_TSCC
+CODEC_ID_VP5
+
