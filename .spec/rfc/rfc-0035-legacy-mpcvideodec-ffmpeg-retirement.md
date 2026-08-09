@@ -22,7 +22,7 @@
 | MPEG-2 真实路径 modern-only | RFC-0031 | ✓ |
 | RealVideo modern + 时间戳 | RFC-0032 | ✓ |
 | RealAudio modern + legacy 清理 | RFC-0034/0044/0045 | ✓ |
-| DXVA 不依赖旧私有结构 | [RFC-0033](./completed/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) + [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md) | 0033 ✓；0047 阶段 4 ✓ / 5a runtime smoke ✓（glue 仍链接 `libavcodec_gcc`；删树待 5b） |
+| DXVA 不依赖旧私有结构 | [RFC-0033](./completed/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) + [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md) | ✓（modern parse + skip-open；glue 仍链接 `libavcodec_gcc` 作 fallback） |
 | `MpaDecFilter` 不再链接旧 libavcodec | [RFC-0046](./completed/rfc-0046-mpadecfilter-modern-audio.md) | ✓ |
 | `verify-rfc0017` 策略更新 | RFC-0017 | 待删树时更新 |
 
@@ -57,6 +57,7 @@ verify-rfc0012-all.ps1: PASS
 verify-rfc0017-ffmpeg-mpcvideodec.ps1: 更新后 PASS
 verify-rfc0024-ffmpeg-modern.ps1: PASS
 test-rfc0024-*, test-rfc0031-*, test-rmvb-*, test-rfc0027-*, test-rfc0034-*, test-rfc0045-* : PASS
+test-rfc0035-mpcvideodec-include-boundary.ps1: PASS
 ```
 
 ## 7. 下一步行动
@@ -71,14 +72,16 @@ test-rfc0024-*, test-rfc0031-*, test-rmvb-*, test-rfc0027-*, test-rfc0034-*, tes
 8. ~~RFC-0047 阶段 2~~（2026-07-23）：`DxvaH264DxvaSession` + `FFH264*Session`；decoder 帧路径不再 `GetAVCtx()`
 9. ~~RFC-0047 阶段 3~~（2026-07-23）：H.264/VC-1/MPEG-2 legacy glue 全部分离；`FfmpegContext.c` 公共层 4a ✓
 10. ~~RFC-0047 阶段 4~~（2026-07-23）：H.264/VC-1/MPEG-2 modern parse + skip-open + glue 链接隔离 ✓
-11. RFC-0047 阶段 5b：可选 GPU DXVA 样本 handoff ✓；`audit-rfc0035` `libavcodec_gcc` 降为 0 后删树
+11. ~~RFC-0047 阶段 5~~（2026-07-23）：runtime parse smoke + optional GPU handoff ✓
+12. `audit-rfc0035` `libavcodec_gcc` 降为 0 后删树；`MPCVideoDecFilter` legacy software decode 退役
 
-## 8. 当前清单（审计 2026-07-18）
+## 8. 当前清单（审计 2026-08-08）
 
 生成命令：
 
 ```text
 powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File src/Test/Scripts/test-rfc0035-mpcvideodec-include-boundary.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/verify-rfc0035-easplitter-no-legacy-ffmpeg.ps1
 ```
 
@@ -86,15 +89,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/verify-rfc00
 
 | 指标 | 值 |
 | --- | --- |
-| Total hits | 93 |
-| Distinct files | 12（全部在 `mpcvideodec`） |
+| Total hits | 156 |
+| Distinct files | 21（全部在 `mpcvideodec`） |
 
 ### 按主题（阻塞删树）
 
-| 主题 | 说明 |
-| --- | --- |
-| `MPCVideoDec` + `libavcodec_gcc` | 仍为活跃链接（DXVA + 非 bridge legacy software） |
-| DXVA / `FfmpegContext` | [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md) 阶段 1 已去 decoder `avcodec.h`；glue 仍读私有结构 |
+| 主题 | hits | 说明 |
+| --- | --- | --- |
+| `MPCVideoDecLegacyGlue` + `libavcodec_gcc` | 14 | 链接隔离在 glue lib；DXVA modern parse + legacy fallback 仍依赖旧树符号 |
+| `MPCVideoDecFilter` legacy software | 8 | `avcodec_decode_video` / `avcodec_open` 非 bridge 路径 |
+| `FfmpegContext.h` API 面 | 41 | 公共分发层仍暴露 `AVCodecContext*` 合同 |
+| `TlibavcodecExt` | 14 | buffer 回调仍接 legacy `AVCodecContext` |
+| `ffmpeg/` include paths | 16+ | `MPCVideoDec.vcxproj` + glue 仍 `#include` 旧树头 |
 
 ### 已清出
 
@@ -105,14 +111,15 @@ powershell -NoProfile -ExecutionPolicy Bypass -File src/BuildScript/verify-rfc00
 | `CMpeg2DecFilter` / libmpeg2 | ✓ RFC-0031 |
 | RealVideo `RV_FFMPEG` | ✓ RFC-0032 |
 | MpaDecFilter → modern bridge | ✓ RFC-0046 |
-| H.264/VC-1 DXVA contract | ✓ RFC-0033 |
+| H.264/VC-1/MPEG-2 DXVA contract | ✓ RFC-0033 + RFC-0047 |
 | Orphan `libavcodec_gcc`（MpcAudioRenderer / WMV includes / stale vcproj） | ✓ 2026-07-18 |
 | 未构建 `MPCAudioDecFilter.*` | ✓ 已删除 |
 | Bridge codec software fail-closed | ✓ 2026-07-18 Category B |
 | EASplitter 旧 ffmpeg 头 / include paths | ✓ 2026-07-18 |
-| H.264 DXVA decoder TU 去 `avcodec.h` | ✓ RFC-0047 阶段 1 |
-| H.264 DXVA ref/surface session contract | ✓ RFC-0047 阶段 2 |
+| H.264/VC-1/MPEG-2 DXVA modern parse + skip-open | ✓ RFC-0047 阶段 4–5 |
+| `MPCVideoDec` 直接链接 `libavcodec_gcc` | ✓ RFC-0047 4c-i glue 隔离 |
+| `FfmpegContext.c` 私有结构读者 | ✓ 隔离到 `Dxva*LegacyGlue.c` |
 
 ### 结论
 
-**现在仍不能删 `mpcvideodec/ffmpeg`。** 剩余硬依赖在 `MPCVideoDec`：`FfmpegContext.c` 私有结构读者 + `libavcodec_gcc`（跟踪 [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md)）。
+**现在仍不能删 `mpcvideodec/ffmpeg`。** 剩余硬依赖：`MPCVideoDecLegacyGlue`（`libavcodec_gcc` + legacy glue compartments）、`MPCVideoDecFilter` 非 bridge software decode、`TlibavcodecExt` buffer 挂钩，以及两工程上的 `ffmpeg/` include 路径。

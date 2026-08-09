@@ -55,7 +55,11 @@ function Test-ExcludedPath {
 }
 
 $files = Get-ChildItem -Path $scanRoot -Recurse -File -Include *.cpp,*.h,*.c,*.vcxproj,*.vcproj |
-  Where-Object { -not (Test-ExcludedPath -FullPath $_.FullName) }
+  Where-Object {
+    -not (Test-ExcludedPath -FullPath $_.FullName) -and
+    $_.Name -notlike '*.backup*' -and
+    $_.Name -notlike '*.backup-*'
+  }
 
 $hits = New-Object System.Collections.Generic.List[object]
 

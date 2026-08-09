@@ -51,6 +51,10 @@ Invoke-TestStep 'verify-rfc0035-easplitter' {
     & (Join-Path $repoRoot 'src\BuildScript\verify-rfc0035-easplitter-no-legacy-ffmpeg.ps1')
 }
 
+Invoke-TestStep 'test-rfc0035-mpcvideodec-include-boundary' {
+    & (Join-Path $repoRoot 'src\Test\Scripts\test-rfc0035-mpcvideodec-include-boundary.ps1')
+}
+
 Invoke-TestStep 'audit-rfc0047' {
     & (Join-Path $repoRoot 'src\BuildScript\audit-rfc0047-ffmpegcontext-dxva-glue.ps1')
 }
