@@ -22,7 +22,7 @@
 | MPEG-2 真实路径 modern-only | RFC-0031 | ✓ |
 | RealVideo modern + 时间戳 | RFC-0032 | ✓ |
 | RealAudio modern + legacy 清理 | RFC-0034/0044/0045 | ✓ |
-| DXVA 不依赖旧私有结构 | [RFC-0033](./completed/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) + [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md) | 0033 ✓；0047 进行中（glue 退役） |
+| DXVA 不依赖旧私有结构 | [RFC-0033](./completed/rfc-0033-ffmpeg-dxva-phase2-h264-vc1.md) + [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md) | 0033 ✓；0047 阶段 4 ✓ / 5a runtime smoke ✓（glue 仍链接 `libavcodec_gcc`；删树待 5b） |
 | `MpaDecFilter` 不再链接旧 libavcodec | [RFC-0046](./completed/rfc-0046-mpadecfilter-modern-audio.md) | ✓ |
 | `verify-rfc0017` 策略更新 | RFC-0017 | 待删树时更新 |
 
@@ -70,8 +70,8 @@ test-rfc0024-*, test-rfc0031-*, test-rmvb-*, test-rfc0027-*, test-rfc0034-*, tes
 7. ~~RFC-0047 阶段 1~~（2026-07-18）：`DXVADecoderH264` 去 `avcodec.h`；`FFH264GetNalLengthSize` / `FFH264ApplyExtradata`
 8. ~~RFC-0047 阶段 2~~（2026-07-23）：`DxvaH264DxvaSession` + `FFH264*Session`；decoder 帧路径不再 `GetAVCtx()`
 9. ~~RFC-0047 阶段 3~~（2026-07-23）：H.264/VC-1/MPEG-2 legacy glue 全部分离；`FfmpegContext.c` 公共层 4a ✓
-10. 继续 [RFC-0047](./rfc-0047-ffmpegcontext-dxva-glue-retirement.md) 阶段 4b（`MPCVideoDecFilter` 去 legacy avcodec → 去 `libavcodec_gcc`）
-11. 门禁全绿后再删树
+10. ~~RFC-0047 阶段 4~~（2026-07-23）：H.264/VC-1/MPEG-2 modern parse + skip-open + glue 链接隔离 ✓
+11. RFC-0047 阶段 5b：可选 GPU DXVA 样本 handoff ✓；`audit-rfc0035` `libavcodec_gcc` 降为 0 后删树
 
 ## 8. 当前清单（审计 2026-07-18）
 

@@ -1,6 +1,7 @@
 #include "../../Thirdparty/pkg/ffmpeg_modern_bridge.h"
 
 #include <stdio.h>
+#include <windows.h>
 
 namespace {
 
@@ -31,6 +32,106 @@ bool CheckCodec(uint32_t fourcc, bool openSession)
     }
 
     playasa_ffmpeg_modern_destroy(session);
+    return true;
+}
+
+const char* const kBridgeDllName = "playasa_ffmpeg_modern_bridge.dll";
+
+using DxvaParseSession = void;
+
+using DxvaParseCreateFn = int (*)(DxvaParseSession** session);
+using DxvaParseDestroyFn = void (*)(DxvaParseSession* session);
+using DxvaH264ParseOpenFn = int (*)(DxvaParseSession* session, const uint8_t* extra_data, size_t extra_data_size, int32_t nal_length_size);
+using DxvaParseOpenFn = int (*)(DxvaParseSession* session, const uint8_t* extra_data, size_t extra_data_size);
+
+struct DxvaParseApi {
+    DxvaParseCreateFn create;
+    DxvaParseDestroyFn destroy;
+    DxvaH264ParseOpenFn h264Open;
+    DxvaParseOpenFn open;
+};
+
+DxvaParseApi LoadDxvaParseApi(const char* createName, const char* destroyName, const char* openName, bool h264Open)
+{
+    DxvaParseApi api = {};
+    HMODULE module = GetModuleHandleA(kBridgeDllName);
+    if (!module) {
+        fprintf(stderr, "bridge DLL is not loaded: %s\n", kBridgeDllName);
+        return api;
+    }
+
+    api.create = reinterpret_cast<DxvaParseCreateFn>(GetProcAddress(module, createName));
+    api.destroy = reinterpret_cast<DxvaParseDestroyFn>(GetProcAddress(module, destroyName));
+    if (h264Open) {
+        api.h264Open = reinterpret_cast<DxvaH264ParseOpenFn>(GetProcAddress(module, openName));
+    } else {
+        api.open = reinterpret_cast<DxvaParseOpenFn>(GetProcAddress(module, openName));
+    }
+
+    if (!api.create || !api.destroy || (!api.h264Open && !api.open)) {
+        fprintf(stderr, "missing DXVA parse export(s) for %s/%s/%s\n", createName, destroyName, openName);
+        api = {};
+    }
+    return api;
+}
+
+bool CheckDxvaParseLifecycle(const DxvaParseApi& api, const char* codecLabel, bool requireOpen, int32_t nalLengthSize)
+{
+    if (!api.create || !api.destroy) {
+        fprintf(stderr, "%s DXVA parse API was not resolved\n", codecLabel);
+        return false;
+    }
+
+    DxvaParseSession* session = 0;
+    if (!api.create(&session) || !session) {
+        fprintf(stderr, "failed to create %s DXVA parse session\n", codecLabel);
+        return false;
+    }
+
+    if (requireOpen) {
+        const int opened = api.h264Open
+            ? api.h264Open(session, 0, 0, nalLengthSize)
+            : api.open(session, 0, 0);
+        if (!opened) {
+            fprintf(stderr, "failed to open %s DXVA parse session\n", codecLabel);
+            api.destroy(session);
+            return false;
+        }
+    }
+
+    api.destroy(session);
+    return true;
+}
+
+// RFC-0047 phase 5: runtime smoke for DXVA parse ABI via dynamic exports (no dxva.h).
+bool CheckDxvaParseExports()
+{
+    const DxvaParseApi h264Api = LoadDxvaParseApi(
+        "playasa_dxva_h264_parse_create",
+        "playasa_dxva_h264_parse_destroy",
+        "playasa_dxva_h264_parse_open",
+        true);
+    const DxvaParseApi vc1Api = LoadDxvaParseApi(
+        "playasa_dxva_vc1_parse_create",
+        "playasa_dxva_vc1_parse_destroy",
+        "playasa_dxva_vc1_parse_open",
+        false);
+    const DxvaParseApi mpeg2Api = LoadDxvaParseApi(
+        "playasa_dxva_mpeg2_parse_create",
+        "playasa_dxva_mpeg2_parse_destroy",
+        "playasa_dxva_mpeg2_parse_open",
+        false);
+
+    if (!CheckDxvaParseLifecycle(h264Api, "H.264", true, 4)) {
+        return false;
+    }
+    // VC-1 decode init requires container extradata; create/destroy proves bridge linkage.
+    if (!CheckDxvaParseLifecycle(vc1Api, "VC-1", false, 0)) {
+        return false;
+    }
+    if (!CheckDxvaParseLifecycle(mpeg2Api, "MPEG-2", true, 0)) {
+        return false;
+    }
     return true;
 }
 
@@ -110,6 +211,10 @@ int main()
         playasa_ffmpeg_modern_destroy(session);
     }
 
-    printf("bridge smoke OK: avcodec=%u\n", version);
+    if (!CheckDxvaParseExports()) {
+        return 11;
+    }
+
+    printf("bridge smoke OK: avcodec=%u (dxva parse create/open verified)\n", version);
     return 0;
 }

@@ -114,10 +114,19 @@
 2. 软件与 legacy fallback 符号仍由 `MPCVideoDecLegacyGlue` + `libavcodec_gcc` 解析，`MPCVideoDec` 不直接链接旧库。
 3. 门禁：`test-rfc0047-dxva-skip-open-all-codecs.ps1`（汇总 skip-open + session + glue 链接合同）。
 
-**阶段 5（待办）**
+**阶段 5（2026-07-23）**
 
-1. H.264/VC-1/MPEG-2 DXVA 样本回归。
-2. `audit-rfc0035` 对 `libavcodec_gcc` 降为 0 后，由 RFC-0035 删树。
+**5a（本提交）**
+
+1. `MPCVideoDecModernBridgeSmoke` 运行时验证 H.264/VC-1/MPEG-2 `playasa_dxva_*_parse_create/open/destroy`。
+2. 门禁：`test-rfc0047-dxva-modern-parse-smoke.ps1`；扩展 `test-rfc0033-h264-dxva-selfcheck.ps1` 覆盖 MPEG-2 session 合同。
+3. 待续：DXVA 样本实机回归（GPU 依赖，可 SKIP）；`audit-rfc0035` `libavcodec_gcc` 降为 0 后 RFC-0035 删树。
+
+**5b（2026-07-23，本提交）**
+
+1. 新增 `test-rfc0047-dxva-sample-handoff.ps1`：可选 GPU 回归，观测 `DXVA selection` + `RFC-0047: skip legacy avcodec_open`；无 DXVA/GPU 时 SKIP（不阻塞 `run-local-tests`）。
+2. `setup-selfcheck-samples.ps1` 增加 `sample-wmv3-dxva.wmv`（WMV3 DXVA 观测样本）。
+3. 待续：`audit-rfc0035` `libavcodec_gcc` 降为 0 后 RFC-0035 删树。
 
 ## 4. 验证
 
@@ -137,6 +146,8 @@ src/Test/Scripts/test-rfc0047-mpeg2-dxva-session-modern-routing.ps1
 src/Test/Scripts/test-rfc0047-mpeg2-dxva-session-no-avctx.ps1
 src/Test/Scripts/test-rfc0047-dxva-skip-open-all-codecs.ps1
 src/Test/Scripts/test-rfc0047-dxva-vc1-mpeg2-legacy-open-contract.ps1
+src/Test/Scripts/test-rfc0047-dxva-modern-parse-smoke.ps1
+src/Test/Scripts/test-rfc0047-dxva-sample-handoff.ps1
 src/BuildScript/audit-rfc0047-ffmpegcontext-dxva-glue.ps1
 src/Test/Scripts/test-rfc0033-h264-dxva-selfcheck.ps1
 src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
@@ -150,4 +161,4 @@ src/BuildScript/audit-rfc0035-legacy-ffmpeg-refs.ps1
 | 2 ref/surface session contract | ✓ 2026-07-23 |
 | 3 island/parser 替换 | 3a–3f ✓ |
 | 4 FfmpegContext 公共层 | 4a ✓；4b H.264 DXVA 跳过 legacy open ✓；4c-i glue 链接隔离 ✓；4c-ii H.264/VC-1/MPEG-2 parse ✓；4c-iii 全 codec skip-open ✓ |
-| 5 交接删树 | 待办 |
+| 5 交接删树 | 5a runtime parse smoke ✓；5b optional GPU sample handoff ✓；RFC-0035 删树仍待 `libavcodec_gcc` 归零 |

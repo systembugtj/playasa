@@ -72,6 +72,8 @@ New-Item -ItemType Directory -Force -Path $OutputDirectory | Out-Null
 $samples = @(
   New-SelfcheckSample -FileName 'genius_party_sample.mkv' -Uri 'https://samples.ffmpeg.org/Matroska/Mushishi24-head.mkv' -MinimumBytes (1024 * 1024)
 
+  New-SelfcheckSample -FileName 'sample-wmv3-dxva.wmv' -Uri 'https://samples.ffmpeg.org/archive/extension/wmv/asf+wmv3+wmav2++audio_stutter.wmv' -MinimumBytes (256 * 1024)
+
   New-SelfcheckSample -FileName 'sample-mpeg2-dxva.m2ts' -Uri 'https://samples.ffmpeg.org/archive/video/mpeg2video/mpegts+mpeg2video+ac3++Eragon.m2ts' -MinimumBytes (512 * 1024)
   New-SelfcheckSample -FileName 'sample-mpeg2-dxva.ts' -Uri 'https://samples.ffmpeg.org/MPEG2/mpeg2_field_encoding.ts' -MinimumBytes (512 * 1024)
   New-SelfcheckSample -FileName 'sample-mpeg2-dxva.m2v' -Uri 'https://samples.ffmpeg.org/MPEG2/test422.m2v' -MinimumBytes (512 * 1024)

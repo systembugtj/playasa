@@ -16,6 +16,8 @@ $h264LegacyGlueC = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec
 $vc1LegacyGlueC = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\DxvaVc1LegacyGlue.c'
 $h264Cpp = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\DXVADecoderH264.cpp'
 $vc1Cpp = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\DXVADecoderVC1.cpp'
+$mpeg2LegacyGlueC = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\DxvaMpeg2LegacyGlue.c'
+$mpeg2Cpp = Join-Path $repoRoot 'src\Source\filters\transform\mpcvideodec\DXVADecoderMpeg2.cpp'
 $auditScript = Join-Path $repoRoot 'src\BuildScript\audit-rfc0033-dxva-h264-vc1-refs.ps1'
 
 function Assert-Contains {
@@ -26,7 +28,7 @@ function Assert-Contains {
   }
 }
 
-foreach ($path in @($dxvaHeader, $ffmpegHeader, $ffmpegC, $h264LegacyGlueC, $vc1LegacyGlueC, $h264Cpp, $vc1Cpp)) {
+foreach ($path in @($dxvaHeader, $ffmpegHeader, $ffmpegC, $h264LegacyGlueC, $vc1LegacyGlueC, $mpeg2LegacyGlueC, $h264Cpp, $vc1Cpp, $mpeg2Cpp)) {
   if (-not (Test-Path -LiteralPath $path)) {
     throw "Missing required file: $path"
   }
@@ -42,6 +44,11 @@ Assert-Contains -Path $h264LegacyGlueC -Pattern 'FFH264ReadPictureContext' -Desc
 Assert-Contains -Path $vc1LegacyGlueC -Pattern 'FFVC1ReadPictureContext' -Description 'FFVC1ReadPictureContext implementation'
 Assert-Contains -Path $h264Cpp -Pattern 'FFH264ReadPictureContext' -Description 'H.264 decoder contract consumption'
 Assert-Contains -Path $vc1Cpp -Pattern 'FFVC1ReadPictureContext' -Description 'VC-1 decoder contract consumption'
+# RFC-0047 phase 4c-ii: MPEG-2 DXVA session + picture context (RFC-0030 modernization).
+Assert-Contains -Path $dxvaHeader -Pattern 'DxvaMpeg2PictureContext' -Description 'DxvaMpeg2PictureContext'
+Assert-Contains -Path $ffmpegHeader -Pattern 'FFMpeg2ReadPictureContext' -Description 'FFMpeg2ReadPictureContext declaration'
+Assert-Contains -Path $mpeg2LegacyGlueC -Pattern 'FFMpeg2ReadPictureContext' -Description 'FFMpeg2ReadPictureContext implementation'
+Assert-Contains -Path $mpeg2Cpp -Pattern 'FFMpeg2ReadPictureContextSession' -Description 'MPEG-2 decoder session picture context'
 
 # H.264 decoder must not cast to H264Context directly (private struct isolation).
 $h264Text = Get-Content -LiteralPath $h264Cpp -Raw
@@ -51,6 +58,10 @@ if ($h264Text -match '\bH264Context\b') {
 $vc1Text = Get-Content -LiteralPath $vc1Cpp -Raw
 if ($vc1Text -match '\bVC1Context\b') {
   throw 'RFC-0033 gate failed: DXVADecoderVC1.cpp still references VC1Context'
+}
+$mpeg2Text = Get-Content -LiteralPath $mpeg2Cpp -Raw
+if ($mpeg2Text -match '\bMpegEncContext\b') {
+  throw 'RFC-0033 gate failed: DXVADecoderMpeg2.cpp still references MpegEncContext'
 }
 
 if (Test-Path -LiteralPath $auditScript) {
